@@ -58,7 +58,7 @@ func Func5() {
 		return "hello, " + name
 	}
 
-	fn("大明")
+	fn("hcjjj")
 }
 
 // Func6 的返回值是一个方法，
@@ -71,7 +71,7 @@ func Func6() func(name string) string {
 func Func6Invoke() {
 	// sayHello 的签名就是 func(name string) string
 	sayHello := Func6()
-	sayHello("大明")
+	sayHello("hcjjj")
 }
 
 // Func7 演示匿名方法
@@ -100,9 +100,9 @@ func YourName(name string, alias ...string) {
 }
 
 func YourNameInvoke() {
-	YourName("Deng Ming")
-	YourName("Deng Ming", "Da Ming")
-	YourName("Deng Ming", "Da Ming", "Zhong Ming")
+	YourName("hcjjj")
+	YourName("hcjjj", "hcj")
+	YourName("hcjjj", "hcj", "h")
 }
 
 func Defer() {
