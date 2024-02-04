@@ -3,6 +3,7 @@ module basic-go
 go 1.21.6
 
 require (
+	github.com/dlclark/regexp2 v1.10.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/stretchr/testify v1.8.4

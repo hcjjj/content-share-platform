@@ -8,12 +8,29 @@ package web
 
 import (
 	"fmt"
+	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 // UserHandler 定义用户有关的路由
 type UserHandler struct {
+	emailExp    *regexp.Regexp
+	passwordExp *regexp.Regexp
+}
+
+func NewUserHandler() *UserHandler {
+	const (
+		emailRegexPattern    = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"
+		passwordRegexPattern = "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[^\\da-zA-Z\\s]).{1,9}$"
+	)
+	// 预编译所需的正则表达式
+	emailExp := regexp.MustCompile(emailRegexPattern, regexp.None)
+	passwordExp := regexp.MustCompile(passwordRegexPattern, regexp.None)
+	return &UserHandler{
+		emailExp:    emailExp,
+		passwordExp: passwordExp,
+	}
 }
 
 func (u *UserHandler) RegisterRoutesV1(ug *gin.RouterGroup) {
@@ -42,11 +59,40 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		Password        string `json:"password"`
 	}
 	var req SignUpReq
+	// 接收请求
 	// Bind 方法会根据 Content-type 解析数据到 req
 	// 解析出错回直接写回一个 400 错误
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
+	// 数据校验
+	ok, err := u.emailExp.MatchString(req.Email)
+	if err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	if !ok {
+		ctx.String(http.StatusOK, "邮箱格式不对")
+		return
+	}
+
+	if req.ConfirmPassword != req.Password {
+		ctx.String(http.StatusOK, "两次输入的密码不一致")
+		return
+	}
+
+	ok, err = u.passwordExp.MatchString(req.Password)
+	if err != nil {
+		// 记录日志
+		// ...
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	if !ok {
+		ctx.String(http.StatusOK, "至少包含字母、数字、特殊字符，1-9位")
+		return
+	}
+
 	ctx.String(http.StatusOK, "注册成功")
 	fmt.Printf("%v\n", req)
 }
@@ -58,6 +104,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 func (u *UserHandler) Edit(ctx *gin.Context) {
 
 }
+
 func (u *UserHandler) Profile(ctx *gin.Context) {
 
 }
