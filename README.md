@@ -38,7 +38,7 @@
 
 ## 技术要点
 
-**Gin**
+**[Gin](https://gin-gonic.com/zh-cn/docs/)**
 
 * 定义、注册接口
 * 后端处理（校验、处理、返回响应）
@@ -46,7 +46,7 @@
   * AOP-Aspect-Oriented Programming
   * 解决跨域问题
 
-**GORM**
+**[GORM](https://gorm.io/zh_CN/)**
 
 * 模型定义
 * 
