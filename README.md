@@ -17,7 +17,7 @@
   * repository：领域对象的存储，存储数据的抽象
     * dao：数据库操作
   * domain：领域对象
-* web（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
+* handler（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
 
 ## 技术栈
 
@@ -48,4 +48,5 @@
 
 **GORM**
 
+* 模型定义
 * 
