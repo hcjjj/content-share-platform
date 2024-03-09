@@ -8,9 +8,16 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
+
 	"gorm.io/gorm"
+)
+
+var (
+	ErrUserDuplicateEmail = errors.New("邮箱冲突")
 )
 
 type UserDAO struct {
@@ -28,7 +35,20 @@ func (dao *UserDAO) Insert(ctx context.Context, u User) error {
 	now := time.Now().UnixMilli()
 	u.Utime = now
 	u.Ctime = now
-	return dao.db.WithContext(ctx).Create(&u).Error
+	err := dao.db.WithContext(ctx).Create(&u).Error
+	// 判断是 mysql 的错误 和底层强耦合的代码
+	if mysqlErr, ok := err.(*mysql.MySQLError); ok {
+		// MySQL唯一键冲突错误码
+		const uniqueConflictsErrNo uint16 = 1062
+		if mysqlErr.Number == uniqueConflictsErrNo {
+			// 邮箱冲突（因为只有邮箱是唯一索引）
+			return ErrUserDuplicateEmail
+		}
+	}
+	// 为什么不先查询来判断邮箱是否已存在？
+	// 并发查询的时候多个发现不存在，后插入的出现错误❌
+	// 加锁的话会有性能问题，邮箱冲突的情况很少
+	return err
 }
 
 // User 直接对于数据库表结构，两者一一对应

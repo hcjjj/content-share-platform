@@ -10,6 +10,12 @@ import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
 	"context"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+var (
+	ErrUserDuplicateEmail = repository.ErrUserDuplicateEmail
 )
 
 type UserService struct {
@@ -23,6 +29,12 @@ func NewUserService(repo *repository.UserRepository) *UserService {
 }
 
 func (svc *UserService) SignUp(ctx context.Context, u domain.User) error {
-	// 考虑加密和保存的的问题
+	// 加密 password
+	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hash)
+	// 保存加密后的 password
 	return svc.repo.Create(ctx, u)
 }

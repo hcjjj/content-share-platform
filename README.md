@@ -4,8 +4,17 @@
 
 **基本介绍**
 
-* 用户登录功能
-* 
+* 用户服务
+  * 注册、加密
+  * 登录、登录态校验  
+  * 保护登录系统
+
+* 用户关系服务
+* 发帖服务
+* 支付服务
+* 搜索服务
+* 即时通讯
+* Feed 流
 
 > 如何启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
 
@@ -25,11 +34,10 @@
 
 * [gin-gonic/gin](https://github.com/gin-gonic/gin) - HTTP web 框架
   * [gin-contrib/cors](https://github.com/gin-contrib/cors) -  gin's middleware for *cross-origin resource sharing*
-
 * [dlclark/regexp2](https://github.com/dlclark/regexp2) - full-featured 正则表达式
-
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver
+* 
 
 **Docker**
 
@@ -46,7 +54,7 @@
   * AOP-Aspect-Oriented Programming
   * 解决跨域问题
 
-**[GORM](https://gorm.io/zh_CN/)**
+**[GORM](https://gorm.io/zh_CN/)** 
 
 * 模型定义
 * 
