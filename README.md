@@ -5,10 +5,9 @@
 **基本介绍**
 
 * 用户服务
-  * 注册、加密
-  * 登录、登录态校验  
+  * 注册、加密存储（加盐值）
+  * 登录、登录态校验（Cookie + Session）
   * 保护登录系统
-
 * 用户关系服务
 * 发帖服务
 * 支付服务
@@ -33,7 +32,8 @@
 **第三方库**
 
 * [gin-gonic/gin](https://github.com/gin-gonic/gin) - HTTP web 框架
-  * [gin-contrib/cors](https://github.com/gin-contrib/cors) -  gin's middleware for *cross-origin resource sharing*
+  * [cors](https://github.com/gin-contrib/cors) -  Official *cross-origin resource sharing* (CORS) gin's middleware
+  * [sessions](https://github.com/gin-contrib/sessions) - Gin middleware for session management
 * [dlclark/regexp2](https://github.com/dlclark/regexp2) - full-featured 正则表达式
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver

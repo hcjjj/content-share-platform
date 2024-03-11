@@ -11,6 +11,8 @@ import (
 	"basic-go/webook/internal/service"
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
+
 	regexp "github.com/dlclark/regexp2"
 	"github.com/gin-gonic/gin"
 )
@@ -115,7 +117,35 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Login(ctx *gin.Context) {
+	type LoginReq struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var req LoginReq
+	if err := ctx.Bind(&req); err != nil {
+		return
+	}
+	user, err := u.svc.Login(ctx, domain.User{
+		Email:    req.Email,
+		Password: req.Password,
+	})
+	if err == service.ErrInvalidUserOrPassword {
+		ctx.String(http.StatusOK, "邮箱或密码不对")
+		return
+	}
+	if err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
 
+	// 到这里就登录成功了
+	// 设置 session
+	sess := sessions.Default(ctx)
+	// 设置放在 session 里面的值
+	sess.Set("userId", user.Id)
+	sess.Save()
+	ctx.String(http.StatusOK, "登录成功")
+	return
 }
 
 func (u *UserHandler) Edit(ctx *gin.Context) {
@@ -123,5 +153,5 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 }
 
 func (u *UserHandler) Profile(ctx *gin.Context) {
-
+	ctx.String(http.StatusOK, "这是你的 profile")
 }

@@ -11,6 +11,7 @@ import (
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
+	"basic-go/webook/internal/web/middleware"
 	"strings"
 	"time"
 
@@ -18,6 +19,8 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/sessions"
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -53,6 +56,13 @@ func initWebServer() *gin.Engine {
 		// preflight 有效期
 		MaxAge: 12 * time.Hour,
 	}))
+
+	// session management
+	store := cookie.NewStore([]byte("secret"))
+	// 放 session 到每个 ctx
+	server.Use(sessions.Sessions("ssid", store))
+	// 登录校验
+	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
 	return server
 }
 
