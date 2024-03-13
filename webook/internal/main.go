@@ -15,12 +15,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gin-contrib/sessions/redis"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
 )
 
@@ -58,11 +59,25 @@ func initWebServer() *gin.Engine {
 	}))
 
 	// session management
-	store := cookie.NewStore([]byte("secret"))
+	//store := cookie.NewStore([]byte("secret"))
+	//store := memstore.NewStore([]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
+	//	[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
+	store, err := redis.NewStore(16, "tcp", "localhost:6379",
+		"",
+		[]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
+		[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
+	if err != nil {
+		panic(err)
+	}
 	// 放 session 到每个 ctx
 	server.Use(sessions.Sessions("ssid", store))
+
 	// 登录校验
-	server.Use(middleware.NewLoginMiddlewareBuilder().Build())
+	server.Use(middleware.NewLoginMiddlewareBuilder().
+		IgnorePaths("/users/signup").
+		IgnorePaths("/users/login").Build())
+	//server.Use(middleware.CheckLogin())
+
 	return server
 }
 

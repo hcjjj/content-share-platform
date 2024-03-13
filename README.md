@@ -4,10 +4,17 @@
 
 **基本介绍**
 
-* 用户服务
-  * 注册、加密存储（加盐值）
-  * 登录、登录态校验（Cookie + Session）
+* 用户登录服务
+  * 注册、密码加密存储
+  * 登录、登录态校验
+    * Cookie + Session
+    * Session 存储基于 Redis 实现（多实例部署环境）
+      * 但是每次请求都要访问 Redis，性能瓶颈问题⚠️
+    * 刷新登录状态（利用 Session 有效期机制）
+    * 后续换为 JWT（JSON Web Token）机制
   * 保护登录系统
+    * 限流
+    * 增强登录安全
 * 用户关系服务
 * 发帖服务
 * 支付服务
@@ -37,12 +44,13 @@
 * [dlclark/regexp2](https://github.com/dlclark/regexp2) - full-featured 正则表达式
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver
+* [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Golang implementation of JSON Web Tokens (JWT)
 * 
 
 **Docker**
 
 * [mysql](https://hub.docker.com/_/mysql)
-* 
+* [redis](https://hub.docker.com/_/redis)
 
 ## 技术要点
 

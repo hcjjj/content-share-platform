@@ -27,6 +27,7 @@ func NewUserRepository(dao *dao.UserDAO) *UserRepository {
 	}
 }
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (domain.User, error) {
+	// SELECT *FROM `users` WHERE `email` = ?
 	u, err := r.dao.FindByEmail(ctx, email)
 	if err != nil {
 		return domain.User{}, err
