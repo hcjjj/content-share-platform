@@ -15,13 +15,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-contrib/sessions/redis"
-
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 
 	"github.com/gin-contrib/cors"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -43,10 +40,12 @@ func initWebServer() *gin.Engine {
 	// 解决跨域问题，作用于定义在这个 server 的全部路由
 	server.Use(cors.New(cors.Config{
 		//AllowOrigins:     []string{"http://localhost:3000"},
-		AllowMethods:     []string{"POST", "GET"},
+		AllowMethods: []string{"POST", "GET"},
+		// 这边需要和前端对应
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		AllowCredentials: true,
-		//ExposeHeaders: []string{"x-jwt-token"},
+		// 加这个前端才能拿到
+		ExposeHeaders: []string{"x-jwt-token"},
 		AllowOriginFunc: func(origin string) bool {
 			if strings.HasPrefix(origin, "http://localhost") {
 				// 开发环境
@@ -62,22 +61,26 @@ func initWebServer() *gin.Engine {
 	//store := cookie.NewStore([]byte("secret"))
 	//store := memstore.NewStore([]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
 	//	[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
-	store, err := redis.NewStore(16, "tcp", "localhost:6379",
-		"",
-		[]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
-		[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
-	if err != nil {
-		panic(err)
-	}
+	//store, err := redis.NewStore(16, "tcp", "localhost:6379",
+	//	"",
+	//	[]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
+	//	[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
+	//if err != nil {
+	//	panic(err)
+	//}
 	// 放 session 到每个 ctx
-	server.Use(sessions.Sessions("ssid", store))
+	//server.Use(sessions.Sessions("ssid", store))
 
-	// 登录校验
-	server.Use(middleware.NewLoginMiddlewareBuilder().
-		IgnorePaths("/users/signup").
-		IgnorePaths("/users/login").Build())
+	// 登录校验 session
+	//server.Use(middleware.NewLoginMiddlewareBuilder().
+	//	IgnorePaths("/users/signup").
+	//	IgnorePaths("/users/login").Build())
 	//server.Use(middleware.CheckLogin())
 
+	// JWT 的登录校验
+	server.Use(middleware.NewLoginJWTMiddlewareBuilder().
+		IgnorePaths("/users/signup").
+		IgnorePaths("/users/login").Build())
 	return server
 }
 
