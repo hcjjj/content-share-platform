@@ -10,6 +10,8 @@ import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/service"
 	"net/http"
+	"strconv"
+	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
 
@@ -41,12 +43,12 @@ func NewUserHandler(svc *service.UserService) *UserHandler {
 	}
 }
 
-func (u *UserHandler) RegisterRoutesV1(ug *gin.RouterGroup) {
-	ug.POST("/signup", u.SignUp)
-	ug.POST("/login", u.Login)
-	ug.POST("/edit", u.Edit)
-	ug.GET("/profile", u.Profile)
-}
+//func (u *UserHandler) RegisterRoutesV1(ug *gin.RouterGroup) {
+//	ug.POST("/signup", u.SignUp)
+//	ug.POST("/login", u.Login)
+//	ug.POST("/edit", u.Edit)
+//	ug.GET("/profile", u.Profile)
+//}
 
 func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	//server.POST("/users/signup", u.SignUp)
@@ -59,7 +61,8 @@ func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	ug.POST("/login", u.LoginJWT)
 	ug.POST("/logout", u.Logout)
 	ug.POST("/edit", u.Edit)
-	ug.GET("/profile", u.Profile)
+	//ug.GET("/profile", u.Profile)
+	ug.GET("/profile", u.ProfileJWT)
 }
 
 func (u *UserHandler) SignUp(ctx *gin.Context) {
@@ -129,7 +132,7 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	_, err := u.svc.Login(ctx, domain.User{
+	user, err := u.svc.Login(ctx, domain.User{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -144,7 +147,14 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	// 到这里就登录成功了
 	// 用 JWT 设置登录态
 	// 生成一个JWT token
-	token := jwt.New(jwt.SigningMethodHS512)
+	claims := UserClaims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			// 设置过期时间 1min
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 10)),
+		},
+		Uid: user.Id,
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
 	tokenStr, err := token.SignedString([]byte("jaks3jgvkjoiGezwd4QbE9ujPZp0fL8p"))
 	if err != nil {
 		ctx.String(http.StatusInternalServerError, "系统错误")
@@ -155,8 +165,8 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	ctx.Header("x-jwt-token", tokenStr)
 
 	ctx.String(http.StatusOK, "登录成功")
-
 }
+
 func (u *UserHandler) Login(ctx *gin.Context) {
 	type LoginReq struct {
 		Email    string `json:"email"`
@@ -208,4 +218,27 @@ func (u *UserHandler) Logout(ctx *gin.Context) {
 }
 func (u *UserHandler) Profile(ctx *gin.Context) {
 	ctx.String(http.StatusOK, "这是你的 profile")
+}
+
+func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
+	c, _ := ctx.Get("claims")
+	//if !ok {
+	//	ctx.String(http.StatusOK, "系统错误")
+	//	return
+	//}
+	// 类型断言
+	claims, ok := c.(*UserClaims)
+	if !ok {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	//fmt.Println(claims.Uid)
+	ctx.String(http.StatusOK, strconv.Itoa(int(claims.Uid))+"：这是你的 profile")
+}
+
+type UserClaims struct {
+	jwt.RegisteredClaims
+	// 声明自己的要放入 token 里的数据
+	// 敏感数据不要放这
+	Uid int64
 }
