@@ -5,20 +5,6 @@
 **基本介绍**
 
 * 用户登录服务 😺
-  * 注册、密码加密存储
-  * 登录、登录态校验
-    * Cookie + Session
-    * Session 存储基于 Redis 实现（多实例部署环境）
-      * 但是每次请求都要访问 Redis，性能瓶颈问题⚠️
-      * 换为 JWT（JSON Web Token）机制
-        * 这边有个问题需要解决，多实例部署的退出登录功能
-    *   刷新登录状态
-      * 在登录校验处执行相关逻辑
-      * 控制 Session 的有效期
-      * 生成一个新的 Token
-  * 保护登录系统
-    * 限流
-    * 增强登录安全
 * 用户关系服务 🧩
 * 发帖服务 📃
 * 支付服务 💰
@@ -51,22 +37,39 @@
 * [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Golang implementation of JSON Web Tokens (JWT)
 * 
 
-**Docker**
+**[Docker](https://www.docker.com/)**
 
 * [mysql](https://hub.docker.com/_/mysql)
 * [redis](https://hub.docker.com/_/redis)
 
 ## 技术要点
 
-**[Gin](https://gin-gonic.com/zh-cn/docs/)**
+* **[Gin](https://gin-gonic.com/zh-cn/docs/)**
+  * [Middleware](https://github.com/gin-gonic/contrib)
+* **[GORM](https://gorm.io/zh_CN/)** 
 
-* 定义、注册接口
-* 后端处理（校验、处理、返回响应）
-* [Middleware](https://github.com/gin-gonic/contrib)
-  * AOP-Aspect-Oriented Programming
-  * 解决跨域问题
+***
 
-**[GORM](https://gorm.io/zh_CN/)** 
-
-* 模型定义
-* 
+* 用户登录服务
+  * 注册、密码加密存储
+  * 登录、登录态校验
+    * Cookie + Session
+    * Session 存储基于 Redis 实现（多实例部署环境）
+      * 但是每次请求都要访问 Redis，性能瓶颈问题
+      * 换为 JWT（JSON Web Token）机制
+        * 这边有个问题需要解决，多实例部署的退出登录功能
+    *   刷新登录状态
+      * 在登录校验处执行相关逻辑
+      * 控制 Session 的有效期
+      * 生成一个新的 Token
+  * 保护登录系统
+    * 限流（限制每个用户每秒最多发送固定数量的请求  ）
+      * 基于 Redis 的 IP 限流
+    * 增强登录安全
+      * 利用 User-Agent 增强安全性  
+* 用户关系服务
+* 发帖服务
+* 支付服务
+* 搜索服务 
+* 即时通讯
+* Feed 流 

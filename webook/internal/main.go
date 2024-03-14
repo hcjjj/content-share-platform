@@ -12,8 +12,15 @@ import (
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
+	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
 	"strings"
 	"time"
+
+	"github.com/redis/go-redis/v9"
+
+	. "github.com/gin-contrib/sessions/memstore"
+
+	"github.com/gin-contrib/sessions"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -37,6 +44,14 @@ func main() {
 
 func initWebServer() *gin.Engine {
 	server := gin.Default()
+
+	// 限流
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+	// 1s 限流 100的请求
+	server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
+
 	// 解决跨域问题，作用于定义在这个 server 的全部路由
 	server.Use(cors.New(cors.Config{
 		//AllowOrigins:     []string{"http://localhost:3000"},
@@ -68,8 +83,10 @@ func initWebServer() *gin.Engine {
 	//if err != nil {
 	//	panic(err)
 	//}
-	// 放 session 到每个 ctx
-	//server.Use(sessions.Sessions("ssid", store))
+	store := NewStore([]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
+		[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
+	//放 session 到每个 ctx
+	server.Use(sessions.Sessions("ssid", store))
 
 	// 登录校验 session
 	//server.Use(middleware.NewLoginMiddlewareBuilder().
