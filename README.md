@@ -1,33 +1,13 @@
 # 建设中 🔨
 
-## 开发环境
+
+## 项目介绍
+
+**开发环境**
 
 IDE🧑‍💻： [GoLand](https://www.jetbrains.com/go/)
 
 OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
-
-```shell
-# 环境配置
-# Golang
-wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
-sudo tar xfz go1.22.1.linux-amd64.tar.gz -C /usr/local
-sudo vim /etc/profile
-# export GOROOT=/usr/local/go
-# export GOPATH=$HOME/gowork
-# export GOBIN=$GOPATH/bin
-# export PATH=$GOPATH:$GOBIN:$GOROOT/bin:$PATH
-source /etc/profile
-go version
-go env -w GOPROXY="https://goproxy.cn"
-go env -w GO111MODULE=on
-
-# Docker
-# 
-git clone https://github.com/hcjjj/webook.git
-```
-
-
-## 社交平台
 
 **基本介绍**
 
@@ -67,6 +47,7 @@ git clone https://github.com/hcjjj/webook.git
 
 **相关组件**
 
+* [Node.js](https://nodejs.org/en)
 * [Docker](https://www.docker.com/)
   * [mysql](https://hub.docker.com/_/mysql)
   * [redis](https://hub.docker.com/_/redis)
@@ -97,6 +78,31 @@ git clone https://github.com/hcjjj/webook.git
 * 搜索服务 
 * 即时通讯
 * Feed 流 
+
+## 其他记录
+
+**环境配置**
+
+```shell
+# Ubuntu 22.04.3 LTS
+# Golang
+wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
+sudo tar xfz go1.22.1.linux-amd64.tar.gz -C /usr/local
+sudo vim /etc/profile
+# export GOROOT=/usr/local/go
+# export GOPATH=$HOME/gowork
+# export GOBIN=$GOPATH/bin
+# export PATH=$GOPATH:$GOBIN:$GOROOT/bin:$PATH
+source /etc/profile
+go version
+go env -w GOPROXY="https://goproxy.cn"
+go env -w GO111MODULE=on
+
+# Docker
+# 
+
+git clone https://github.com/hcjjj/webook.git
+```
 
 **用 Kubernetes 部署 Web 服务器**
 
