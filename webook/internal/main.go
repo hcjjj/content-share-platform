@@ -13,6 +13,7 @@ import (
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
+	"net/http"
 	"strings"
 	"time"
 
@@ -31,14 +32,19 @@ import (
 
 func main() {
 	// 初始化数据库
-	db := initDB()
+	//db := initDB()
 	// 初始化 Web服务
-	server := initWebServer()
+	//server := initWebServer()
 	// 初始化 User Handler
-	u := initUser(db)
+	//u := initUser(db)
 	// 注册 User 相关路由
-	u.RegisterRoutes(server)
+	//u.RegisterRoutes(server)
 	// 启动 Web服务
+
+	server := gin.Default()
+	server.GET("/hello", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "hello")
+	})
 	server.Run(":8080")
 }
 

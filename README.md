@@ -1,5 +1,11 @@
 # 建设中 🔨
 
+## 开发环境
+
+IDE： [GoLand](https://www.jetbrains.com/go/)
+
+OS：Ubuntu 22.04.3 LTS (WSL2)
+
 ## 社交平台
 
 **基本介绍**
@@ -29,27 +35,24 @@
 **第三方库**
 
 * [gin-gonic/gin](https://github.com/gin-gonic/gin) - HTTP web 框架
+  * [Middleware](https://github.com/gin-gonic/contrib) - Collection of middlewares created by the community
   * [cors](https://github.com/gin-contrib/cors) -  Official *cross-origin resource sharing* (CORS) gin's middleware
   * [sessions](https://github.com/gin-contrib/sessions) - Gin middleware for session management
+  
 * [dlclark/regexp2](https://github.com/dlclark/regexp2) - full-featured 正则表达式
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver
 * [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Golang implementation of JSON Web Tokens (JWT)
-* 
 
-**[Docker](https://www.docker.com/)**
+**相关组件**
 
-* [mysql](https://hub.docker.com/_/mysql)
-* [redis](https://hub.docker.com/_/redis)
+* [Docker](https://www.docker.com/)
+  * [mysql](https://hub.docker.com/_/mysql)
+  * [redis](https://hub.docker.com/_/redis)
+* [kubernates](https://kubernetes.io/)
+  * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 
 ## 技术要点
-
-* **[Gin](https://gin-gonic.com/zh-cn/docs/)**
-  * [Middleware](https://github.com/gin-gonic/contrib)
-* **[GORM](https://gorm.io/zh_CN/)** 
-
-***
-
 * 用户登录服务
   * 注册、密码加密存储
   * 登录、登录态校验
@@ -73,3 +76,8 @@
 * 搜索服务 
 * 即时通讯
 * Feed 流 
+
+**用 Kubernetes 部署 Web 服务器**
+
+交叉编译为 Linux 平台的应用程序 `GOOS=linux GOARCH=amd64 go build -o webook .`
+
