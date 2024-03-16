@@ -6,6 +6,27 @@ IDE🧑‍💻： [GoLand](https://www.jetbrains.com/go/)
 
 OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
+```shell
+# 环境配置
+# Golang
+wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
+sudo tar xfz go1.22.1.linux-amd64.tar.gz -C /usr/local
+sudo vim /etc/profile
+# export GOROOT=/usr/local/go
+# export GOPATH=$HOME/gowork
+# export GOBIN=$GOPATH/bin
+# export PATH=$GOPATH:$GOBIN:$GOROOT/bin:$PATH
+source /etc/profile
+go version
+go env -w GOPROXY="https://goproxy.cn"
+go env -w GO111MODULE=on
+
+# Docker
+# 
+git clone https://github.com/hcjjj/webook.git
+```
+
+
 ## 社交平台
 
 **基本介绍**
