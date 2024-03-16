@@ -2,9 +2,9 @@
 
 ## 开发环境
 
-IDE： [GoLand](https://www.jetbrains.com/go/)
+IDE🧑‍💻： [GoLand](https://www.jetbrains.com/go/)
 
-OS：Ubuntu 22.04.3 LTS (WSL2)
+OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 ## 社交平台
 
