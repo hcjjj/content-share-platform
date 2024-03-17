@@ -19,8 +19,6 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * 即时通讯 💬
 * Feed 流 🏄
 
-> 如何启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
-
 **项目结构**
 
 * 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
@@ -48,11 +46,17 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 **相关组件**
 
 * [Node.js](https://nodejs.org/en)
+  * 启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
+
 * [Docker](https://www.docker.com/)
+  * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
   * [mysql](https://hub.docker.com/_/mysql)
   * [redis](https://hub.docker.com/_/redis)
+
 * [kubernates](https://kubernetes.io/)
+  * [Cluster](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/)
+
 
 ## 技术要点
 * 用户登录服务
@@ -90,7 +94,7 @@ wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
 sudo tar xfz go1.22.1.linux-amd64.tar.gz -C /usr/local
 sudo vim /etc/profile
 # export GOROOT=/usr/local/go
-# export GOPATH=$HOME/gowork
+# export GOPATH=$HOME/go
 # export GOBIN=$GOPATH/bin
 # export PATH=$GOPATH:$GOBIN:$GOROOT/bin:$PATH
 source /etc/profile
@@ -106,5 +110,53 @@ git clone https://github.com/hcjjj/webook.git
 
 **用 Kubernetes 部署 Web 服务器**
 
-交叉编译为 Linux 平台的应用程序 `GOOS=linux GOARCH=amd64 go build -o webook .`
+交叉编译
+
+```shell
+# Windows → Linux
+# powershell
+$env:GOOS="linux"
+$env:GOARCH="amd64"
+go build -o .\build\webook
+# Mac → Linux
+GOOS=linux GOARCH=amd64 go build -o /build/webook
+```
+
+编写 `Dockerfile`
+
+```dockerfile
+# 基础镜像
+FROM ubuntu:20.04
+# 把编译后的打包进这个镜像，放到工作目录 /app
+COPY /build/webook /app/webook
+WORKDIR /app
+# CMD 是执行命令
+# 最佳
+ENTRYPOINT ["/app/webook"]
+```
+
+```shell
+# 构建
+docker build -t hcjjj/webook:v0.0.1 .
+# 删除
+docker rmi -f hcjjj/webook:v0.0.1
+# 可以将上述命令都写在 Makefile 里面
+```
+
+编写 `k8s.yaml` 后
+
+```shell
+# 启动
+kubectl apply -f k8s-webook-deployment.yaml
+# 查看
+kubectl get deployments
+kubectl get pods
+kubectl apply -f k8s-webook-service.yaml
+kubectl get services
+# 停止
+kubectl delete service webook
+kubectl delete deployment webook
+```
+
+
 

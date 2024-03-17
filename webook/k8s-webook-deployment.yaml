@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webook
+# 描述一个 Deployment 相关信息
+spec:
+  # 副本数量
+  replicas: 3
+  # 用来筛选所需资源 POD
+  selector:
+    matchLabels:
+      app: webook
+  # 描述 POD
+  template:
+      metadata:
+        name: webook
+        labels:
+          app: webook
+      # POD 的具体信息
+      spec:
+        containers:
+          - name: webook
+            image: hcjjj/webook:v0.0.1
+            ports:
+              - containerPort: 8080
