@@ -55,7 +55,9 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 * [kubernates](https://kubernetes.io/)
   * [Cluster](https://kubernetes.io/docs/concepts/architecture/)
-  * [kubectl](https://kubernetes.io/docs/tasks/tools/)
+  * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
+  * [HELM](https://helm.sh/) - The package manager for Kubernetes
+  * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
 
 
 ## 技术要点
@@ -146,17 +148,66 @@ docker rmi -f hcjjj/webook:v0.0.1
 编写 `k8s.yaml` 后
 
 ```shell
-# 启动
+# 启动 deployment
 kubectl apply -f k8s-webook-deployment.yaml
-# 查看
+# 查看 
 kubectl get deployments
 kubectl get pods
+# 查看 POD 的日志
+kebectl get logs -f webook-5b4c5b9-4g74z
+# 启动 services
 kubectl apply -f k8s-webook-service.yaml
+# 查看
 kubectl get services
 # 停止
 kubectl delete service webook
 kubectl delete deployment webook
 ```
 
+**用 Kubernetes 部署 Mysql**
 
+```shell
+# Mysql 持久化
+# 启动
+kubectl apply -f k8s-mysql-deployment.yaml
+kubectl apply -f k8s-mysql-service.yaml
+kubectl apply -f k8s-mysql-pv.yaml
+kubectl apply -f k8s-mysql-pvc.yaml
+# 查看
+kubectl get pv
+kubectl get pvc
+# 停止
+kubectl delete service webook-mysql
+kubectl delete deployment webook-mysql
+kubectl delete pvc webook-mysql-claim
+kubectl delete pv webook-mysql-pv
+```
 
+**用 Kubernetes 部署 Redis**
+
+```shell
+kubectl apply -f k8s-redis-deployment.yaml
+kubectl apply -f k8s-redis-service.yaml
+kubectl delete service webook-redis
+kubectl delete deployment webook-redis
+```
+
+**用 Kubernetes 部署 nginx**
+
+```shell
+# 本地环境需要修改 host 到 ip 的映射，host 在 k8s-ingress-nginx.yaml 里面
+# ❯ ping  hcjjj.webook.com
+# PING hcjjj.webook.com (127.0.0.1) 56(84) bytes of data.
+# 64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.028 ms
+# 使用 clash for windows 的话，同时需要在 Bypass Domain/IPNet 中添加 
+
+# 安装 ingress-nignx 
+helm upgrade --install ingress-nginx ingress-nginx  --repo https://kubernetes.github.io/ingress-nginx  --namespace ingress-nginx --create-namespace
+# 查看
+kubectl get service --namespace ingress-nginx
+# 启动
+kubectl apply -f k8s-ingress-nginx.yaml
+kubectl get ingresses
+kubectl delete ingress webook-ingress
+
+```

@@ -3,7 +3,7 @@
 docker:
 	# 删除旧的
 	@rm /build/webook || true
-	# 编译前 tidy
+	# 编译前 tidy 复制 go.sum 不对
 	@go mod tidy
 	# 交叉编译
 	@GOOS=linux GOARCH=amd64 go build -o /build/webook

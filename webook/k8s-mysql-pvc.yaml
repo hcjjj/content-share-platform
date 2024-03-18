@@ -1,0 +1,14 @@
+# pvc persistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # 这个是指 mysql 要用的东西
+  name: webook-mysql-claim
+spec:
+  storageClassName: mysql-storage
+  accessModes:
+    # 需要一个 RWO 的 PV
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
