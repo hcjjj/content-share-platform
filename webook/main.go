@@ -7,13 +7,13 @@
 package main
 
 import (
+	"basic-go/webook/config"
 	"basic-go/webook/internal/repository"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
-	"net/http"
 	"strings"
 	"time"
 
@@ -32,19 +32,19 @@ import (
 
 func main() {
 	// 初始化数据库
-	//db := initDB()
+	db := initDB()
 	// 初始化 Web服务
-	//server := initWebServer()
+	server := initWebServer()
 	// 初始化 User Handler
-	//u := initUser(db)
+	u := initUser(db)
 	// 注册 User 相关路由
-	//u.RegisterRoutes(server)
+	u.RegisterRoutes(server)
 	// 启动 Web服务
 
-	server := gin.Default()
-	server.GET("/hello", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "hello")
-	})
+	//server := gin.Default()
+	//server.GET("/hello", func(ctx *gin.Context) {
+	//	ctx.String(http.StatusOK, "hello")
+	//})
 
 	server.Run(":8080")
 }
@@ -54,7 +54,7 @@ func initWebServer() *gin.Engine {
 
 	// 限流
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: config.Config.Redis.Addr,
 	})
 	// 1s 限流 100的请求
 	server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
@@ -73,7 +73,7 @@ func initWebServer() *gin.Engine {
 				// 开发环境
 				return true
 			}
-			return strings.Contains(origin, "yourcompany.com")
+			return strings.Contains(origin, "hcjjj.webook.com")
 		},
 		// preflight 有效期
 		MaxAge: 12 * time.Hour,
@@ -120,7 +120,7 @@ func initUser(db *gorm.DB) *web.UserHandler {
 
 func initDB() *gorm.DB {
 	// 打开数据库
-	db, err := gorm.Open(mysql.Open("root:root@tcp(localhost:13306)/webook"))
+	db, err := gorm.Open(mysql.Open(config.Config.DB.DSN))
 	if err != nil {
 		panic(err)
 	}

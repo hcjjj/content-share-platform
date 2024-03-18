@@ -3,11 +3,13 @@ kind: Service
 metadata:
   name: webook
 spec:
+  # 改成 ClusterIP 就一定要经过 nginx
   type: LoadBalancer
   selector:
     app: webook
   ports:
     - protocol: TCP
+      name: http
       # 监听什么端口
       port: 80
       # 转发到 POD 的什么端口

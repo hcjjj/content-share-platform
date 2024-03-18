@@ -32,12 +32,10 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 ## 技术栈
 
 **第三方库**
-
 * [gin-gonic/gin](https://github.com/gin-gonic/gin) - HTTP web 框架
   * [Middleware](https://github.com/gin-gonic/contrib) - Collection of middlewares created by the community
   * [cors](https://github.com/gin-contrib/cors) -  Official *cross-origin resource sharing* (CORS) gin's middleware
   * [sessions](https://github.com/gin-contrib/sessions) - Gin middleware for session management
-  
 * [dlclark/regexp2](https://github.com/dlclark/regexp2) - full-featured 正则表达式
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver
@@ -47,18 +45,15 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 * [Node.js](https://nodejs.org/en)
   * 启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
-
 * [Docker](https://www.docker.com/)
   * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
-  * [mysql](https://hub.docker.com/_/mysql)
-  * [redis](https://hub.docker.com/_/redis)
-
+  * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
+  * [redis](https://hub.docker.com/_/redis) - An open-source in-memory storage
 * [kubernates](https://kubernetes.io/)
-  * [Cluster](https://kubernetes.io/docs/concepts/architecture/)
+  * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
   * [HELM](https://helm.sh/) - The package manager for Kubernetes
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
-
 
 ## 技术要点
 * 用户登录服务
@@ -120,6 +115,7 @@ git clone https://github.com/hcjjj/webook.git
 $env:GOOS="linux"
 $env:GOARCH="amd64"
 go build -o .\build\webook
+go build -tags=k8s -o .\build\webook
 # Mac → Linux
 GOOS=linux GOARCH=amd64 go build -o /build/webook
 ```
