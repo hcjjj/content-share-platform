@@ -9,7 +9,7 @@ IDE🧑‍💻： [GoLand](https://www.jetbrains.com/go/)
 
 OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
-**基本介绍**
+**开发计划**
 
 - [x] 用户登录服务 😺
   - [x] 注册、登录态校验与刷新
@@ -90,7 +90,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * 即时通讯
 * Feed 流
 
-## 其他记录
+# 部署应用
 
 **环境配置**
 
@@ -112,7 +112,8 @@ go env -w GO111MODULE=on
 # Docker
 # 
 
-git clone https://github.com/hcjjj/webook.git
+# Kubernetes
+#
 ```
 
 **用 Kubernetes 部署 Web 服务**
