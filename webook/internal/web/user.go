@@ -9,8 +9,8 @@ package web
 import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/service"
+	"fmt"
 	"net/http"
-	"strconv"
 	"time"
 
 	jwt "github.com/golang-jwt/jwt/v5"
@@ -59,7 +59,7 @@ func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	ug.POST("/signup", u.SignUp)
 	//ug.POST("/login", u.Login)
 	ug.POST("/login", u.LoginJWT)
-	ug.POST("/logout", u.Logout)
+	//ug.POST("/logout", u.Logout)
 	ug.POST("/edit", u.Edit)
 	//ug.GET("/profile", u.Profile)
 	ug.GET("/profile", u.ProfileJWT)
@@ -149,8 +149,8 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	// 生成一个JWT token
 	claims := UserClaims{
 		RegisteredClaims: jwt.RegisteredClaims{
-			// 设置过期时间 1min
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 10)),
+			// 设置过期时间 30min
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 30)),
 		},
 		Uid:       user.Id,
 		UserAgent: ctx.Request.UserAgent(),
@@ -234,7 +234,8 @@ func (u *UserHandler) ProfileJWT(ctx *gin.Context) {
 		return
 	}
 	//fmt.Println(claims.Uid)
-	ctx.String(http.StatusOK, strconv.Itoa(int(claims.Uid))+"：这是你的 profile")
+	ue, _ := u.svc.Profile(ctx, claims.Uid)
+	ctx.String(http.StatusOK, fmt.Sprintf("用户Id：%d\n邮箱：%s\n创建时间：%s", ue.Id, ue.Email, ue.Ctime))
 }
 
 type UserClaims struct {

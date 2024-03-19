@@ -11,13 +11,19 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 **基本介绍**
 
-* 用户登录服务 😺
-* 用户关系服务 🧩
-* 发帖服务 📃
-* 支付服务 💰
-* 搜索服务 🔍
-* 即时通讯 💬
-* Feed 流 🏄
+- [x] 用户登录服务 😺
+  - [x] 注册、登录态校验与刷新
+  - [x] 保护登录系统
+  - [x] 优化登录性能
+  - [x] 短信验证码登录
+  - [ ] 微信扫码登录
+
+- [ ] 发帖服务 📃
+- [ ] 用户关系服务 🧩
+- [ ] 支付服务 💰
+- [ ] 搜索服务 🔍
+- [ ] 即时通讯 💬
+- [ ] Feed 流 🏄
 
 **项目结构**
 
@@ -32,6 +38,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 ## 技术栈
 
 **第三方库**
+
 * [gin-gonic/gin](https://github.com/gin-gonic/gin) - HTTP web 框架
   * [Middleware](https://github.com/gin-gonic/contrib) - Collection of middlewares created by the community
   * [cors](https://github.com/gin-contrib/cors) -  Official *cross-origin resource sharing* (CORS) gin's middleware
@@ -54,6 +61,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
   * [HELM](https://helm.sh/) - The package manager for Kubernetes
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
+* [wrk](https://github.com/wg/wrk) - Modern HTTP benchmarking tool
 
 ## 技术要点
 * 用户登录服务
@@ -73,12 +81,14 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
       * 基于 Redis 的 IP 限流
     * 增强登录安全
       * 利用 User-Agent 增强安全性  
+  * 优化登录性能
+  * 短信验证码登录
 * 用户关系服务
 * 发帖服务
 * 支付服务
 * 搜索服务 
 * 即时通讯
-* Feed 流 
+* Feed 流
 
 ## 其他记录
 
@@ -105,7 +115,7 @@ go env -w GO111MODULE=on
 git clone https://github.com/hcjjj/webook.git
 ```
 
-**用 Kubernetes 部署 Web 服务器**
+**用 Kubernetes 部署 Web 服务**
 
 交叉编译
 
@@ -203,7 +213,8 @@ helm upgrade --install ingress-nginx ingress-nginx  --repo https://kubernetes.gi
 kubectl get service --namespace ingress-nginx
 # 启动
 kubectl apply -f k8s-ingress-nginx.yaml
+# 停止
 kubectl get ingresses
 kubectl delete ingress webook-ingress
-
+kubectl delete namespaces ingress-nginx
 ```

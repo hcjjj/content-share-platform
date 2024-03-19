@@ -9,19 +9,15 @@ package main
 import (
 	"basic-go/webook/config"
 	"basic-go/webook/internal/repository"
+	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
-	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
 	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
-
-	. "github.com/gin-contrib/sessions/memstore"
-
-	"github.com/gin-contrib/sessions"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -53,11 +49,12 @@ func initWebServer() *gin.Engine {
 	server := gin.Default()
 
 	// 限流
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: config.Config.Redis.Addr,
-	})
+	//redisClient := redis.NewClient(&redis.Options{
+	//	Addr: config.Config.Redis.Addr,
+	//})
 	// 1s 限流 100的请求
-	server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
+	// 压测的时候需要取消
+	//server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
 
 	// 解决跨域问题，作用于定义在这个 server 的全部路由
 	server.Use(cors.New(cors.Config{
@@ -90,10 +87,10 @@ func initWebServer() *gin.Engine {
 	//if err != nil {
 	//	panic(err)
 	//}
-	store := NewStore([]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
-		[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
+	//store := NewStore([]byte("DDs0d8i62qjM8GhwhxCG3JHp6JF4Zsqc"),
+	//	[]byte("vX2Vep2UjPPpr7JmMGjFcF6f0Gf8YyAc"))
 	//放 session 到每个 ctx
-	server.Use(sessions.Sessions("ssid", store))
+	//server.Use(sessions.Sessions("ssid", store))
 
 	// 登录校验 session
 	//server.Use(middleware.NewLoginMiddlewareBuilder().
@@ -112,7 +109,10 @@ func initUser(db *gorm.DB) *web.UserHandler {
 	// 初始化 Uer
 	// DAO repository service handler
 	ud := dao.NewUserDAO(db)
-	repo := repository.NewUserRepository(ud)
+	uc := cache.NewUserCache(redis.NewClient(&redis.Options{
+		Addr: config.Config.Redis.Addr,
+	}), time.Minute*30)
+	repo := repository.NewUserRepository(ud, uc)
 	svc := service.NewUserService(repo)
 	u := web.NewUserHandler(svc)
 	return u
