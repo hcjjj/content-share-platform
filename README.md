@@ -11,13 +11,12 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 **开发计划**
 
-- [x] 用户登录服务 😺
+- [x] 用户登录服务 👤
   - [x] 注册、登录态校验与刷新
   - [x] 保护登录系统
   - [x] 优化登录性能
-  - [x] 短信验证码登录
+  - [ ] 短信验证码登录
   - [ ] 微信扫码登录
-
 - [ ] 发帖服务 📃
 - [ ] 用户关系服务 🧩
 - [ ] 支付服务 💰
@@ -47,8 +46,13 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [go-gorm/gorm](https://github.com/go-gorm/gorm) - The fantastic ORM library for Golang
   * [go-gorm/mysql](https://github.com/go-gorm/mysql) - GORM mysql driver
 * [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Golang implementation of JSON Web Tokens (JWT)
+* [tencentcloud-sdk-go](https://github.com/TencentCloud/tencentcloud-sdk-go) - Tencent Cloud API 3.0 SDK for Golang
+  * [腾讯云 SMS](https://console.cloud.tencent.com/smsv2) 个人用户无法使用短信服务 API
 
-**相关组件**
+* ~~[shansuma](https://gitee.com/shansuma/sms-sdk-master) - 闪速码 SMS 的 API 接口~~
+* 
+
+**相关环境**
 
 * [Node.js](https://nodejs.org/en)
   * 启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
@@ -62,6 +66,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [HELM](https://helm.sh/) - The package manager for Kubernetes
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
 * [wrk](https://github.com/wg/wrk) - Modern HTTP benchmarking tool
+* [ekit](https://github.com/ecodeclub/ekit) - 支持泛型的工具库
 
 ## 技术要点
 * 用户登录服务
@@ -83,6 +88,9 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
       * 利用 User-Agent 增强安全性  
   * 优化登录性能
   * 短信验证码登录
+    * 验证码是一个独立的功能 （登录、修改密码、危险操作的二次验证）
+    * 短信服务也是独立的（方便更换供应商）
+    * 验证码登录功能 → 验证码功能 → 短信服务（最基础的服务）
 * 用户关系服务
 * 发帖服务
 * 支付服务
