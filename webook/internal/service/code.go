@@ -19,6 +19,13 @@ type CodeService struct {
 	smsSvc sms.Service
 }
 
+func NewCodeService(repo *repository.CodeRepository, smsSvc sms.Service) *CodeService {
+	return &CodeService{
+		repo:   repo,
+		smsSvc: smsSvc,
+	}
+}
+
 // Send 发送验证码
 func (svc *CodeService) Send(ctx context.Context,
 	// 区别验证码的业务场景
@@ -62,7 +69,7 @@ func (svc *CodeService) generateCode() string {
 	// 0 - 9999
 	num := rand.Intn(10000)
 	// 补全为 4 位
-	return fmt.Sprintf("%4d", num)
+	return fmt.Sprintf("%04d", num)
 }
 
 func (svc *CodeService) Verify(ctx context.Context, biz string,

@@ -14,6 +14,6 @@ elseif expectedCode == code then
 else
     -- 用户手抖 输错了
     -- 可验证次数 -1
-    redis.call("decr", cntKey, -1)
+    redis.call("decr", cntKey)
     return -2
 end

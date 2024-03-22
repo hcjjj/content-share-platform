@@ -12,6 +12,7 @@ import (
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
+	"basic-go/webook/internal/service/sms/memory"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
 	"strings"
@@ -32,7 +33,11 @@ func main() {
 	// 初始化 Web服务
 	server := initWebServer()
 	// 初始化 User Handler
-	u := initUser(db)
+	// 初始化 Redis
+	rdb := redis.NewClient(&redis.Options{
+		Addr: config.Config.Redis.Addr,
+	})
+	u := initUser(db, rdb)
 	// 注册 User 相关路由
 	u.RegisterRoutes(server)
 	// 启动 Web服务
@@ -101,20 +106,29 @@ func initWebServer() *gin.Engine {
 	// JWT 的登录校验
 	server.Use(middleware.NewLoginJWTMiddlewareBuilder().
 		IgnorePaths("/users/signup").
+		IgnorePaths("/users/login_sms/code/send").
+		IgnorePaths("/users/login_sms").
 		IgnorePaths("/users/login").Build())
 	return server
 }
 
-func initUser(db *gorm.DB) *web.UserHandler {
+func initUser(db *gorm.DB, rdb redis.Cmdable) *web.UserHandler {
 	// 初始化 Uer
 	// DAO repository service handler
 	ud := dao.NewUserDAO(db)
-	uc := cache.NewUserCache(redis.NewClient(&redis.Options{
-		Addr: config.Config.Redis.Addr,
-	}), time.Minute*30)
+	//uc := cache.NewUserCache(redis.NewClient(&redis.Options{
+	//	Addr: config.Config.Redis.Addr,
+	//}), time.Minute*30)
+	uc := cache.NewUserCache(rdb, time.Minute*30)
 	repo := repository.NewUserRepository(ud, uc)
 	svc := service.NewUserService(repo)
-	u := web.NewUserHandler(svc)
+
+	codeCache := cache.NewCodeCache(rdb)
+	codeRepo := repository.NewCodeRepository(codeCache)
+	// 方便测试 使用基于内存的 sms 实现 没有通过第三方服务
+	smsSvc := memory.NewService()
+	codeSvc := service.NewCodeService(codeRepo, smsSvc)
+	u := web.NewUserHandler(svc, codeSvc)
 	return u
 }
 
