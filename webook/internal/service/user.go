@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	ErrUserDuplicateEmail    = repository.ErrUserDuplicateEmail
+	ErrUserDuplicate         = repository.ErrUserDuplicate
 	ErrInvalidUserOrPassword = errors.New("邮箱或密码不对")
 )
 
@@ -73,7 +73,7 @@ func (svc *UserService) FindOrCreate(ctx context.Context, phone string) (domain.
 	}
 	// 通过新用户的手机号注册
 	err = svc.repo.Create(ctx, u)
-	if err != nil {
+	if err != nil && err != ErrUserDuplicate {
 		return u, err
 	}
 	// 然后再查询其 Id

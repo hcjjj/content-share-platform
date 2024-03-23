@@ -200,8 +200,8 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	})
-	if err == service.ErrUserDuplicateEmail {
-		ctx.String(http.StatusOK, "邮箱冲突")
+	if err == service.ErrUserDuplicate {
+		ctx.String(http.StatusOK, "邮箱或者手机号码冲突")
 		return
 	}
 	if err != nil {
