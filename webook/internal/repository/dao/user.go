@@ -8,6 +8,7 @@ package dao
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 
@@ -29,6 +30,11 @@ func NewUserDAO(db *gorm.DB) *UserDAO {
 	return &UserDAO{
 		db: db,
 	}
+}
+func (dao *UserDAO) FindByPhone(ctx context.Context, phone string) (User, error) {
+	var u User
+	err := dao.db.WithContext(ctx).Where("phone = ?", phone).First(&u).Error
+	return u, err
 }
 
 func (dao *UserDAO) FindByEmail(ctx context.Context, email string) (User, error) {
@@ -67,9 +73,12 @@ func (dao *UserDAO) Insert(ctx context.Context, u User) error {
 // User 直接对于数据库表结构，两者一一对应
 // 如 entity modle PO (persistent object) ...
 type User struct {
-	Id       int64  `gorm:"primaryKey,autoIncrement"`
-	Email    string `gorm:"unique"`
+	Id int64 `gorm:"primaryKey,autoIncrement"`
+	// 唯一索引 允许有多个空值
+	// 但是不能有多个 ""
+	Email    sql.NullString `gorm:"unique"`
 	Password string
+	Phone    sql.NullString `gorm:"unique"`
 	// 创建时间和更新时间，毫秒数，UTC
 	// 避免应用代码和数据库时区的不一致性
 	Ctime int64

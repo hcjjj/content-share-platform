@@ -11,6 +11,8 @@ import (
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
 	"context"
+	"database/sql"
+	"time"
 )
 
 var (
@@ -29,24 +31,26 @@ func NewUserRepository(dao *dao.UserDAO, c *cache.UserCache) *UserRepository {
 		cache: c,
 	}
 }
+func (r *UserRepository) FindByPhone(ctx context.Context, phone string) (domain.User, error) {
+	// SELECT *FROM `users` WHERE `phone` = ?
+	u, err := r.dao.FindByPhone(ctx, phone)
+	if err != nil {
+		return domain.User{}, err
+	}
+	return r.entityToDomain(u), nil
+}
+
 func (r *UserRepository) FindByEmail(ctx context.Context, email string) (domain.User, error) {
 	// SELECT *FROM `users` WHERE `email` = ?
 	u, err := r.dao.FindByEmail(ctx, email)
 	if err != nil {
 		return domain.User{}, err
 	}
-	return domain.User{
-		Id:       u.Id,
-		Email:    u.Email,
-		Password: u.Password,
-	}, nil
+	return r.entityToDomain(u), nil
 }
 
 func (r *UserRepository) Create(ctx context.Context, u domain.User) error {
-	return r.dao.Insert(ctx, dao.User{
-		Email:    u.Email,
-		Password: u.Password,
-	})
+	return r.dao.Insert(ctx, r.domainToEntity(u))
 	// 不过好像没什么必要
 	// 这边可以加个缓存 通常用户注册完就会登录 这边的过期时间可以设置得非常短
 	// mail → password
@@ -64,11 +68,7 @@ func (r *UserRepository) FindById(ctx context.Context, id int64) (domain.User, e
 	if err != nil {
 		return domain.User{}, err
 	}
-	u = domain.User{
-		Id:       ue.Id,
-		Email:    ue.Email,
-		Password: ue.Password,
-	}
+	u = r.entityToDomain(ue)
 	// 放入缓存
 	go func() {
 		err = r.cache.Set(ctx, u)
@@ -86,4 +86,29 @@ func (r *UserRepository) FindById(ctx context.Context, id int64) (domain.User, e
 	// 如果是 Redis 挂掉了 直接冲击到数据库
 	// 选加载数据库需要做好兜底（限流）
 
+}
+func (r *UserRepository) domainToEntity(u domain.User) dao.User {
+	return dao.User{
+		Id: u.Id,
+		Email: sql.NullString{
+			String: u.Email,
+			Valid:  u.Email != "",
+		},
+		Phone: sql.NullString{
+			String: u.Phone,
+			Valid:  u.Phone != "",
+		},
+		Password: u.Password,
+		Ctime:    u.Ctime.UnixMilli(),
+	}
+}
+
+func (r *UserRepository) entityToDomain(u dao.User) domain.User {
+	return domain.User{
+		Id:       u.Id,
+		Email:    u.Email.String,
+		Password: u.Password,
+		Phone:    u.Phone.String,
+		Ctime:    time.UnixMilli(u.Ctime),
+	}
 }

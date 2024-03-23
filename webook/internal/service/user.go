@@ -59,6 +59,28 @@ func (svc *UserService) Login(ctx context.Context, uReq domain.User) (domain.Use
 	return u, nil
 }
 
+func (svc *UserService) FindOrCreate(ctx context.Context, phone string) (domain.User, error) {
+	// 先查询一下这个手机号注册过没有
+	u, err := svc.repo.FindByPhone(ctx, phone)
+	if err != repository.ErrUserNotFound {
+		// nil 会进来
+		// 用户存在也会进来
+		return u, err
+	}
+	// 没有这个用户的话
+	u = domain.User{
+		Phone: phone,
+	}
+	// 通过新用户的手机号注册
+	err = svc.repo.Create(ctx, u)
+	if err != nil {
+		return u, err
+	}
+	// 然后再查询其 Id
+	// 可能会有主从延迟的坑🕳
+	return svc.repo.FindByPhone(ctx, phone)
+}
+
 func (svc *UserService) Profile(ctx context.Context, id int64) (domain.User, error) {
 	return svc.repo.FindById(ctx, id)
 }

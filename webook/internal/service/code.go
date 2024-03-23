@@ -14,6 +14,11 @@ import (
 	"math/rand"
 )
 
+var (
+	ErrCodeVerifyTooManyTimes = repository.ErrVerifyCodeTooManyTimes
+	ErrCodeSendTooMany        = repository.ErrSendCodeTooMany
+)
+
 type CodeService struct {
 	repo   *repository.CodeRepository
 	smsSvc sms.Service
