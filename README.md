@@ -48,9 +48,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [golang-jwt/jwt](https://github.com/golang-jwt/jwt) - Golang implementation of JSON Web Tokens (JWT)
 * [tencentcloud-sdk-go](https://github.com/TencentCloud/tencentcloud-sdk-go) - Tencent Cloud API 3.0 SDK for Golang
   * [腾讯云 SMS](https://console.cloud.tencent.com/smsv2) 个人用户无法使用短信服务 API
-
 * ~~[shansuma](https://gitee.com/shansuma/sms-sdk-master) - 闪速码 SMS 的 API 接口~~
-* 
+* [wire](https://github.com/google/wire) - Compile-time Dependency Injection for Go
 
 **相关环境**
 
@@ -100,9 +99,12 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * 即时通讯
 * Feed 流
 
-**设计模式**
+**编程思想**
 
-* 
+* 控制反转（Inversion of Control, IoC）
+  * 依赖注入（Dependency Injection）
+  * 依赖查找、依赖发现（Go 里面没有）
+* 面向接口编程
 
 # 部署应用
 

@@ -29,24 +29,20 @@ import (
 
 func main() {
 	// 初始化数据库
-	db := initDB()
-	// 初始化 Web服务
-	server := initWebServer()
-	// 初始化 User Handler
+	//db := initDB()
 	// 初始化 Redis
-	rdb := redis.NewClient(&redis.Options{
-		Addr: config.Config.Redis.Addr,
-	})
-	u := initUser(db, rdb)
+	//rdb := initRDB()
+	// 初始化 User Handler
+	//u := initUser(db, rdb)
+	// 初始化 Web服务
+	//server := initWebServer()
 	// 注册 User 相关路由
-	u.RegisterRoutes(server)
+	//u.RegisterRoutes(server)
 	// 启动 Web服务
+	//server.Run(":8080")
 
-	//server := gin.Default()
-	//server.GET("/hello", func(ctx *gin.Context) {
-	//	ctx.String(http.StatusOK, "hello")
-	//})
-
+	// wiredemo
+	server := InitWebServer()
 	server.Run(":8080")
 }
 
@@ -119,7 +115,7 @@ func initUser(db *gorm.DB, rdb redis.Cmdable) *web.UserHandler {
 	//uc := cache.NewUserCache(redis.NewClient(&redis.Options{
 	//	Addr: config.Config.Redis.Addr,
 	//}), time.Minute*30)
-	uc := cache.NewUserCache(rdb, time.Minute*30)
+	uc := cache.NewUserCache(rdb)
 	repo := repository.NewUserRepository(ud, uc)
 	svc := service.NewUserService(repo)
 
@@ -144,4 +140,11 @@ func initDB() *gorm.DB {
 		panic(err)
 	}
 	return db
+}
+
+func initRDB() *redis.Client {
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: config.Config.Redis.Addr,
+	})
+	return redisClient
 }
