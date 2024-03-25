@@ -41,7 +41,7 @@ func main() {
 	// 启动 Web服务
 	//server.Run(":8080")
 
-	// wiredemo
+	// wire
 	server := InitWebServer()
 	server.Run(":8080")
 }

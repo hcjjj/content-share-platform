@@ -23,13 +23,13 @@ import (
 
 // UserHandler 定义用户有关的路由
 type UserHandler struct {
-	svc         *service.UserService
-	codeSvc     *service.CodeService
+	svc         service.UserService
+	codeSvc     service.CodeService
 	emailExp    *regexp.Regexp
 	passwordExp *regexp.Regexp
 }
 
-func NewUserHandler(svc *service.UserService, codeSvc *service.CodeService) *UserHandler {
+func NewUserHandler(svc service.UserService, codeSvc service.CodeService) *UserHandler {
 	const (
 		emailRegexPattern    = "\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*"
 		passwordRegexPattern = "^(?=.*\\d)(?=.*[a-zA-Z])(?=.*[^\\da-zA-Z\\s]).{1,16}$"

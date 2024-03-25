@@ -19,20 +19,25 @@ var (
 	ErrCodeSendTooMany        = repository.ErrSendCodeTooMany
 )
 
-type CodeService struct {
-	repo   *repository.CodeRepository
+type CodeService interface {
+	Send(ctx context.Context, biz string, phone string) error
+	Verify(ctx context.Context, biz string, phone string, inputCode string) (bool, error)
+}
+
+type CodeServiceV1 struct {
+	repo   repository.CodeRepository
 	smsSvc sms.Service
 }
 
-func NewCodeService(repo *repository.CodeRepository, smsSvc sms.Service) *CodeService {
-	return &CodeService{
+func NewCodeService(repo repository.CodeRepository, smsSvc sms.Service) CodeService {
+	return &CodeServiceV1{
 		repo:   repo,
 		smsSvc: smsSvc,
 	}
 }
 
 // Send 发送验证码
-func (svc *CodeService) Send(ctx context.Context,
+func (svc *CodeServiceV1) Send(ctx context.Context,
 	// 区别验证码的业务场景
 	biz string,
 	phone string) error {
@@ -55,7 +60,7 @@ func (svc *CodeService) Send(ctx context.Context,
 	return err
 }
 
-func (svc *CodeService) SendTest(ctx context.Context,
+func (svc *CodeServiceV1) SendTest(ctx context.Context,
 	// 区别验证码的业务场景
 	biz string,
 	phone string) (error, string) {
@@ -70,14 +75,14 @@ func (svc *CodeService) SendTest(ctx context.Context,
 	return nil, code
 }
 
-func (svc *CodeService) generateCode() string {
+func (svc *CodeServiceV1) generateCode() string {
 	// 0 - 9999
 	num := rand.Intn(10000)
 	// 补全为 4 位
 	return fmt.Sprintf("%04d", num)
 }
 
-func (svc *CodeService) Verify(ctx context.Context, biz string,
+func (svc *CodeServiceV1) Verify(ctx context.Context, biz string,
 	phone string, inputCode string) (bool, error) {
 	return svc.repo.Verify(ctx, biz, phone, inputCode)
 }
