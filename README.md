@@ -105,6 +105,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * 依赖注入（Dependency Injection）
   * 依赖查找、依赖发现（Go 里面没有）
 * 面向接口编程
+  * 扩展性强
+  * 超前设计，最小化实现
 
 # 部署应用
 
