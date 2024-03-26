@@ -31,7 +31,7 @@ type UserServiceV1 struct {
 	repo repository.UserRepository
 }
 
-// NewUserService 传入的是接口 返回的是接口
+// NewUserService 传入的是接口 返回的是接口 为了符合 wire
 func NewUserService(repo repository.UserRepository) UserService {
 	return &UserServiceV1{
 		repo: repo,
@@ -90,5 +90,7 @@ func (svc *UserServiceV1) FindOrCreate(ctx context.Context, phone string) (domai
 }
 
 func (svc *UserServiceV1) Profile(ctx context.Context, id int64) (domain.User, error) {
+	// 在系统内部，基本上都是用 ID 的
+	// 有些人的系统比较复杂，有一个 GUID（global unique ID）
 	return svc.repo.FindById(ctx, id)
 }

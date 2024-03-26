@@ -86,6 +86,9 @@ type User struct {
 	Email    sql.NullString `gorm:"unique"`
 	Password string
 	Phone    sql.NullString `gorm:"unique"`
+	Birthday sql.NullInt64
+	Nickname sql.NullString
+	AboutMe  sql.NullString `gorm:"type:varchar(1024)"`
 	// 创建时间和更新时间，毫秒数，UTC
 	// 避免应用代码和数据库时区的不一致性
 	Ctime int64

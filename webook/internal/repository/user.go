@@ -105,17 +105,35 @@ func (r *CachedUserRepository) domainToEntity(u domain.User) dao.User {
 			String: u.Phone,
 			Valid:  u.Phone != "",
 		},
+		Birthday: sql.NullInt64{
+			Int64: u.Birthday.UnixMilli(),
+			Valid: !u.Birthday.IsZero(),
+		},
+		Nickname: sql.NullString{
+			String: u.Nickname,
+			Valid:  u.Nickname != "",
+		},
+		AboutMe: sql.NullString{
+			String: u.AboutMe,
+			Valid:  u.AboutMe != "",
+		},
 		Password: u.Password,
-		Ctime:    u.Ctime.UnixMilli(),
 	}
 }
 
 func (r *CachedUserRepository) entityToDomain(u dao.User) domain.User {
+	var birthday time.Time
+	if u.Birthday.Valid {
+		birthday = time.UnixMilli(u.Birthday.Int64)
+	}
 	return domain.User{
 		Id:       u.Id,
 		Email:    u.Email.String,
 		Password: u.Password,
 		Phone:    u.Phone.String,
+		Nickname: u.Nickname.String,
+		AboutMe:  u.AboutMe.String,
+		Birthday: birthday,
 		Ctime:    time.UnixMilli(u.Ctime),
 	}
 }
