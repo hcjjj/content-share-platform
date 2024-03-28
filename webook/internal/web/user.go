@@ -338,12 +338,12 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 
 	// 这边要处理数据库和缓存了
 	// .....
-
+	fmt.Printf("[%s %s %s]\n", req.Nickname, birthday, req.AboutMe)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{Code: 5, Msg: "系统错误"})
 		return
 	}
-	ctx.JSON(http.StatusOK, Result{Msg: fmt.Sprintf("%s\n%s\n%s\n", req.Nickname, req.AboutMe, birthday)})
+	ctx.JSON(http.StatusOK, Result{Msg: "OK"})
 
 }
 

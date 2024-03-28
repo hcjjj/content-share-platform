@@ -15,7 +15,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 注册、登录态校验与刷新
   - [x] 保护登录系统
   - [x] 优化登录性能
-  - [ ] 短信验证码登录
+  - [x] 短信验证码登录
   - [ ] 微信扫码登录
 - [ ] 发帖服务 📃
 - [ ] 用户关系服务 🧩
@@ -50,6 +50,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [腾讯云 SMS](https://console.cloud.tencent.com/smsv2) 个人用户无法使用短信服务 API
 * ~~[shansuma](https://gitee.com/shansuma/sms-sdk-master) - 闪速码 SMS 的 API 接口~~
 * [wire](https://github.com/google/wire) - Compile-time Dependency Injection for Go
+* [ekit](https://github.com/ecodeclub/ekit) - 支持泛型的工具库
+* [mock](https://github.com/uber-go/mock) - GoMock is a mocking framework for the Go programming language
 
 **相关环境**
 
@@ -65,7 +67,6 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [HELM](https://helm.sh/) - The package manager for Kubernetes
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
 * [wrk](https://github.com/wg/wrk) - Modern HTTP benchmarking tool
-* [ekit](https://github.com/ecodeclub/ekit) - 支持泛型的工具库
 
 ## 技术要点
 **业务功能**
@@ -107,6 +108,22 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * 面向接口编程
   * 扩展性强
   * 超前设计，最小化实现
+
+**测试**
+
+* 单元测试
+
+  * Table Driven 模式
+
+  * 看代码，最起码做到分支覆盖  
+
+* 集成测试
+
+  * 至少测完业务层面的主要正常流程和主要异常流程
+
+**第三方服务治理**
+
+* 
 
 # 部署应用
 
