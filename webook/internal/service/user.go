@@ -22,7 +22,7 @@ var (
 
 type UserService interface {
 	SignUp(ctx context.Context, u domain.User) error
-	Login(ctx context.Context, uReq domain.User) (domain.User, error)
+	Login(ctx context.Context, email string, password string) (domain.User, error)
 	FindOrCreate(ctx context.Context, phone string) (domain.User, error)
 	Profile(ctx context.Context, id int64) (domain.User, error)
 }
@@ -49,9 +49,9 @@ func (svc *UserServiceV1) SignUp(ctx context.Context, u domain.User) error {
 	return svc.repo.Create(ctx, u)
 }
 
-func (svc *UserServiceV1) Login(ctx context.Context, uReq domain.User) (domain.User, error) {
+func (svc *UserServiceV1) Login(ctx context.Context, email string, password string) (domain.User, error) {
 	// 先找用户
-	u, err := svc.repo.FindByEmail(ctx, uReq.Email)
+	u, err := svc.repo.FindByEmail(ctx, email)
 	if err == repository.ErrUserNotFound {
 		return domain.User{}, ErrInvalidUserOrPassword
 	}
@@ -59,7 +59,7 @@ func (svc *UserServiceV1) Login(ctx context.Context, uReq domain.User) (domain.U
 		return domain.User{}, err
 	}
 	// 再比较密码
-	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(uReq.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	if err != nil {
 		// 打印日志
 		return domain.User{}, ErrInvalidUserOrPassword

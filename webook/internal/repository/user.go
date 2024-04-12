@@ -75,8 +75,13 @@ func (r *CachedUserRepository) FindById(ctx context.Context, id int64) (domain.U
 	if err != nil {
 		return domain.User{}, err
 	}
+
+	// webook/internal/repository/user_test.go
+	//u = r.entityToDomain(ue)
+	//_ = r.cache.Set(ctx, u)
+
 	u = r.entityToDomain(ue)
-	// 放入缓存
+	// 异步放入缓存
 	go func() {
 		err = r.cache.Set(ctx, u)
 		if err != nil {

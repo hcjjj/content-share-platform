@@ -17,7 +17,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 优化登录性能
   - [x] 短信验证码登录
   - [ ] 微信扫码登录
-- [ ] 发帖服务 📃
+- [x] 发帖服务 📃
 - [ ] 用户关系服务 🧩
 - [ ] 支付服务 💰
 - [ ] 搜索服务 🔍
@@ -52,6 +52,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [wire](https://github.com/google/wire) - Compile-time Dependency Injection for Go
 * [ekit](https://github.com/ecodeclub/ekit) - 支持泛型的工具库
 * [mock](https://github.com/uber-go/mock) - GoMock is a mocking framework for the Go programming language
+* [go-sqlmock](https://github.com/DATA-DOG/go-sqlmock) - Sql mock driver for golang to test database interactions
 
 **相关环境**
 
@@ -115,7 +116,11 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
   * Table Driven 模式
 
-  * 看代码，最起码做到分支覆盖  
+  * 最起码做到分支覆盖  
+
+  * 与时间相关的测试
+
+  * 
 
 * 集成测试
 

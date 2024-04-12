@@ -221,10 +221,7 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	user, err := u.svc.Login(ctx, domain.User{
-		Email:    req.Email,
-		Password: req.Password,
-	})
+	user, err := u.svc.Login(ctx, req.Email, req.Password)
 	if err == service.ErrInvalidUserOrPassword {
 		ctx.String(http.StatusOK, "邮箱或密码不对")
 		return
@@ -273,10 +270,7 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
-	user, err := u.svc.Login(ctx, domain.User{
-		Email:    req.Email,
-		Password: req.Password,
-	})
+	user, err := u.svc.Login(ctx, req.Email, req.Password)
 	if err == service.ErrInvalidUserOrPassword {
 		ctx.String(http.StatusOK, "邮箱或密码不对")
 		return
