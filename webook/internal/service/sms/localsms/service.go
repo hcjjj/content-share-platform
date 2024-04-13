@@ -1,10 +1,10 @@
-// Package memory -----------------------------
-// @file      : service.go
+// Package localsms -----------------------------
+// @file      : limiter.go
 // @author    : hcjjj
 // @contact   : hcjjj@foxmail.com
 // @time      : 2024-03-22 10:26
 // -------------------------------------------
-package memory
+package localsms
 
 import (
 	"context"

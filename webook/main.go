@@ -12,7 +12,7 @@ import (
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
-	"basic-go/webook/internal/service/sms/memory"
+	"basic-go/webook/internal/service/sms/localsms"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
 	"strings"
@@ -55,7 +55,7 @@ func initWebServer() *gin.Engine {
 	//})
 	// 1s 限流 100的请求
 	// 压测的时候需要取消
-	//server.Use(ratelimit.NewBuilder(redisClient, time.Second, 100).Build())
+	//server.Use(limiter.NewBuilder(redisClient, time.Second, 100).Build())
 
 	// 解决跨域问题，作用于定义在这个 server 的全部路由
 	server.Use(cors.New(cors.Config{
@@ -122,7 +122,7 @@ func initUser(db *gorm.DB, rdb redis.Cmdable) *web.UserHandler {
 	codeCache := cache.NewCodeCache(rdb)
 	codeRepo := repository.NewCodeRepository(codeCache)
 	// 方便测试 使用基于内存的 sms 实现 没有通过第三方服务
-	smsSvc := memory.NewService()
+	smsSvc := localsms.NewService()
 	codeSvc := service.NewCodeService(codeRepo, smsSvc)
 	u := web.NewUserHandler(svc, codeSvc)
 	return u

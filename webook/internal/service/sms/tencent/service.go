@@ -1,5 +1,5 @@
 // Package tencent -----------------------------
-// @file      : service.go
+// @file      : limiter.go
 // @author    : hcjjj
 // @contact   : hcjjj@foxmail.com
 // @time      : 2024-03-20 11:07

@@ -10,6 +10,7 @@ import (
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/middleware"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
+	"basic-go/webook/pkg/limiter"
 	"strings"
 	"time"
 
@@ -60,5 +61,5 @@ func corsHlf() gin.HandlerFunc {
 }
 
 func ratelimitHlf(redisClient redis.Cmdable) gin.HandlerFunc {
-	return ratelimit.NewBuilder(redisClient, time.Second, 100).Build()
+	return ratelimit.NewBuilder(limiter.NewRedisSlidingWindowLimiter(redisClient, time.Second, 100)).Build()
 }

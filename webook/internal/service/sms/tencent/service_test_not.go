@@ -1,10 +1,12 @@
 // Package tencent -----------------------------
-// @file      : service_test.go
+// @file      : service_test_not.go
 // @author    : hcjjj
 // @contact   : hcjjj@foxmail.com
 // @time      : 2024-03-20 12:22
 // -------------------------------------------
 package tencent
+
+// 这边不行 没法申请使用短信服务 api
 
 import (
 	"context"
