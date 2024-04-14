@@ -35,7 +35,7 @@ func InitWebServer() *gin.Engine {
 		// 中间件
 		ioc.InitMiddlewares,
 		// web（服务 + 路由）
-		ioc.InitGin,
+		ioc.InitWebServer,
 	)
 	return new(gin.Engine)
 }

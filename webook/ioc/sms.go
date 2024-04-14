@@ -20,12 +20,15 @@ import (
 )
 
 func InitSMSService(cmd redis.Cmdable) sms.Service {
+	// 使用有限流的
+	//return ratelimit.NewRateLimitSMSService(localsms.NewService(),
+	//	limiter.NewRedisSlidingWindowLimiter(cmd, time.Second, 100))
+	//return initTencentSMSService()
+	// 带有重试功能的
+	//return retryable.NewService(localsms.NewService(), 3)
 	// 基于内存的实现，还是换别的
 	return localsms.NewService()
-	// 使用有限流的
-	//return ratelimit.NewRateLimitSMSService(localsms.NewService(), limiter.NewRedisSlidingWindowLimiter(cmd, 3000, 1))
-	//return initTencentSMSService()
-
+	// 还可以叠加使用
 }
 
 func initTencentSMSService() sms.Service {
