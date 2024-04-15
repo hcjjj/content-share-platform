@@ -17,7 +17,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 优化登录性能
   - [x] 短信验证码登录
   - [x] 微信扫码登录
-  - [ ] 长短 Token 与登出
+  - [x] 长短 Token 与退出
 - [ ] 接入配置模块 ⚙️
 - [ ] 接入日志模块 📋️
 - [ ] 发帖服务 📃

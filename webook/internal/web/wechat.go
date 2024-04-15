@@ -3,6 +3,7 @@ package web
 import (
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/service/oauth2/wechat"
+	ijwt "basic-go/webook/internal/web/jwt"
 	"errors"
 	"fmt"
 	"net/http"
@@ -14,11 +15,11 @@ import (
 )
 
 type OAuth2WechatHandler struct {
-	svc     wechat.Service
-	userSvc service.UserService
-	jwtHandler
+	svc      wechat.Service
+	userSvc  service.UserService
 	stateKey []byte
 	cfg      WechatHandlerConfig
+	ijwt.Handler
 }
 
 type WechatHandlerConfig struct {
@@ -28,12 +29,14 @@ type WechatHandlerConfig struct {
 
 func NewOAuth2WechatHandler(svc wechat.Service,
 	userSvc service.UserService,
-	cfg WechatHandlerConfig) *OAuth2WechatHandler {
+	cfg WechatHandlerConfig,
+	jwtHdl ijwt.Handler) *OAuth2WechatHandler {
 	return &OAuth2WechatHandler{
 		svc:      svc,
 		userSvc:  userSvc,
 		stateKey: []byte("jaks3jgvkjoiGezwd4QbE9ujPZp0fL8p"),
 		cfg:      cfg,
+		Handler:  jwtHdl,
 	}
 }
 
@@ -113,16 +116,8 @@ func (h *OAuth2WechatHandler) Callback(ctx *gin.Context) {
 		return
 	}
 
-	err = h.setJWTToken(ctx, u.Id)
-	if err != nil {
-		ctx.JSON(http.StatusOK, Result{
-			Code: 5,
-			Msg:  "系统错误",
-		})
-		return
-	}
-
-	err = h.setRefreshToken(ctx, u.Id)
+	// 设置长短 Token
+	err = h.SetLoginToken(ctx, u.Id)
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: 5,

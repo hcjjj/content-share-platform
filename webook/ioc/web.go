@@ -8,6 +8,7 @@ package ioc
 
 import (
 	"basic-go/webook/internal/web"
+	ijwt "basic-go/webook/internal/web/jwt"
 	"basic-go/webook/internal/web/middleware"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
 	"basic-go/webook/pkg/limiter"
@@ -36,11 +37,11 @@ func InitWebServer(mdls []gin.HandlerFunc, userHdl *web.UserHandler) *gin.Engine
 	return server
 }
 
-func InitMiddlewares(redisClient redis.Cmdable) []gin.HandlerFunc {
+func InitMiddlewares(redisClient redis.Cmdable, jwtHdl ijwt.Handler) []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		corsHlf(),
 		ratelimitHlf(redisClient),
-		middleware.NewLoginJWTMiddlewareBuilder().
+		middleware.NewLoginJWTMiddlewareBuilder(jwtHdl).
 			IgnorePaths("/users/signup").
 			IgnorePaths("/users/login_sms/code/send").
 			IgnorePaths("/users/login_sms").

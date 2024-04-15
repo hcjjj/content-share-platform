@@ -15,6 +15,7 @@ import (
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
+	ijwt "basic-go/webook/internal/web/jwt"
 	"basic-go/webook/ioc"
 
 	"github.com/gin-gonic/gin"
@@ -26,12 +27,14 @@ func InitWebServer() *gin.Engine {
 		// 最基础的第三方依赖
 		ioc.InitDB, ioc.InitRedis,
 		// 业务相关
+		// 用户
 		dao.NewUserDAO,
 		cache.NewUserCache, cache.NewCodeCache,
 		repository.NewUserRepository, repository.NewCodeRepository,
 		ioc.InitSMSService,
 		service.NewUserService, service.NewCodeService,
 		web.NewUserHandler,
+		ijwt.NewRedisJWTHandler,
 		// 微信登录
 		//ioc.InitWechatService,
 		//ioc.NewWechatHandlerConfig,

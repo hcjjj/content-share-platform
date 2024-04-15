@@ -49,8 +49,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			name: "用户已存在",
 			mock: func(ctrl *gomock.Controller) service.UserService {
 				usersvc := svcmocks.NewMockUserService(ctrl)
-				usersvc.EXPECT().SignUp(gomock.Any(),
-					gomock.Any()).Return(service.ErrUserDuplicate)
+				usersvc.EXPECT().SignUp(gomock.Any(), gomock.Any()).Return(service.ErrUserDuplicate)
 				return usersvc
 			},
 			reqBody: `{
@@ -140,7 +139,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			// 注册路由
 			server := gin.Default()
 			// SignUp 没用到 codeSvc
-			h := NewUserHandler(tc.mock(ctrl), nil)
+			h := NewUserHandler(tc.mock(ctrl), nil, nil)
 			h.RegisterRoutes(server)
 
 			// 构造请求
