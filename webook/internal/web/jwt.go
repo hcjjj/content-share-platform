@@ -19,7 +19,8 @@ func (h jwtHandler) setJWTToken(ctx *gin.Context, uid int64) error {
 		UserAgent: ctx.Request.UserAgent(),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS512, claims)
-	tokenStr, err := token.SignedString([]byte("95osj3fUD7fo0mlYdDbncXz4VD2igvf0"))
+	// 这里的 “ ” 得 和 中间件那边的一致
+	tokenStr, err := token.SignedString([]byte("jaks3jgvkjoiGezwd4QbE9ujPZp0fL8p"))
 	if err != nil {
 		return err
 	}

@@ -133,6 +133,15 @@ func (r *CachedUserRepository) domainToEntity(u domain.User) dao.User {
 			Valid:  u.AboutMe != "",
 		},
 		Password: u.Password,
+		Ctime:    u.Ctime.UnixMilli(),
+		WechatOpenID: sql.NullString{
+			String: u.WechatInfo.OpenID,
+			Valid:  u.WechatInfo.OpenID != "",
+		},
+		WechatUnionID: sql.NullString{
+			String: u.WechatInfo.UnionID,
+			Valid:  u.WechatInfo.UnionID != "",
+		},
 	}
 }
 
@@ -150,5 +159,9 @@ func (r *CachedUserRepository) entityToDomain(u dao.User) domain.User {
 		AboutMe:  u.AboutMe.String,
 		Birthday: birthday,
 		Ctime:    time.UnixMilli(u.Ctime),
+		WechatInfo: domain.WechatInfo{
+			UnionID: u.WechatUnionID.String,
+			OpenID:  u.WechatOpenID.String,
+		},
 	}
 }

@@ -7,25 +7,20 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	uuid "github.com/lithammer/shortuuid/v4"
 )
 
-// 本地测试可以改 host 文件 域名 → IP
-var redirectURI = url.PathEscape("https://xxxxx.com/oauth2/wechat/callback")
-
-//var redirectURI = url.PathEscape("https://meoying.com/oauth2/wechat/callback")
+var redirectURI = url.PathEscape("https://meoying.com/oauth2/wechat/callback")
 
 type Service interface {
-	AuthURL(ctx context.Context) (string, error)
-	VerifyCode(ctx context.Context, code string, state string) (domain.WechatInfo, error)
+	AuthURL(ctx context.Context, state string) (string, error)
+	VerifyCode(ctx context.Context, code string) (domain.WechatInfo, error)
 }
 
 type service struct {
 	appId     string
 	appSecret string
-	// 因为这边不需要用到其他client 不需要从外面注入
-	client *http.Client
+	client    *http.Client
+	//cmd       redis.Cmdable
 }
 
 // 不偷懒的写法
@@ -46,7 +41,7 @@ func NewService(appId string, appSecret string) Service {
 	}
 }
 
-func (s *service) VerifyCode(ctx context.Context, code string, state string) (domain.WechatInfo, error) {
+func (s *service) VerifyCode(ctx context.Context, code string) (domain.WechatInfo, error) {
 	const targetPattern = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=%s&secret=%s&code=%s&grant_type=authorization_code"
 	target := fmt.Sprintf(targetPattern, s.appId, s.appSecret, code)
 	//resp, err := http.Get(target)
@@ -63,7 +58,7 @@ func (s *service) VerifyCode(ctx context.Context, code string, state string) (do
 		return domain.WechatInfo{}, err
 	}
 
-	// body 只读一遍
+	// 只读一遍
 	decoder := json.NewDecoder(resp.Body)
 	var res Result
 	err = decoder.Decode(&res)
@@ -81,19 +76,24 @@ func (s *service) VerifyCode(ctx context.Context, code string, state string) (do
 			fmt.Errorf("微信返回错误响应，错误码：%d，错误信息：%s", res.ErrCode, res.ErrMsg)
 	}
 
+	// 攻击者的 state
+	//str := s.cmd.Get(ctx, "my-state"+state).String()
+	//if str != state {
+	//	// 不相等
+	//}
+
 	return domain.WechatInfo{
 		OpenID:  res.OpenID,
 		UnionID: res.UnionID,
 	}, nil
 }
 
-func (s *service) AuthURL(ctx context.Context) (string, error) {
+func (s *service) AuthURL(ctx context.Context, state string) (string, error) {
 	const urlPattern = "https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect"
-	state := uuid.New()
+	// 如果在这里存 state，假如说我存 redis
+	//s.cmd.Set(ctx, "my-state"+state, state, time.Minute)
 	return fmt.Sprintf(urlPattern, s.appId, redirectURI, state), nil
 }
-
-// 授权后接口调用（UnionID）
 
 type Result struct {
 	ErrCode int64  `json:"errcode"`

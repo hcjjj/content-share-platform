@@ -20,11 +20,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitWebServer(mdls []gin.HandlerFunc, userHdl *web.UserHandler, oauth2WechatHdl *web.OAuth2WechatHandler) *gin.Engine {
+// 带微信登录的
+//func InitWebServer(mdls []gin.HandlerFunc, userHdl *web.UserHandler, oauth2WechatHdl *web.OAuth2WechatHandler) *gin.Engine {
+//	server := gin.Default()
+//	server.Use(mdls...)
+//	userHdl.RegisterRoutes(server)
+//  oauth2WechatHdl.RegisterRoutes(server)
+//	return server
+//}
+
+func InitWebServer(mdls []gin.HandlerFunc, userHdl *web.UserHandler) *gin.Engine {
 	server := gin.Default()
 	server.Use(mdls...)
 	userHdl.RegisterRoutes(server)
-	//oauth2WechatHdl.RegisterRoutes(server)
 	return server
 }
 
