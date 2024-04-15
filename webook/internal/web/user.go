@@ -13,6 +13,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/gin-contrib/sessions"
 
 	regexp "github.com/dlclark/regexp2"
@@ -42,6 +44,7 @@ func NewUserHandler(svc service.UserService, codeSvc service.CodeService) *UserH
 		emailExp:    emailExp,
 		passwordExp: passwordExp,
 		codeSvc:     codeSvc,
+		jwtHandler:  NewJwtHandler(),
 	}
 }
 
@@ -70,6 +73,7 @@ func (u *UserHandler) RegisterRoutes(server *gin.Engine) {
 	// POST "/sms/login/code"
 	ug.POST("/login_sms/code/send", u.SendLoginSMSCode)
 	ug.POST("/login_sms", u.LoginSMS)
+	ug.POST("/refresh_token", u.RefreshToken)
 }
 
 const biz = "login"
@@ -109,6 +113,12 @@ func (u *UserHandler) LoginSMS(ctx *gin.Context) {
 	}
 	// 登录成功
 	if err = u.setJWTToken(ctx, user.Id); err != nil {
+		ctx.JSON(http.StatusOK, Result{
+			Code: 5,
+			Msg:  "系统错误",
+		})
+	}
+	if err = u.setRefreshToken(ctx, user.Id); err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: 5,
 			Msg:  "系统错误",
@@ -212,6 +222,31 @@ func (u *UserHandler) SignUp(ctx *gin.Context) {
 	//fmt.Printf("%v\n", req)
 }
 
+// RefreshToken 可以同时刷新长短 token，用 redis 来记录是否有效，即 refresh_token 是一次性的
+// 参考登录校验部分，比较 User-Agent 来增强安全性
+func (u *UserHandler) RefreshToken(ctx *gin.Context) {
+	// 只有这个接口，拿出来的才是 refresh_token，其它地方都是 access token
+	// 需要和前端配合， 前端需要拿 refresh_token 来刷新
+	refreshToken := ExtractToken(ctx)
+	var rc RefreshClaims
+	token, err := jwt.ParseWithClaims(refreshToken, &rc, func(token *jwt.Token) (interface{}, error) {
+		return u.rtKey, nil
+	})
+	if err != nil || !token.Valid {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	// 搞个新的 access_token
+	err = u.setJWTToken(ctx, rc.Uid)
+	if err != nil {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	ctx.JSON(http.StatusOK, Result{
+		Msg: "刷新成功",
+	})
+}
+
 func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	type LoginReq struct {
 		Email    string `json:"email"`
@@ -232,8 +267,12 @@ func (u *UserHandler) LoginJWT(ctx *gin.Context) {
 	}
 	// 到这里就登录成功了
 	// 用 JWT 设置登录态
-	// 生成一个JWT token
+	// 生成长短 token
 	if err := u.setJWTToken(ctx, user.Id); err != nil {
+		ctx.String(http.StatusOK, "系统错误")
+		return
+	}
+	if err := u.setRefreshToken(ctx, user.Id); err != nil {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
