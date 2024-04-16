@@ -7,14 +7,20 @@
 package ioc
 
 import (
-	"basic-go/webook/config"
+	"github.com/spf13/viper"
 
 	"github.com/redis/go-redis/v9"
 )
 
 func InitRedis() redis.Cmdable {
+	// 使用 Viper 配置
+	addr := viper.GetString("redis.addr")
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: config.Config.Redis.Addr,
+		Addr: addr,
 	})
+	// 使用 配置结构体
+	//redisClient := redis.NewClient(&redis.Options{
+	//	Addr: config.Config.Redis.Addr,
+	//})
 	return redisClient
 }

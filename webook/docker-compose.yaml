@@ -5,7 +5,7 @@ services:
   # MySQL8
   mysql8:
     image: mysql:8.0.29
-#    restart: always
+  # restart: always
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: root
@@ -23,3 +23,11 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '16379:6379'
+
+  # etcd
+#  etcd:
+#    image: 'bitnami/etcd:latest'
+#    environment:
+#      - ALLOW_NONE_AUTHENTICATION=yes
+#    ports:
+#      - 12379:2379

@@ -18,7 +18,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 短信验证码登录
   - [x] 微信扫码登录
   - [x] 长短 Token 与退出
-- [ ] 接入配置模块 ⚙️
+- [x] 接入配置模块 ⚙️
 - [ ] 接入日志模块 📋️
 - [ ] 发帖服务 📃
   - [ ] 文本存储
@@ -64,6 +64,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [ekit](https://github.com/ecodeclub/ekit) - 支持泛型的工具库
 * [mock](https://github.com/uber-go/mock) - GoMock is a mocking framework for the Go programming language
 * [go-sqlmock](https://github.com/DATA-DOG/go-sqlmock) - Sql mock driver for golang to test database interactions
+* [viper](https://github.com/spf13/viper) - Go configuration with fangs
+* [etcd](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
 
 **相关环境**
 
@@ -73,6 +75,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
   * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
   * [redis](https://hub.docker.com/_/redis) - An open-source in-memory storage
+  * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster.
 * [kubernates](https://kubernetes.io/)
   * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool

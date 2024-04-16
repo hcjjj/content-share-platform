@@ -1,0 +1,10 @@
+#remote：
+#db:
+#  dsn: "root:root@tcp(localhost:13306)/webook"
+
+db:
+  mysql:
+    dsn: "root:root@tcp(localhost:13306)/webook"
+
+redis:
+  addr: "localhost:16379"
