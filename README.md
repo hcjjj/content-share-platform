@@ -19,7 +19,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 微信扫码登录
   - [x] 长短 Token 与退出
 - [x] 接入配置模块 ⚙️
-- [ ] 接入日志模块 📋️
+- [x] 接入日志模块 📋️
 - [ ] 发帖服务 📃
   - [ ] 文本存储
   - [ ] 发帖功能
@@ -66,6 +66,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [go-sqlmock](https://github.com/DATA-DOG/go-sqlmock) - Sql mock driver for golang to test database interactions
 * [viper](https://github.com/spf13/viper) - Go configuration with fangs
 * [etcd](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
+* [zap](https://github.com/uber-go/zap) - Blazing fast, structured, leveled logging in Go
 
 **相关环境**
 
@@ -75,7 +76,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
   * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
   * [redis](https://hub.docker.com/_/redis) - An open-source in-memory storage
-  * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster.
+  * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster
 * [kubernates](https://kubernetes.io/)
   * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
@@ -113,8 +114,18 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * 长短 Token 与登出
   * 微信扫码登录（未完成）
 * 接入配置模块
+  * 不同环境读取不同配置文件
+  * viper 接入 etcd，实现远程配置中心
+
 * 接入日志模块
+  * 抽象日志接口并使用 zap 实现
+  * 利用 Gin 的 middleware 打印日志
+  * 实现 GORM 的日志接口 
+  
 * 发帖服务
+  * 测试驱动开发 TDD，专注于某个功能的实现
+  * 
+
 * 评论服务
 * 用户关系服务
 * 支付服务

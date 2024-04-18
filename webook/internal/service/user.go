@@ -9,6 +9,7 @@ package service
 import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
+	"basic-go/webook/pkg/logger"
 	"context"
 	"errors"
 
@@ -30,12 +31,14 @@ type UserService interface {
 
 type UserServiceV1 struct {
 	repo repository.UserRepository
+	l    logger.LoggerV1
 }
 
 // NewUserService 传入的是接口 返回的是接口 为了符合 wire
-func NewUserService(repo repository.UserRepository) UserService {
+func NewUserService(repo repository.UserRepository, l logger.LoggerV1) UserService {
 	return &UserServiceV1{
 		repo: repo,
+		l:    l,
 	}
 }
 
@@ -76,6 +79,9 @@ func (svc *UserServiceV1) FindOrCreate(ctx context.Context, phone string) (domai
 		// 用户存在也会进来
 		return u, err
 	}
+
+	svc.l.Info("用户未注册", logger.String("phone", phone))
+
 	// 没有这个用户的话
 	u = domain.User{
 		Phone: phone,

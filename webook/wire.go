@@ -35,6 +35,8 @@ func InitWebServer() *gin.Engine {
 		service.NewUserService, service.NewCodeService,
 		web.NewUserHandler,
 		ijwt.NewRedisJWTHandler,
+		// 日志模块
+		ioc.InitLogger,
 		// 微信登录
 		//ioc.InitWechatService,
 		//ioc.NewWechatHandlerConfig,

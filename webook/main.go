@@ -10,6 +10,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"go.uber.org/zap"
+
 	"github.com/spf13/pflag"
 
 	"github.com/fsnotify/fsnotify"
@@ -35,7 +37,7 @@ func main() {
 
 	// 配置模块
 	//initViper()
-	initViperV1()
+	initViperWithArg()
 	// 要先把数据存在 etcd
 	//initViperRemote()
 	//keys := viper.AllKeys()
@@ -43,10 +45,32 @@ func main() {
 	//setting := viper.AllSettings()
 	//fmt.Println(setting)
 
+	// 日志模块
+	initLogger()
+
 	// wire
 	server := InitWebServer()
 	server.Run(":8080")
 
+}
+
+func initLogger() {
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		panic(err)
+	}
+	zap.L().Info("这是 replace 之前")
+	// 如果你不 replace，直接用 zap.L()，你啥都打不出来。
+	zap.ReplaceGlobals(logger)
+	zap.L().Info("zap start!")
+
+	//type Demo struct {
+	//	Name string `json:"name"`
+	//}
+	//zap.L().Info("这是实验参数",
+	//	zap.Error(errors.New("这是一个 error")),
+	//	zap.Int64("id", 123),
+	//	zap.Any("一个结构体", Demo{Name: "hello"}))
 }
 
 func initViper() {
@@ -75,7 +99,7 @@ func initViper() {
 	//otherViper.SetConfigType("json")
 }
 
-func initViperV1() {
+func initViperWithArg() {
 	// 不同环境加载不同配置环境
 	// --config=config/dev.yaml
 	// program argument

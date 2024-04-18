@@ -12,6 +12,7 @@ import (
 	"basic-go/webook/internal/web/middleware"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
 	"basic-go/webook/pkg/limiter"
+	logger2 "basic-go/webook/pkg/logger"
 	"strings"
 	"time"
 
@@ -30,17 +31,37 @@ import (
 //	return server
 //}
 
-func InitWebServer(mdls []gin.HandlerFunc, userHdl *web.UserHandler) *gin.Engine {
+func InitWebServer(mdls []gin.HandlerFunc,
+	userHdl *web.UserHandler, articleHdl *web.ArticleHandler) *gin.Engine {
 	server := gin.Default()
 	server.Use(mdls...)
 	userHdl.RegisterRoutes(server)
+	articleHdl.RegisterRoutes(server)
 	return server
 }
 
-func InitMiddlewares(redisClient redis.Cmdable, jwtHdl ijwt.Handler) []gin.HandlerFunc {
+func InitMiddlewares(redisClient redis.Cmdable,
+	l logger2.LoggerV1,
+	jwtHdl ijwt.Handler) []gin.HandlerFunc {
+
+	//bd := logger.NewBuilder(func(ctx context.Context, al *logger.AccessLog) {
+	//	// 这边传入打什么级别的，与打印格式
+	//	l.Debug("HTTP请求", logger2.Field{Key: "al", Value: al})
+	//}).AllowReqBody(true).AllowRespBody()
+	//// 监听配置文件的变动，事实控制
+	//viper.OnConfigChange(func(in fsnotify.Event) {
+	//	ok := viper.GetBool("web.logreq")
+	//	bd.AllowReqBody(ok)
+	//})
+
 	return []gin.HandlerFunc{
+		// 跨域
 		corsHlf(),
+		// HTTP日志记录
+		//bd.Build(),
+		// IP 限流
 		ratelimitHlf(redisClient),
+		// 不校验
 		middleware.NewLoginJWTMiddlewareBuilder(jwtHdl).
 			IgnorePaths("/users/signup").
 			IgnorePaths("/users/login_sms/code/send").

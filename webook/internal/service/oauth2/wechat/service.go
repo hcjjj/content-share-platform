@@ -2,6 +2,7 @@ package wechat
 
 import (
 	"basic-go/webook/internal/domain"
+	"basic-go/webook/pkg/logger"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -21,6 +22,7 @@ type service struct {
 	appSecret string
 	client    *http.Client
 	//cmd       redis.Cmdable
+	l logger.LoggerV1
 }
 
 // 不偷懒的写法
@@ -32,12 +34,13 @@ func NewServiceV1(appId string, appSecret string, client *http.Client) Service {
 	}
 }
 
-func NewService(appId string, appSecret string) Service {
+func NewService(appId string, appSecret string, l logger.LoggerV1) Service {
 	return &service{
 		appId:     appId,
 		appSecret: appSecret,
 		// 依赖注入，但是没完全注入
 		client: http.DefaultClient,
+		l:      l,
 	}
 }
 
