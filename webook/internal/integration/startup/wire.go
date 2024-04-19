@@ -7,6 +7,7 @@ import (
 	"basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
+	articleDao "basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/ioc"
@@ -33,7 +34,7 @@ func InitWebServer() *gin.Engine {
 		userSvcProvider,
 		//articlSvcProvider,
 		cache.NewCodeCache,
-		dao.NewGORMArticleDAO,
+		articleDao.NewGORMArticleDAO,
 		repository.NewCodeRepository,
 		article.NewArticleRepository,
 
@@ -65,7 +66,7 @@ func InitWebServer() *gin.Engine {
 
 func InitArticleHandler() *web.ArticleHandler {
 	wire.Build(thirdProvider,
-		dao.NewGORMArticleDAO,
+		articleDao.NewGORMArticleDAO,
 		article.NewArticleRepository,
 		service.NewArticleService,
 		web.NewArticleHandler,

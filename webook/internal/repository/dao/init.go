@@ -6,9 +6,13 @@
 // -------------------------------------------
 package dao
 
-import "gorm.io/gorm"
+import (
+	"basic-go/webook/internal/repository/dao/article"
+
+	"gorm.io/gorm"
+)
 
 func InitTable(db *gorm.DB) error {
 	// 自动建表
-	return db.AutoMigrate(&User{}, &Article{})
+	return db.AutoMigrate(&User{}, &article.Article{}, &article.PublishArticle{})
 }

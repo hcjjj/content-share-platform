@@ -8,6 +8,7 @@ type Article struct {
 	Author Author
 }
 
+// Author 在文章领域是一个值对象
 type Author struct {
 	Id   int64
 	Name string

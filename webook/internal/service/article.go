@@ -18,7 +18,7 @@ type ArticleService interface {
 type articleService struct {
 	repo article.ArticleRepository
 
-	// V1
+	// V1 依靠两个不同的 repository 来解决这种跨表，或者跨库的问题
 	author article.ArticleAuthorRepository
 	reader article.ArticleReaderRepository
 	l      logger.LoggerV1
@@ -29,7 +29,7 @@ func (a *articleService) Publish(ctx context.Context, art domain.Article) (int64
 	//id, err := a.repo.Create(ctx, art)
 	//// 线上库呢？
 	//a.repo.SyncToLiveDB(ctx, art)
-	panic("implement me")
+	return a.repo.Sync(ctx, art)
 }
 
 func (a *articleService) PublishV1(ctx context.Context, art domain.Article) (int64, error) {
@@ -84,12 +84,10 @@ func NewArticleServiceV1(author article.ArticleAuthorRepository,
 }
 
 func (a *articleService) Save(ctx context.Context, art domain.Article) (int64, error) {
-	// 修改
 	if art.Id > 0 {
 		err := a.repo.Update(ctx, art)
 		return art.Id, err
 	}
-	// 新建
 	return a.repo.Create(ctx, art)
 }
 
@@ -100,6 +98,5 @@ func (a *articleService) update(ctx context.Context, art domain.Article) error {
 	//if art.Author.Id != artInDB.Author.Id {
 	//	return errors.New("更新别人的数据")
 	//}
-	// 直接修改 减少一次数据库的查询
 	return a.repo.Update(ctx, art)
 }

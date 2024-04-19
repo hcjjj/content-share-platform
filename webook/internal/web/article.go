@@ -62,7 +62,7 @@ func (h *ArticleHandler) Publish(ctx *gin.Context) {
 			Msg:  "系统错误",
 		})
 		// 打日志？
-		h.l.Error("发表帖子失败", logger.Error(err))
+		h.l.Error("发表文章失败", logger.Error(err))
 		return
 	}
 	ctx.JSON(http.StatusOK, Result{
@@ -97,7 +97,7 @@ func (h *ArticleHandler) Edit(ctx *gin.Context) {
 			Msg:  "系统错误",
 		})
 		// 打日志？
-		h.l.Error("保存帖子失败", logger.Error(err))
+		h.l.Error("保存文章失败", logger.Error(err))
 		return
 	}
 	ctx.JSON(http.StatusOK, Result{
