@@ -4,6 +4,7 @@ package startup
 
 import (
 	"basic-go/webook/internal/repository"
+	"basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/internal/service"
@@ -34,7 +35,7 @@ func InitWebServer() *gin.Engine {
 		cache.NewCodeCache,
 		dao.NewGORMArticleDAO,
 		repository.NewCodeRepository,
-		repository.NewArticleRepository,
+		article.NewArticleRepository,
 
 		// service 部分
 		// 集成测试我们显式指定使用内存实现
@@ -65,7 +66,7 @@ func InitWebServer() *gin.Engine {
 func InitArticleHandler() *web.ArticleHandler {
 	wire.Build(thirdProvider,
 		dao.NewGORMArticleDAO,
-		repository.NewArticleRepository,
+		article.NewArticleRepository,
 		service.NewArticleService,
 		web.NewArticleHandler,
 	)

@@ -10,6 +10,7 @@ import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
 	repomocks "basic-go/webook/internal/repository/mocks"
+	"basic-go/webook/pkg/logger"
 	"context"
 	"errors"
 	"testing"
@@ -114,7 +115,7 @@ func TestUserServiceV1_Login(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 			// 具体的测试代码
-			svc := NewUserService(tc.mock(ctrl))
+			svc := NewUserService(tc.mock(ctrl), &logger.NopLogger{})
 			u, err := svc.Login(context.Background(), tc.email, tc.password)
 			assert.Equal(t, tc.wantErr, err)
 			assert.Equal(t, tc.wantUser, u)

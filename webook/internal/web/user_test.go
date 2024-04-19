@@ -156,6 +156,7 @@ func TestUserHandler_SignUp(t *testing.T) {
 			// 这是 HTTP 请求进入 GIN 框架的入口
 			// 这样子调用的时候 GIN 就会处理这个请求，响应会写回到 resp
 			server.ServeHTTP(resp, req)
+
 			assert.Equal(t, tc.wantCode, resp.Code)
 			assert.Equal(t, tc.wantBody, resp.Body.String())
 		})

@@ -21,8 +21,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 - [x] 接入配置模块 ⚙️
 - [x] 接入日志模块 📋️
 - [ ] 发帖服务 📃
-  - [ ] 文本存储
-  - [ ] 发帖功能
+  - [x] 编辑修改暂存、发布
+  - [ ] 帖子领域中用户的两重身份
   - [ ] 阅读、点赞和收藏
   - [ ] 监控、埋点和告警
   - [ ] 榜单模型
@@ -72,10 +72,11 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 * [Node.js](https://nodejs.org/en)
   * 启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
+  * 前端不完善，采用测试驱动开发
 * [Docker](https://www.docker.com/)
   * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
   * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
-  * [redis](https://hub.docker.com/_/redis) - An open-source in-memory storage
+  * [redis](https://hub.docker.com/r/bitnami/redis) - An open-source in-memory storage
   * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster
 * [kubernates](https://kubernetes.io/)
   * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
