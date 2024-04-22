@@ -26,10 +26,9 @@ func Test_articleService_Publish(t *testing.T) {
 		wantId  int64
 	}{
 		{
-			name: "新建并发布成功",
+			name: "新建发表成功",
 			mock: func(ctrl *gomock.Controller) (article.ArticleAuthorRepository,
 				article.ArticleReaderRepository) {
-				// 新建
 				author := artrepomocks.NewMockArticleAuthorRepository(ctrl)
 				author.EXPECT().Create(gomock.Any(), domain.Article{
 					Title:   "我的标题",
@@ -38,7 +37,6 @@ func Test_articleService_Publish(t *testing.T) {
 						Id: 123,
 					},
 				}).Return(int64(1), nil)
-				// 发布
 				reader := artrepomocks.NewMockArticleReaderRepository(ctrl)
 				reader.EXPECT().Save(gomock.Any(), domain.Article{
 					// 确保使用了制作库 ID
@@ -185,7 +183,6 @@ func Test_articleService_Publish(t *testing.T) {
 					},
 				}).Return(nil)
 				reader := artrepomocks.NewMockArticleReaderRepository(ctrl)
-				// 重试 3 次
 				reader.EXPECT().Save(gomock.Any(), domain.Article{
 					// 确保使用了制作库 ID
 					Id:      2,

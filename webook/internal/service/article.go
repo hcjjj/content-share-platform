@@ -14,6 +14,9 @@ type ArticleService interface {
 	Withdraw(ctx context.Context, art domain.Article) error
 	Publish(ctx context.Context, art domain.Article) (int64, error)
 	PublishV1(ctx context.Context, art domain.Article) (int64, error)
+	List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error)
+	GetById(ctx context.Context, id int64) (domain.Article, error)
+	GetPublishedById(ctx context.Context, id int64) (domain.Article, error)
 }
 
 type articleService struct {
@@ -23,6 +26,19 @@ type articleService struct {
 	author article.ArticleAuthorRepository
 	reader article.ArticleReaderRepository
 	l      logger.LoggerV1
+}
+
+func (svc *articleService) GetPublishedById(ctx context.Context, id int64) (domain.Article, error) {
+	// 另一个选项，在这里组装 Author，调用 UserService
+	return svc.repo.GetPublishedById(ctx, id)
+}
+
+func (a *articleService) GetById(ctx context.Context, id int64) (domain.Article, error) {
+	return a.repo.GetByID(ctx, id)
+}
+
+func (a *articleService) List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error) {
+	return a.repo.List(ctx, uid, offset, limit)
 }
 
 func (a *articleService) Withdraw(ctx context.Context, art domain.Article) error {

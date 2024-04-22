@@ -4,15 +4,14 @@ package startup
 
 import (
 	"basic-go/webook/internal/repository"
-	"basic-go/webook/internal/repository/article"
+	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
-	articleDao "basic-go/webook/internal/repository/dao/article"
+	"basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
-	"basic-go/webook/ioc"
-
 	ijwt "basic-go/webook/internal/web/jwt"
+	"basic-go/webook/ioc"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
@@ -26,31 +25,36 @@ var userSvcProvider = wire.NewSet(
 	repository.NewUserRepository,
 	service.NewUserService)
 
+var articleSvcProvider = wire.NewSet(
+	article.NewGORMArticleDAO,
+	cache.NewRedisArticleCache,
+	article2.NewArticleRepository,
+	service.NewArticleService)
+
+var interactiveSvcProvider = wire.NewSet(
+	service.NewInteractiveService,
+	repository.NewCachedInteractiveRepository,
+	dao.NewGORMInteractiveDAO,
+	cache.NewRedisInteractiveCache,
+)
+
 func InitWebServer() *gin.Engine {
 	wire.Build(
-		// 基础第三方
 		thirdProvider,
-		// 用户相关
 		userSvcProvider,
-		//articlSvcProvider,
+		articleSvcProvider,
 		cache.NewCodeCache,
-		articleDao.NewGORMArticleDAO,
 		repository.NewCodeRepository,
-		article.NewArticleRepository,
-
 		// service 部分
 		// 集成测试我们显式指定使用内存实现
 		ioc.InitSMSService,
+
 		// 指定啥也不干的 wechat service
 		//InitPhantomWechatService,
 		service.NewCodeService,
-		service.NewArticleService,
-
 		// handler 部分
 		web.NewUserHandler,
-		// Wechat 登录
 		//web.NewOAuth2WechatHandler,
-		//InitWechatHandlerConfig,
 		web.NewArticleHandler,
 		ijwt.NewRedisJWTHandler,
 
@@ -64,14 +68,15 @@ func InitWebServer() *gin.Engine {
 	return gin.Default()
 }
 
-func InitArticleHandler() *web.ArticleHandler {
+func InitArticleHandler(dao article.ArticleDAO) *web.ArticleHandler {
 	wire.Build(thirdProvider,
-		articleDao.NewGORMArticleDAO,
-		article.NewArticleRepository,
+		//userSvcProvider,
+		cache.NewRedisArticleCache,
+		//wire.InterfaceValue(new(article.ArticleDAO), dao),
+		article2.NewArticleRepository,
 		service.NewArticleService,
-		web.NewArticleHandler,
-	)
-	return &web.ArticleHandler{}
+		web.NewArticleHandler)
+	return new(web.ArticleHandler)
 }
 
 func InitUserSvc() service.UserService {
@@ -82,4 +87,9 @@ func InitUserSvc() service.UserService {
 func InitJwtHdl() ijwt.Handler {
 	wire.Build(thirdProvider, ijwt.NewRedisJWTHandler)
 	return ijwt.NewRedisJWTHandler(nil)
+}
+
+func InitInteractiveService() service.InteractiveService {
+	wire.Build(thirdProvider, interactiveSvcProvider)
+	return service.NewInteractiveService(nil, nil)
 }

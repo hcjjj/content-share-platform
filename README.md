@@ -133,12 +133,14 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
     * 文章领域中用户的两重身份
     * 新建、修改、保存、发布
     * 发布时制作库和线上库数据的同步问题
-    * Mysql → MongoDB （未做）
-    * OSS + CDN （未做）
+    * *Mysql → MongoDB （未做）*
+    * *OSS + CDN （未做）*
 
   * 阅读、点赞、收藏
 
-    * 
+    * 三者聚合的表设计、索引的设计策略
+    * 采用 Redis 的 map 结构缓存三者
+    * 使用软删除缓解性能问题
 
 * 评论服务
 
