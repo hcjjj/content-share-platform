@@ -17,6 +17,7 @@ type ArticleRepository interface {
 	Update(ctx context.Context, art domain.Article) error
 	// Sync 存储并同步数据
 	Sync(ctx context.Context, art domain.Article) (int64, error)
+	SyncStatus(ctx context.Context, id int64, author int64, status domain.ArticleStatus) error
 	//FindById(ctx context.Context, id int64) domain.Article
 }
 
@@ -32,6 +33,10 @@ type CachedArticleRepository struct {
 	// 那么就只能利用 db 开始事务之后，创建基于事务的 DAO
 	// 或者，直接去掉 DAO 这一层，在 repository 的实现中，直接操作 db
 	db *gorm.DB
+}
+
+func (c *CachedArticleRepository) SyncStatus(ctx context.Context, id int64, author int64, status domain.ArticleStatus) error {
+	return c.dao.SyncStatus(ctx, id, author, uint8(status))
 }
 
 func (c *CachedArticleRepository) Sync(ctx context.Context, art domain.Article) (int64, error) {
@@ -71,7 +76,6 @@ func (c *CachedArticleRepository) SyncV2(ctx context.Context, art domain.Article
 	}
 	if err != nil {
 		// 执行有问题，要回滚
-		//defer 那边有了这边就不需要了
 		//tx.Rollback()
 		return id, err
 	}
@@ -79,7 +83,7 @@ func (c *CachedArticleRepository) SyncV2(ctx context.Context, art domain.Article
 	// 考虑到，此时线上库可能有，可能没有，你要有一个 UPSERT 的写法
 	// INSERT or UPDATE
 	// 如果数据库有，那么就更新，不然就插入
-	err = reader.UpsertV2(ctx, dao.PublishArticle{Article: artn})
+	err = reader.UpsertV2(ctx, dao.PublishedArticle{Article: artn})
 	// 执行成功，直接提交
 	tx.Commit()
 	return id, err
@@ -114,6 +118,7 @@ func (c *CachedArticleRepository) Create(ctx context.Context, art domain.Article
 		Title:    art.Title,
 		Content:  art.Content,
 		AuthorId: art.Author.Id,
+		Status:   uint8(art.Status),
 	})
 }
 
@@ -123,6 +128,7 @@ func (c *CachedArticleRepository) Update(ctx context.Context, art domain.Article
 		Title:    art.Title,
 		Content:  art.Content,
 		AuthorId: art.Author.Id,
+		Status:   uint8(art.Status),
 	})
 }
 
@@ -132,6 +138,7 @@ func (c *CachedArticleRepository) toEntity(art domain.Article) dao.Article {
 		Title:    art.Title,
 		Content:  art.Content,
 		AuthorId: art.Author.Id,
+		Status:   uint8(art.Status),
 	}
 }
 

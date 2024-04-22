@@ -3,8 +3,8 @@
 package wiredemo
 
 import (
-	"basic-go/wiredemo/repository"
-	"basic-go/wiredemo/repository/dao"
+	"basic-go/other/wiredemo/repository"
+	"basic-go/other/wiredemo/repository/dao"
 
 	"github.com/google/wire"
 )

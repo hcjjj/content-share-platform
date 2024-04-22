@@ -14,5 +14,5 @@ import (
 
 func InitTable(db *gorm.DB) error {
 	// 自动建表
-	return db.AutoMigrate(&User{}, &article.Article{}, &article.PublishArticle{})
+	return db.AutoMigrate(&User{}, &article.Article{}, &article.PublishedArticle{})
 }

@@ -415,7 +415,7 @@ func (c *UserHandler) ProfileJWT(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "系统错误")
 		return
 	}
-	u, err := c.svc.Profile(ctx, claims.Uid)
+	u, err := c.svc.Profile(ctx, claims.Id)
 	if err != nil {
 		ctx.String(http.StatusOK, "系统错误")
 		return

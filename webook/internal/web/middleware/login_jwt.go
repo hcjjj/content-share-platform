@@ -60,7 +60,7 @@ func (l *LoginJWTMiddlewareBuilder) Build() gin.HandlerFunc {
 		//	// 过期了
 		//}
 		// err 为 nil，token 不为 nil
-		if token == nil || !token.Valid || claims.Uid == 0 {
+		if token == nil || !token.Valid || claims.Id == 0 {
 			// 没登录
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return

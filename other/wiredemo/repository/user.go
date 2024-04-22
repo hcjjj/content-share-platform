@@ -1,6 +1,8 @@
 package repository
 
-import "basic-go/wiredemo/repository/dao"
+import (
+	"basic-go/other/wiredemo/repository/dao"
+)
 
 type UserRepository struct {
 	dao *dao.UserDAO

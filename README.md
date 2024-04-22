@@ -21,7 +21,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 - [x] 接入配置模块 ⚙️
 - [x] 接入日志模块 📋️
 - [ ] 文章服务 📃
-  - [x] 编辑、修改、暂存和发布
+  - [x] 新建、修改、保存和发布
   - [ ] 阅读、点赞和收藏
   - [ ] 监控、埋点和告警
   - [ ] 榜单模型
@@ -66,6 +66,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [viper](https://github.com/spf13/viper) - Go configuration with fangs
 * [etcd](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
 * [zap](https://github.com/uber-go/zap) - Blazing fast, structured, leveled logging in Go
+* [mongo-go-driver](https://github.com/mongodb/mongo-go-driver) - The Official Golang driver for MongoDB
 
 **相关环境**
 
@@ -77,6 +78,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
   * [redis](https://hub.docker.com/r/bitnami/redis) - An open-source in-memory storage
   * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster
+  * [mongo](https://hub.docker.com/_/mongo) - MongoDB document databases provide high availability and easy scalability
 * [kubernates](https://kubernetes.io/)
   * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
@@ -113,25 +115,41 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
     * 提高可用性：重试机制、客户端限流、failover（轮询，实时检测）
   * 长短 Token 与登出
   * 微信扫码登录（未完成）
+  
 * 接入配置模块
   * 不同环境读取不同配置文件
   * viper 接入 etcd，实现远程配置中心
-
+  
 * 接入日志模块
   * 抽象日志接口并使用 zap 实现
   * 利用 Gin 的 middleware 打印日志
   * 实现 GORM 的日志接口 
   
-* 发帖服务
-  * 测试驱动开发 TDD，专注于某个功能的实现
-  * 文章领域中用户的两重身份
-  * 制作库到线上库数据的同步问题
+* 文章服务
+
+  * ###### 新建、修改、保存和发布
+
+    * 测试驱动开发 TDD，专注于某个功能的实现
+    * 文章领域中用户的两重身份
+    * 新建、修改、保存、发布
+    * 发布时制作库和线上库数据的同步问题
+    * Mysql → MongoDB （未做）
+    * OSS + CDN （未做）
+
+  * 阅读、点赞、收藏
+
+    * 
 
 * 评论服务
+
 * 用户关系服务
+
 * 支付服务
+
 * 搜索服务 
+
 * 即时通讯
+
 * Feed 流
 
 **编程思想**

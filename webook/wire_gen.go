@@ -8,8 +8,10 @@ package main
 
 import (
 	"basic-go/webook/internal/repository"
+	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
+	"basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/jwt"
@@ -38,6 +40,10 @@ func InitWebServer() *gin.Engine {
 	smsService := ioc.InitSMSService(cmdable)
 	codeService := service.NewCodeService(codeRepository, smsService)
 	userHandler := web.NewUserHandler(userService, codeService, handler)
-	engine := ioc.InitWebServer(v, userHandler)
+	articleDAO := article.NewGORMArticleDAO(db)
+	articleRepository := article2.NewArticleRepository(articleDAO)
+	articleService := service.NewArticleService(articleRepository)
+	articleHandler := web.NewArticleHandler(articleService, loggerV1)
+	engine := ioc.InitWebServer(v, userHandler, articleHandler)
 	return engine
 }

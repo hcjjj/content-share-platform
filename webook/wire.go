@@ -11,8 +11,10 @@ package main
 
 import (
 	"basic-go/webook/internal/repository"
+	"basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
+	articleDao "basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	ijwt "basic-go/webook/internal/web/jwt"
@@ -35,6 +37,11 @@ func InitWebServer() *gin.Engine {
 		service.NewUserService, service.NewCodeService,
 		web.NewUserHandler,
 		ijwt.NewRedisJWTHandler,
+		// 文章
+		articleDao.NewGORMArticleDAO,
+		article.NewArticleRepository,
+		service.NewArticleService,
+		web.NewArticleHandler,
 		// 日志模块
 		ioc.InitLogger,
 		// 微信登录

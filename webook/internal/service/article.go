@@ -11,6 +11,7 @@ import (
 
 type ArticleService interface {
 	Save(ctx context.Context, art domain.Article) (int64, error)
+	Withdraw(ctx context.Context, art domain.Article) error
 	Publish(ctx context.Context, art domain.Article) (int64, error)
 	PublishV1(ctx context.Context, art domain.Article) (int64, error)
 }
@@ -24,7 +25,13 @@ type articleService struct {
 	l      logger.LoggerV1
 }
 
+func (a *articleService) Withdraw(ctx context.Context, art domain.Article) error {
+	// art.Status = domain.ArticleStatusPrivate 然后直接把整个 art 往下传
+	return a.repo.SyncStatus(ctx, art.Id, art.Author.Id, domain.ArticleStatusPrivate)
+}
+
 func (a *articleService) Publish(ctx context.Context, art domain.Article) (int64, error) {
+	art.Status = domain.ArticleStatusPublished
 	// 制作库
 	//id, err := a.repo.Create(ctx, art)
 	//// 线上库呢？
@@ -84,6 +91,7 @@ func NewArticleServiceV1(author article.ArticleAuthorRepository,
 }
 
 func (a *articleService) Save(ctx context.Context, art domain.Article) (int64, error) {
+	art.Status = domain.ArticleStatusUnpublished
 	if art.Id > 0 {
 		err := a.repo.Update(ctx, art)
 		return art.Id, err

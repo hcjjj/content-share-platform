@@ -84,3 +84,17 @@ func (mr *MockArticleServiceMockRecorder) Save(ctx, art any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockArticleService)(nil).Save), ctx, art)
 }
+
+// Withdraw mocks base method.
+func (m *MockArticleService) Withdraw(ctx context.Context, art domain.Article) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Withdraw", ctx, art)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Withdraw indicates an expected call of Withdraw.
+func (mr *MockArticleServiceMockRecorder) Withdraw(ctx, art any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Withdraw", reflect.TypeOf((*MockArticleService)(nil).Withdraw), ctx, art)
+}

@@ -2,7 +2,6 @@ version: '3.0'
 
 services:
 
-  # MySQL8
   mysql8:
     image: mysql:8.0.29
   # restart: always
@@ -16,18 +15,25 @@ services:
       # 这里映射为了 13306 端口
       - "13306:3306"
 
-  # Redis
   redis:
-    image: 'bitnami/redis:latest'
+    image: bitnami/redis:7.0.15
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - '16379:6379'
 
-  # etcd
 #  etcd:
-#    image: 'bitnami/etcd:latest'
+#    image: bitnami/etcd:3.5.13
 #    environment:
 #      - ALLOW_NONE_AUTHENTICATION=yes
 #    ports:
 #      - 12379:2379
+
+#  mongo:
+#    image: mongo:6.0
+#    restart: always
+#    environment:
+#      MONGO_INITDB_ROOT_USERNAME: root
+#      MONGO_INITDB_ROOT_PASSWORD: example
+#    ports:
+#      - 27017:27017
