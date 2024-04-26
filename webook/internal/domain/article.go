@@ -13,16 +13,20 @@ type Article struct {
 	Status ArticleStatus
 	Ctime  time.Time
 	Utime  time.Time
+
+	// 做成这样，就应该在 service 或者 repository 里面完成构造
+	// 设计成这个样子，就认为 Interactive 是 Article 的一个属性（值对象）
+	// Intr Interactive
 }
 
 func (a Article) Abstract() string {
-	// 摘要我们取前几句。
+	// 摘要取前几句
 	// 要考虑一个中文问题
 	cs := []rune(a.Content)
 	if len(cs) < 100 {
 		return a.Content
 	}
-	// 英文怎么截取一个完整的单词，我的看法是……不需要纠结，就截断拉到
+	// 英文怎么截取一个完整的单词，不需要纠结，就截断拉到
 	// 词组、介词，往后找标点符号
 	return string(cs[:100])
 }

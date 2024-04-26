@@ -1,7 +1,7 @@
 --你的验证码在 Redis 上的 key
 -- phone_code:login:152xxxxxxxx
 local key = KEYS[1]
--- 验证次数，我们一个验证码，最多重复三次，这个记录还可以验证几次
+-- 验证次数，一个验证码，最多重复三次，这个记录还可以验证几次
 -- phone_code:login:152xxxxxxxx:cnt
 local cntKey = key..":cnt"
 -- 你的验证码 123456

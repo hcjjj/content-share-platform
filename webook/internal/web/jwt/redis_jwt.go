@@ -80,7 +80,7 @@ func (h *RedisJWTHandler) CheckSession(ctx *gin.Context, ssid string) error {
 }
 
 func (h *RedisJWTHandler) ExtractToken(ctx *gin.Context) string {
-	// 我现在用 JWT 来校验
+	// 用 JWT 来校验
 	tokenHeader := ctx.GetHeader("Authorization")
 	//segs := strings.SplitN(tokenHeader, " ", 2)
 	segs := strings.Split(tokenHeader, " ")

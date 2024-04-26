@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"basic-go/other/wiredemo/repository/dao"
+	"basic-go/others/wiredemo/repository/dao"
 )
 
 type UserRepository struct {

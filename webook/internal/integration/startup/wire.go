@@ -46,7 +46,7 @@ func InitWebServer() *gin.Engine {
 		cache.NewCodeCache,
 		repository.NewCodeRepository,
 		// service 部分
-		// 集成测试我们显式指定使用内存实现
+		// 集成测试显式指定使用内存实现
 		ioc.InitSMSService,
 
 		// 指定啥也不干的 wechat service

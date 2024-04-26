@@ -22,7 +22,7 @@ type RateLimitSMSService struct {
 type RateLimitSMSServiceV1 struct {
 	// 使用组合的方式
 	// 自动实现 sms.Service 的所有方法
-	// 只需要装饰我需要装饰的方法即可
+	// 只需要装饰需要装饰的方法即可
 	sms.Service
 	limiter limiter.Limiter
 	key     string

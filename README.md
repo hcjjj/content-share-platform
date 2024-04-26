@@ -20,18 +20,16 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 长短 Token 与退出
 - [x] 接入配置模块 ⚙️
 - [x] 接入日志模块 📋️
+- [x] 系统监控埋点 📹️
 - [ ] 文章服务 📃
   - [x] 新建、修改、保存和发布
-  - [ ] 阅读、点赞和收藏
-  - [ ] 监控、埋点和告警
+  - [x] 阅读、点赞和收藏
   - [ ] 榜单模型
   - [ ] 分布式任务调度
-- [ ] 评论服务 ✍️
-- [ ] 用户关系服务 🧩
-- [ ] 支付服务 💰
+- [ ] 评论服务 ✍
+- [ ] 用户关系 🧩
 - [ ] 搜索服务 🔍
 - [ ] 即时通讯 💬
-- [ ] Feed 流 🏄
 - [ ] 单元/集成测试 ✅
 
 **项目结构**
@@ -67,6 +65,9 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [etcd](https://github.com/etcd-io/etcd) - Distributed reliable key-value store for the most critical data of a distributed system
 * [zap](https://github.com/uber-go/zap) - Blazing fast, structured, leveled logging in Go
 * [mongo-go-driver](https://github.com/mongodb/mongo-go-driver) - The Official Golang driver for MongoDB
+* [sarama](https://github.com/IBM/sarama) - Sarama is a Go library for Apache Kafka
+* [prometheus](https://github.com/prometheus)/[client_golang](https://github.com/prometheus/client_golang) - Prometheus instrumentation library for Go applications
+* [cron](https://github.com/robfig/cron) - a cron library for go 定时任务
 
 **相关环境**
 
@@ -79,6 +80,10 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [redis](https://hub.docker.com/r/bitnami/redis) - An open-source in-memory storage
   * [etcd](https://hub.docker.com/r/bitnami/etcd) - A distributed key-value store designed to securely store data across a cluster
   * [mongo](https://hub.docker.com/_/mongo) - MongoDB document databases provide high availability and easy scalability
+  * [kafka](https://hub.docker.com/r/bitnami/kafka) - Apache Kafka is a distributed streaming platform used for building real-time applications
+  * [prometheus](https://hub.docker.com/r/bitnami/prometheus) - The Prometheus monitoring system and time series database
+  * *grafana - The open observability platform*
+  * *zipkin - A distributed tracing system*
 * [kubernates](https://kubernetes.io/)
   * [Kubernetes cluster architecture](https://kubernetes.io/docs/concepts/architecture/)
   * [kubectl](https://kubernetes.io/docs/tasks/tools/) - The Kubernetes command-line tool
@@ -139,20 +144,28 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * 阅读、点赞、收藏
 
     * 三者聚合的表设计、索引的设计策略
-    * 采用 Redis 的 map 结构缓存三者
+    * 采用 Redis 的 map 结构缓存三者的总数
     * 使用软删除缓解性能问题
+    * 使用 errgroup.Group 并发查询文章内容和相关数据
+    * 用 Kafka 改造阅读计数功能，批量处理消息提高性能
+    
+  * 榜单模型
 
-* 评论服务
+    * 综合考虑用户的各种行为、时间的衰减特性和权重因子
+    * 滑动窗口 + 优先队列
+    * 定时任务
 
-* 用户关系服务
+* 监控、埋点和告警
 
-* 支付服务
+  * 利用 Gin middleware 来统计 HTTP 请求  
+* 测试：`wrk -t1 -d1m -c2 http://localhost:8080/test/metric`
+  * 利用 GORM 的 Plugin 来监控和数据库有关的信息  
+  * 使用 Callback 来监控 GROM 执行时间
+  * HTTP 接口里面设计的 Code 字段可以考虑用于监控埋点
+  * 利用 Redis 的 Hook 功能监控缓存命中率
+  * *接入 OpenTelemetry 集成 zipkin（未做）*
+  * *prometheus 集成 Grafana （未做）* 
 
-* 搜索服务 
-
-* 即时通讯
-
-* Feed 流
 
 **编程思想**
 

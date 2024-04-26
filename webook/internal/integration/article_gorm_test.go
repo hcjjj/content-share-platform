@@ -51,7 +51,7 @@ func (s *ArticleGORMHandlerTestSuite) TestArticleHandler_Edit() {
 		// 验证并且删除数据
 		after func(t *testing.T)
 		// 构造请求，直接使用 req
-		// 也就是说，我们放弃测试 Bind 的异常分支
+		// 也就是说，放弃测试 Bind 的异常分支
 		req Article
 
 		// 预期响应
@@ -141,7 +141,7 @@ func (s *ArticleGORMHandlerTestSuite) TestArticleHandler_Edit() {
 					Content: "我的内容",
 					Ctime:   456,
 					Utime:   234,
-					// 注意。这个 AuthorID 我们设置为另外一个人的ID
+					// 注意。这个 AuthorID 设置为另外一个人的ID
 					AuthorId: 789,
 					Status:   domain.ArticleStatusPublished.ToUint8(),
 				})
@@ -350,7 +350,7 @@ func (s *ArticleGORMHandlerTestSuite) TestArticle_Publish() {
 					Content: "我的内容",
 					Ctime:   456,
 					Utime:   234,
-					// 注意。这个 AuthorID 我们设置为另外一个人的ID
+					// 注意。这个 AuthorID 设置为另外一个人的ID
 					AuthorId: 789,
 				}
 				s.db.Create(&art)

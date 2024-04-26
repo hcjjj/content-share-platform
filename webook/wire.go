@@ -10,6 +10,7 @@
 package main
 
 import (
+	articleEve "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	"basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
@@ -20,11 +21,10 @@ import (
 	ijwt "basic-go/webook/internal/web/jwt"
 	"basic-go/webook/ioc"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 )
 
-func InitWebServer() *gin.Engine {
+func InitWebServer() *App {
 	wire.Build(
 		// 最基础的第三方依赖
 		ioc.InitDB, ioc.InitRedis,
@@ -37,9 +37,19 @@ func InitWebServer() *gin.Engine {
 		service.NewUserService, service.NewCodeService,
 		web.NewUserHandler,
 		ijwt.NewRedisJWTHandler,
+		// kafka
+		ioc.InitKafka,
+		ioc.NewConsumers,
+		ioc.NewSyncProducer,
 		// 文章
+		cache.NewRedisArticleCache,
+		cache.NewRedisInteractiveCache,
 		articleDao.NewGORMArticleDAO,
+		dao.NewGORMInteractiveDAO,
 		article.NewArticleRepository,
+		repository.NewCachedInteractiveRepository,
+		articleEve.NewKafkaProducer,
+		articleEve.NewInteractiveReadEventBatchConsumer,
 		service.NewArticleService,
 		web.NewArticleHandler,
 		// 日志模块
@@ -52,6 +62,7 @@ func InitWebServer() *gin.Engine {
 		ioc.InitMiddlewares,
 		// web（服务 + 路由）
 		ioc.InitWebServer,
+		wire.Struct(new(App), "*"),
 	)
-	return new(gin.Engine)
+	return new(App)
 }

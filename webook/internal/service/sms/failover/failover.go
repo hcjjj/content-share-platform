@@ -42,7 +42,7 @@ func (f *FailOverSMSService) SendV1(ctx context.Context, tplId string, args []st
 	// 不让每次都从 0 开始
 	idx := atomic.AddUint64(&f.idx, 1)
 	length := uint64(len(f.svcs))
-	// 我要迭代 length
+	// 要迭代 length
 	for i := idx; i < idx+length; i++ {
 		// 取余数来计算下标
 		svc := f.svcs[i%length]

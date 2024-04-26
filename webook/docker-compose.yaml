@@ -28,7 +28,7 @@ services:
 #      - ALLOW_NONE_AUTHENTICATION=yes
 #    ports:
 #      - 12379:2379
-
+#
 #  mongo:
 #    image: mongo:6.0
 #    restart: always
@@ -37,3 +37,38 @@ services:
 #      MONGO_INITDB_ROOT_PASSWORD: example
 #    ports:
 #      - 27017:27017
+
+  kafka:
+    image: 'bitnami/kafka:3.6.0'
+    ports:
+      - '9092:9092'
+      - '9094:9094'
+    environment:
+      - KAFKA_CFG_NODE_ID=0
+      #      - 允许自动创建 topic，线上不要开启
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_CFG_PROCESS_ROLES=controller,broker
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093,EXTERNAL://0.0.0.0:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka:9093
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    volumes:
+      #      - 将本地的 prometheus 文件映射到容器内的配置文件
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      #      - 访问数据的端口
+      - 9090:9090
+
+#  grafana:
+#    image: grafana/grafana-enterprise:10.2.0
+#    ports:
+#      - 3000:3000
+#  zipkin:
+#    #    用的是不支持 Kafka 之类的简化版本
+#    image: openzipkin/zipkin-slim:2.24
+#    ports:
+#      - '9411:9411'

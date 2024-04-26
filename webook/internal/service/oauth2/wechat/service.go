@@ -93,7 +93,7 @@ func (s *service) VerifyCode(ctx context.Context, code string) (domain.WechatInf
 
 func (s *service) AuthURL(ctx context.Context, state string) (string, error) {
 	const urlPattern = "https://open.weixin.qq.com/connect/qrconnect?appid=%s&redirect_uri=%s&response_type=code&scope=snsapi_login&state=%s#wechat_redirect"
-	// 如果在这里存 state，假如说我存 redis
+	// 如果在这里存 state，假如说存 redis
 	//s.cmd.Set(ctx, "my-state"+state, state, time.Minute)
 	return fmt.Sprintf(urlPattern, s.appId, redirectURI, state), nil
 }

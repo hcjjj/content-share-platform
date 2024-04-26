@@ -9,6 +9,10 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"go.uber.org/zap"
 
@@ -38,6 +42,9 @@ func main() {
 	// 配置模块
 	//initViper()
 	initViperWithArg()
+
+	initPrometheus()
+
 	// 要先把数据存在 etcd
 	//initViperRemote()
 	//keys := viper.AllKeys()
@@ -49,9 +56,28 @@ func main() {
 	initLogger()
 
 	// wire
-	server := InitWebServer()
-	server.Run(":8080")
 
+	app := InitWebServer()
+	// Consumer 的设计，类似于 Web，或者 GRPC 之类的，是一个顶级入口
+	for _, c := range app.consumers {
+		err := c.Start()
+		if err != nil {
+			panic(err)
+		}
+	}
+	server := app.web
+	server.GET("/hello", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "你好，你来了")
+	})
+
+	server.Run(":8080")
+}
+
+func initPrometheus() {
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":8081", nil)
+	}()
 }
 
 func initLogger() {
@@ -62,7 +88,7 @@ func initLogger() {
 	zap.L().Info("这是 replace 之前")
 	// 如果你不 replace，直接用 zap.L()，你啥都打不出来。
 	zap.ReplaceGlobals(logger)
-	zap.L().Info("zap start!")
+	//zap.L().Info("zap start!")
 
 	//type Demo struct {
 	//	Name string `json:"name"`
@@ -75,12 +101,12 @@ func initLogger() {
 
 func initViper() {
 	// 如果配置文件里面没有 设置默认值
-	viper.SetDefault("db.mysql.dsn",
+	viper.SetDefault("mysql.dsn",
 		"root:root@tcp(localhost:13306)/mysql")
 	// 配置文件的名字，但是不包含文件扩展名
 	// 不包含 .go, .yaml 之类的后缀
 	viper.SetConfigName("dev")
-	// 告诉 viper 我的配置用的是 yaml 格式
+	// 告诉 viper 配置用的是 yaml 格式
 	// 现实中，有很多格式，JSON，XML，YAML，TOML，ini
 	viper.SetConfigType("yaml")
 	// 当前工作目录下的 config 子目录

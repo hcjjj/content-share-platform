@@ -29,6 +29,8 @@ func InitSMSService(cmd redis.Cmdable) sms.Service {
 	// 基于内存的实现，还是换别的
 	return localsms.NewService()
 	// 还可以叠加使用
+	// 接入监控的
+	//return metrics.NewPrometheusDecorator(localsms.NewService())
 }
 
 func initTencentSMSService() sms.Service {

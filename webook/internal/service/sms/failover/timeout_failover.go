@@ -50,7 +50,7 @@ func (t *TimeoutFailoverSMSService) Send(ctx context.Context, tplId string, args
 		atomic.AddInt32(&t.cnt, 1)
 	default:
 		// 遇到了错误，但是又不是超时错误，这个时候，你要考虑怎么搞
-		// 我可以增加，也可以不增加
+		// 可以增加，也可以不增加
 		// 如果强调一定是超时，那么就不增加
 		// 如果是 EOF 之类的错误，你还可以考虑直接切换
 	}

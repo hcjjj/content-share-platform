@@ -8,6 +8,7 @@ package web
 
 import (
 	"basic-go/webook/internal/domain"
+	"basic-go/webook/internal/errs"
 	"basic-go/webook/internal/service"
 	ijwt "basic-go/webook/internal/web/jwt"
 	"fmt"
@@ -305,9 +306,15 @@ func (u *UserHandler) Login(ctx *gin.Context) {
 		return
 	}
 	user, err := u.svc.Login(ctx, req.Email, req.Password)
+	//if err == service.ErrInvalidUserOrPassword {
+	//	ctx.String(http.StatusOK, "邮箱或密码不对")
+	//	return
+	//}
 	if err == service.ErrInvalidUserOrPassword {
-		ctx.String(http.StatusOK, "邮箱或密码不对")
-		return
+		ctx.JSON(http.StatusOK, Result{
+			Code: errs.UserInvalidOrPassword,
+			Msg:  "用户不存在或密码错误",
+		})
 	}
 	if err != nil {
 		ctx.String(http.StatusOK, "系统错误")
@@ -358,7 +365,7 @@ func (u *UserHandler) Edit(ctx *gin.Context) {
 	}
 	birthday, err := time.Parse(time.DateOnly, req.Birthday)
 	if err != nil {
-		// 也就是说，我们其实并没有直接校验具体的格式
+		// 也就是说，其实并没有直接校验具体的格式
 		// 而是如果你能转化过来，那就说明没问题
 		ctx.JSON(http.StatusOK, Result{Code: 4, Msg: "日期格式不对"})
 		return

@@ -49,7 +49,7 @@ func (h *OAuth2WechatHandler) RegisterRoutes(server *gin.Engine) {
 func (h *OAuth2WechatHandler) AuthURL(ctx *gin.Context) {
 	state := uuid.New()
 	url, err := h.svc.AuthURL(ctx, state)
-	// 要把我的 state 存好
+	// 要把 state 存好
 	if err != nil {
 		ctx.JSON(http.StatusOK, Result{
 			Code: 5,
@@ -134,7 +134,7 @@ func (h *OAuth2WechatHandler) Callback(ctx *gin.Context) {
 
 func (h *OAuth2WechatHandler) verifyState(ctx *gin.Context) error {
 	state := ctx.Query("state")
-	// 校验一下我的 state
+	// 校验一下 state
 	ck, err := ctx.Cookie("jwt-state")
 	if err != nil {
 		return fmt.Errorf("拿不到 state 的 cookie, %w", err)

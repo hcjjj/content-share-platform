@@ -5,32 +5,75 @@ import (
 	"time"
 
 	"basic-go/webook/internal/domain"
+	events "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository/article"
 	"basic-go/webook/pkg/logger"
 )
 
+//go:generate mockgen -source=article.go -package=svcmocks -destination=mocks/article.mock.go ArticleService
 type ArticleService interface {
 	Save(ctx context.Context, art domain.Article) (int64, error)
 	Withdraw(ctx context.Context, art domain.Article) error
 	Publish(ctx context.Context, art domain.Article) (int64, error)
 	PublishV1(ctx context.Context, art domain.Article) (int64, error)
 	List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error)
+	// ListPub 只会取 start 七天内的数据
+	ListPub(ctx context.Context, start time.Time, offset, limit int) ([]domain.Article, error)
 	GetById(ctx context.Context, id int64) (domain.Article, error)
-	GetPublishedById(ctx context.Context, id int64) (domain.Article, error)
+	GetPublishedById(ctx context.Context, id, uid int64) (domain.Article, error)
 }
 
 type articleService struct {
 	repo article.ArticleRepository
 
 	// V1 依靠两个不同的 repository 来解决这种跨表，或者跨库的问题
-	author article.ArticleAuthorRepository
-	reader article.ArticleReaderRepository
-	l      logger.LoggerV1
+	author   article.ArticleAuthorRepository
+	reader   article.ArticleReaderRepository
+	l        logger.LoggerV1
+	producer events.Producer
+
+	ch chan readInfo
 }
 
-func (svc *articleService) GetPublishedById(ctx context.Context, id int64) (domain.Article, error) {
+func (svc *articleService) ListPub(ctx context.Context,
+	start time.Time, offset, limit int) ([]domain.Article, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
+type readInfo struct {
+	uid int64
+	aid int64
+}
+
+func (svc *articleService) GetPublishedById(ctx context.Context, id, uid int64) (domain.Article, error) {
 	// 另一个选项，在这里组装 Author，调用 UserService
-	return svc.repo.GetPublishedById(ctx, id)
+	art, err := svc.repo.GetPublishedById(ctx, id)
+	if err == nil {
+		go func() {
+			// 生产者也可以通过改批量来提高性能
+			er := svc.producer.ProduceReadEvent(
+				ctx,
+				events.ReadEvent{
+					// 即便你的消费者要用 art 的里面的数据，
+					// 让它去查询，你不要在 event 里面带
+					Uid: uid,
+					Aid: id,
+				})
+			if er == nil {
+				svc.l.Error("发送读者阅读事件失败")
+			}
+		}()
+
+		go func() {
+			// 改批量的做法
+			svc.ch <- readInfo{
+				aid: id,
+				uid: uid,
+			}
+		}()
+	}
+	return art, err
 }
 
 func (a *articleService) GetById(ctx context.Context, id int64) (domain.Article, error) {
@@ -91,9 +134,53 @@ func (a *articleService) PublishV1(ctx context.Context, art domain.Article) (int
 	return id, err
 }
 
-func NewArticleService(repo article.ArticleRepository) ArticleService {
+func NewArticleService(repo article.ArticleRepository,
+	l logger.LoggerV1,
+	producer events.Producer) ArticleService {
 	return &articleService{
-		repo: repo,
+		repo:     repo,
+		producer: producer,
+		l:        l,
+		//ch:       make(chan readInfo, 10),
+	}
+}
+
+func NewArticleServiceV2(repo article.ArticleRepository,
+	l logger.LoggerV1,
+	producer events.Producer) ArticleService {
+	ch := make(chan readInfo, 10)
+	go func() {
+		for {
+			uids := make([]int64, 0, 10)
+			aids := make([]int64, 0, 10)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+			for i := 0; i < 10; i++ {
+				select {
+				case info, ok := <-ch:
+					if !ok {
+						cancel()
+						return
+					}
+					uids = append(uids, info.uid)
+					aids = append(aids, info.aid)
+				case <-ctx.Done():
+					break
+				}
+			}
+			cancel()
+			ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+			producer.ProduceReadEventV1(ctx, events.ReadEventV1{
+				Uids: uids,
+				Aids: aids,
+			})
+			cancel()
+		}
+	}()
+	return &articleService{
+		repo:     repo,
+		producer: producer,
+		l:        l,
+		ch:       ch,
 	}
 }
 

@@ -6,7 +6,7 @@ spec:
   # 用 nginx
   ingressClassName: nginx
   rules:
-    # 当 host 是 webook.com 的时候命中我这条
+    # 当 host 是 webook.com 的时候命中这条
     - host: hcjjj.webook.com
       http:
         paths:

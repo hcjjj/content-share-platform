@@ -10,6 +10,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
+//go:generate mockgen -source=./interactive.go -package=svcmocks -destination=mocks/interactive.mock.go InteractiveService
 type InteractiveService interface {
 	IncrReadCnt(ctx context.Context, biz string, bizId int64) error
 	// Like 点赞
@@ -20,11 +21,17 @@ type InteractiveService interface {
 	// cid 不一定有，或者说 0 对应的是该用户的默认收藏夹
 	Collect(ctx context.Context, biz string, bizId, cid, uid int64) error
 	Get(ctx context.Context, biz string, bizId, uid int64) (domain.Interactive, error)
+	GetByIds(ctx context.Context, biz string, bizIds []int64) (map[int64]domain.Interactive, error)
 }
 
 type interactiveService struct {
 	repo repository.InteractiveRepository
 	l    logger.LoggerV1
+}
+
+func (i *interactiveService) GetByIds(ctx context.Context, biz string, bizIds []int64) (map[int64]domain.Interactive, error) {
+	//TODO implement me
+	panic("implement me")
 }
 
 func (i *interactiveService) IncrReadCnt(ctx context.Context, biz string, bizId int64) error {

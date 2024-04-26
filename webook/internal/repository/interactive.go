@@ -13,18 +13,40 @@ import (
 type InteractiveRepository interface {
 	IncrReadCnt(ctx context.Context,
 		biz string, bizId int64) error
+	BatchIncrReadCnt(ctx context.Context,
+		biz []string, bizId []int64) error
 	IncrLike(ctx context.Context, biz string, bizId, uid int64) error
 	DecrLike(ctx context.Context, biz string, bizId, uid int64) error
 	AddCollectionItem(ctx context.Context, biz string, bizId, cid int64, uid int64) error
 	Get(ctx context.Context, biz string, bizId int64) (domain.Interactive, error)
 	Liked(ctx context.Context, biz string, id int64, uid int64) (bool, error)
 	Collected(ctx context.Context, biz string, id int64, uid int64) (bool, error)
+	AddRecord(ctx context.Context, aid int64, uid int64) error
 }
 
 type CachedReadCntRepository struct {
 	cache cache.InteractiveCache
 	dao   dao.InteractiveDAO
 	l     logger.LoggerV1
+}
+
+func (c *CachedReadCntRepository) AddRecord(ctx context.Context, aid int64, uid int64) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+// BatchIncrReadCnt bizs 和 ids 的长度必须相等
+func (c *CachedReadCntRepository) BatchIncrReadCnt(ctx context.Context,
+	bizs []string, bizId []int64) error {
+	// 在这里要不要检测 bizs 和 ids 的长度是否相等？
+	err := c.dao.BatchIncrReadCnt(ctx, bizs, bizId)
+	if err != nil {
+		return err
+	}
+	// 也要批量的去修改 redis，所以就要去改 lua 脚本
+	// c.cache.IncrReadCntIfPresent()
+	// TODO, 需要修改 lua 脚本/或者用 pipeline
+	return nil
 }
 
 func (c *CachedReadCntRepository) Liked(ctx context.Context, biz string, id int64, uid int64) (bool, error) {

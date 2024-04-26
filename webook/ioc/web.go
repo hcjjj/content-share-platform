@@ -10,11 +10,15 @@ import (
 	"basic-go/webook/internal/web"
 	ijwt "basic-go/webook/internal/web/jwt"
 	"basic-go/webook/internal/web/middleware"
+	"basic-go/webook/pkg/ginx"
+	"basic-go/webook/pkg/ginx/middlewares/metric"
 	"basic-go/webook/pkg/ginx/middlewares/ratelimit"
 	"basic-go/webook/pkg/limiter"
 	logger2 "basic-go/webook/pkg/logger"
 	"strings"
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/gin-contrib/cors"
 	"github.com/redis/go-redis/v9"
@@ -37,6 +41,8 @@ func InitWebServer(mdls []gin.HandlerFunc,
 	server.Use(mdls...)
 	userHdl.RegisterRoutes(server)
 	articleHdl.RegisterRoutes(server)
+	// 观察测试
+	(&web.ObservabilityHandler{}).RegisterRoutes(server)
 	return server
 }
 
@@ -54,6 +60,14 @@ func InitMiddlewares(redisClient redis.Cmdable,
 	//	bd.AllowReqBody(ok)
 	//})
 
+	// Prometheus 监控
+	ginx.InitCounter(prometheus.CounterOpts{
+		Namespace: "hcjjj",
+		Subsystem: "webook",
+		Name:      "http_biz_code",
+		Help:      "HTTP 的业务错误码",
+	})
+
 	return []gin.HandlerFunc{
 		// 跨域
 		corsHlf(),
@@ -61,6 +75,15 @@ func InitMiddlewares(redisClient redis.Cmdable,
 		//bd.Build(),
 		// IP 限流
 		ratelimitHlf(redisClient),
+		// Prometheus 监控
+		(&metric.MiddlewareBuilder{
+			Namespace:  "hcjjj",
+			Subsystem:  "webook",
+			Name:       "gin_http",
+			Help:       "统计 GIN 的 HTTP 接口",
+			InstanceID: "my-instance-1",
+		}).Build(),
+
 		// 不校验
 		middleware.NewLoginJWTMiddlewareBuilder(jwtHdl).
 			IgnorePaths("/users/signup").
@@ -69,6 +92,7 @@ func InitMiddlewares(redisClient redis.Cmdable,
 			IgnorePaths("/users/refresh_token").
 			IgnorePaths("/oauth2/wechat/authurl").
 			IgnorePaths("/oauth2/wechat/callback").
+			IgnorePaths("/test/metric").
 			IgnorePaths("/users/login").Build(),
 	}
 }

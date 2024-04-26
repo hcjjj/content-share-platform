@@ -47,7 +47,7 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 			return
 		}
 		// 刷新登录状态（session的有效期）
-		// 固定间隔时间刷新，比如说每分钟内第一次访问我都刷新
+		// 固定间隔时间刷新，比如说每分钟内第一次访问都刷新
 		updateTime := sess.Get("update_time")
 		sess.Set("userId", id)
 		sess.Options(sessions.Options{
