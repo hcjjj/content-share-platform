@@ -24,6 +24,7 @@ type ArticleRepository interface {
 	List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error)
 	GetByID(ctx context.Context, id int64) (domain.Article, error)
 	GetPublishedById(ctx context.Context, id int64) (domain.Article, error)
+	ListPub(ctx context.Context, start time.Time, offset int, limit int) ([]domain.Article, error)
 	//FindById(ctx context.Context, id int64) domain.Article
 }
 
@@ -43,6 +44,16 @@ type CachedArticleRepository struct {
 
 	cache cache.ArticleCache
 	l     logger.LoggerV1
+}
+
+func (repo *CachedArticleRepository) ListPub(ctx context.Context, start time.Time, offset int, limit int) ([]domain.Article, error) {
+	res, err := repo.dao.ListPub(ctx, start, offset, limit)
+	if err != nil {
+		return nil, err
+	}
+	return slice.Map(res, func(idx int, src dao.Article) domain.Article {
+		return repo.toDomain(src)
+	}), nil
 }
 
 func (repo *CachedArticleRepository) GetPublishedById(
@@ -78,8 +89,8 @@ func (c *CachedArticleRepository) GetByID(ctx context.Context, id int64) (domain
 }
 
 func (c *CachedArticleRepository) List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error) {
-	// 你在这个地方，集成你的复杂的缓存方案
-	// 你只缓存这一页
+	// 在这个地方，集成复杂的缓存方案
+	// 只缓存这一页
 	if offset == 0 && limit <= 100 {
 		data, err := c.cache.GetFirstPage(ctx, uid)
 		if err == nil {
@@ -253,7 +264,6 @@ func (c *CachedArticleRepository) preCache(ctx context.Context, data []domain.Ar
 		}
 	}
 }
-
 func NewArticleRepository(dao dao.ArticleDAO, l logger.LoggerV1, c cache.ArticleCache) ArticleRepository {
 	return &CachedArticleRepository{
 		dao:   dao,

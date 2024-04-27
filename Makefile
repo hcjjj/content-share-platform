@@ -3,6 +3,9 @@ mock:
 	@mockgen -source ./webook/internal/service/user.go -package svcmocks -destination ./webook/internal/service/mocks/user.mock.go
 	@mockgen -source ./webook/internal/service/code.go -package svcmocks -destination ./webook/internal/service/mocks/code.mock.go
 	@mockgen -source ./webook/internal/service/article.go -package svcmocks -destination ./webook/internal/service/mocks/article.mock.go
+	@mockgen -source ./webook/internal/service/interactive.go -package svcmocks -destination ./webook/internal/service/mocks/interactive.mock.go
+	# 也可以这样子
+	#	//go:generate mockgen -source=./interactive.go -package=svcmocks -destination=mocks/interactive.mock.go InteractiveService
 	@mockgen -source ./webook/internal/service/sms/types.go -package smsmocks -destination ./webook/internal/service/sms/mocks/sms.mock.go
 	@mockgen -source ./webook/internal/repository/user.go -package repomocks -destination ./webook/internal/repository/mocks/user.mock.go
 	@mockgen -source ./webook/internal/repository/code.go -package repomocks -destination ./webook/internal/repository/mocks/code.mock.go

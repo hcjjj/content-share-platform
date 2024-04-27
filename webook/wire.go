@@ -24,10 +24,24 @@ import (
 	"github.com/google/wire"
 )
 
+var interactiveSvcProvider = wire.NewSet(
+	service.NewInteractiveService,
+	repository.NewCachedInteractiveRepository,
+	dao.NewGORMInteractiveDAO,
+	cache.NewRedisInteractiveCache,
+)
+
+var rankingServiceSet = wire.NewSet(
+	cache.NewRankingRedisCache,
+	repository.NewCachedRankingRepository,
+	service.NewBatchRankingService,
+	articleEve.NewInteractiveReadEventBatchConsumer,
+)
+
 func InitWebServer() *App {
 	wire.Build(
 		// 最基础的第三方依赖
-		ioc.InitDB, ioc.InitRedis,
+		ioc.InitDB, ioc.InitRedis, ioc.InitRLockClient,
 		// 业务相关
 		// 用户
 		dao.NewUserDAO,
@@ -41,15 +55,21 @@ func InitWebServer() *App {
 		ioc.InitKafka,
 		ioc.NewConsumers,
 		ioc.NewSyncProducer,
+
+		interactiveSvcProvider,
+		// Job
+		rankingServiceSet,
+		ioc.InitRankingJob,
+		ioc.InitJobs,
+
 		// 文章
 		cache.NewRedisArticleCache,
-		cache.NewRedisInteractiveCache,
+		//cache.NewRedisInteractiveCache,
 		articleDao.NewGORMArticleDAO,
-		dao.NewGORMInteractiveDAO,
+		//dao.NewGORMInteractiveDAO,
 		article.NewArticleRepository,
-		repository.NewCachedInteractiveRepository,
+		//repository.NewCachedInteractiveRepository,
 		articleEve.NewKafkaProducer,
-		articleEve.NewInteractiveReadEventBatchConsumer,
 		service.NewArticleService,
 		web.NewArticleHandler,
 		// 日志模块

@@ -3,6 +3,7 @@
 package startup
 
 import (
+	article3 "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
@@ -43,6 +44,11 @@ func InitWebServer() *gin.Engine {
 		thirdProvider,
 		userSvcProvider,
 		articleSvcProvider,
+		// kafka
+		ioc.InitKafka,
+		ioc.NewSyncProducer,
+		article3.NewKafkaProducer,
+
 		cache.NewCodeCache,
 		repository.NewCodeRepository,
 		// service 部分
@@ -73,6 +79,12 @@ func InitArticleHandler(dao article.ArticleDAO) *web.ArticleHandler {
 		//userSvcProvider,
 		cache.NewRedisArticleCache,
 		//wire.InterfaceValue(new(article.ArticleDAO), dao),
+
+		// kafka
+		ioc.InitKafka,
+		ioc.NewSyncProducer,
+		article3.NewKafkaProducer,
+
 		article2.NewArticleRepository,
 		service.NewArticleService,
 		web.NewArticleHandler)

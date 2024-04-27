@@ -13,12 +13,20 @@ type GORMArticleDAO struct {
 	db *gorm.DB
 }
 
+func (dao *GORMArticleDAO) ListPub(ctx context.Context, start time.Time, offset int, limit int) ([]Article, error) {
+	var res []Article
+	err := dao.db.WithContext(ctx).
+		Where("utime<?", start.UnixMilli()).
+		Order("utime DESC").Offset(offset).Limit(limit).Find(&res).Error
+	return res, err
+}
+
 func (dao *GORMArticleDAO) GetByAuthor(ctx context.Context, author int64, offset, limit int) ([]Article, error) {
 	var arts []Article
 	// SELECT * FROM XXX WHERE XX order by aaa
 	// 在设计 order by 语句的时候，要注意让 order by 中的数据命中索引
 	// SQL 优化的案例：早期的时候，
-	// order by 没有命中索引的，内存排序非常慢
+	// 我们的 order by 没有命中索引的，内存排序非常慢
 	// 你的工作就是优化了这个查询，加进去了索引
 	// author_id => author_id, utime 的联合索引
 	err := dao.db.WithContext(ctx).Model(&Article{}).

@@ -7,6 +7,7 @@
 package startup
 
 import (
+	article3 "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
@@ -40,7 +41,10 @@ func InitWebServer() *gin.Engine {
 	articleDAO := article.NewGORMArticleDAO(gormDB)
 	articleCache := cache.NewRedisArticleCache(cmdable)
 	articleRepository := article2.NewArticleRepository(articleDAO, loggerV1, articleCache)
-	articleService := service.NewArticleService(articleRepository)
+	client := ioc.InitKafka()
+	syncProducer := ioc.NewSyncProducer(client)
+	producer := article3.NewKafkaProducer(syncProducer)
+	articleService := service.NewArticleService(articleRepository, loggerV1, producer)
 	articleHandler := web.NewArticleHandler(articleService, loggerV1)
 	engine := ioc.InitWebServer(v, userHandler, articleHandler)
 	return engine
@@ -51,7 +55,10 @@ func InitArticleHandler(dao2 article.ArticleDAO) *web.ArticleHandler {
 	cmdable := InitRedis()
 	articleCache := cache.NewRedisArticleCache(cmdable)
 	articleRepository := article2.NewArticleRepository(dao2, loggerV1, articleCache)
-	articleService := service.NewArticleService(articleRepository)
+	client := ioc.InitKafka()
+	syncProducer := ioc.NewSyncProducer(client)
+	producer := article3.NewKafkaProducer(syncProducer)
+	articleService := service.NewArticleService(articleRepository, loggerV1, producer)
 	articleHandler := web.NewArticleHandler(articleService, loggerV1)
 	return articleHandler
 }

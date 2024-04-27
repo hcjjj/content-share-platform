@@ -24,7 +24,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 - [ ] 文章服务 📃
   - [x] 新建、修改、保存和发布
   - [x] 阅读、点赞和收藏
-  - [ ] 榜单模型
+  - [x] 榜单模型和缓存
   - [ ] 分布式任务调度
 - [ ] 评论服务 ✍
 - [ ] 用户关系 🧩
@@ -68,6 +68,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [sarama](https://github.com/IBM/sarama) - Sarama is a Go library for Apache Kafka
 * [prometheus](https://github.com/prometheus)/[client_golang](https://github.com/prometheus/client_golang) - Prometheus instrumentation library for Go applications
 * [cron](https://github.com/robfig/cron) - a cron library for go 定时任务
+* [redis-lock](https://github.com/gotomicro/redis-lock) - 基于 Redis 实现的分布式锁
 
 **相关环境**
 
@@ -132,7 +133,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   
 * 文章服务
 
-  * ###### 新建、修改、保存和发布
+  * 新建、修改、保存和发布
 
     * 测试驱动开发 TDD，专注于某个功能的实现
     * 文章领域中用户的两重身份
@@ -152,8 +153,10 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * 榜单模型
 
     * 综合考虑用户的各种行为、时间的衰减特性和权重因子
-    * 滑动窗口 + 优先队列
-    * 定时任务
+    * 滑动窗口 + 优先队列，定时计算热榜文章后缓存
+    * 分布式定时任务，为了解决不同实例计算结果可能出现偏差
+      * 基于 Redis 的分布式锁
+      * 基于 MySQL 实现通用的分布式任务调度机制（乐观锁）
 
 * 监控、埋点和告警
 
@@ -164,8 +167,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * HTTP 接口里面设计的 Code 字段可以考虑用于监控埋点
   * 利用 Redis 的 Hook 功能监控缓存命中率
   * *接入 OpenTelemetry 集成 zipkin（未做）*
-  * *prometheus 集成 Grafana （未做）* 
-
+  * *prometheus 集成 Grafana 告警（未做）* 
 
 **编程思想**
 

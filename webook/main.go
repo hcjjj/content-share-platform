@@ -8,8 +8,10 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -56,8 +58,9 @@ func main() {
 	initLogger()
 
 	// wire
-
 	app := InitWebServer()
+
+	// 消费者
 	// Consumer 的设计，类似于 Web，或者 GRPC 之类的，是一个顶级入口
 	for _, c := range app.consumers {
 		err := c.Start()
@@ -65,12 +68,25 @@ func main() {
 			panic(err)
 		}
 	}
+	// 定时任务
+	app.cron.Start()
+	// HTTP 服务
 	server := app.web
 	server.GET("/hello", func(ctx *gin.Context) {
 		ctx.String(http.StatusOK, "你好，你来了")
 	})
-
 	server.Run(":8080")
+	// 服务关闭
+	// 一分钟内你要关完，要退出
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	ctx = app.cron.Stop()
+	// 这边可以考虑超时强制退出，防止有些任务，执行特别长的时间
+	tm := time.NewTimer(time.Minute * 10)
+	select {
+	case <-tm.C:
+	case <-ctx.Done():
+	}
 }
 
 func initPrometheus() {
@@ -110,7 +126,7 @@ func initViper() {
 	// 现实中，有很多格式，JSON，XML，YAML，TOML，ini
 	viper.SetConfigType("yaml")
 	// 当前工作目录下的 config 子目录
-	viper.AddConfigPath("./config")
+	viper.AddConfigPath("./webook/config")
 	//viper.AddConfigPath("/tmp/config")
 	//viper.AddConfigPath("/etc/webook")
 	// 读取配置到 viper 里面，或者你可以理解为加载到内存里面
@@ -131,7 +147,7 @@ func initViperWithArg() {
 	// program argument
 	// go run . --config=config/dev.yaml
 	cfile := pflag.String("config",
-		"config/dev.yaml", "指定配置文件路径")
+		"./webook/config/dev.yaml", "指定配置文件路径")
 	// 顺序不能乱 要先从命令行中解析出来，不然都是默认值 dev/config.yaml
 	pflag.Parse()
 	viper.SetConfigFile(*cfile)
