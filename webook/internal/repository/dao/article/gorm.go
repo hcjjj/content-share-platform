@@ -135,6 +135,7 @@ func (dao *GORMArticleDAO) SyncClosure(ctx context.Context,
 	var (
 		id = art.Id
 	)
+	// 开启事务
 	err := dao.db.Transaction(func(tx *gorm.DB) error {
 		var err error
 		now := time.Now().UnixMilli()

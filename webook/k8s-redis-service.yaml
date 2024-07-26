@@ -14,4 +14,7 @@ spec:
       # 集群外部的
       nodePort: 30009
   type: NodePort
-  
+
+# port 抽象 Service 服务本身的
+# targetPort 转发到实例上的什么端口
+# nodeport k8s 集群之外访问的端口

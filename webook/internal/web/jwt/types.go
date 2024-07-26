@@ -17,6 +17,7 @@ type RefreshClaims struct {
 	Uid  int64
 	Ssid string
 	jwt.RegisteredClaims
+	//UserAgent string
 }
 
 type UserClaims struct {
