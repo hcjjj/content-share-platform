@@ -10,6 +10,11 @@
 package main
 
 import (
+	"basic-go/webook/interactive/events"
+	repository2 "basic-go/webook/interactive/repository"
+	cache2 "basic-go/webook/interactive/repository/cache"
+	dao2 "basic-go/webook/interactive/repository/dao"
+	service2 "basic-go/webook/interactive/service"
 	articleEve "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	"basic-go/webook/internal/repository/article"
@@ -25,17 +30,17 @@ import (
 )
 
 var interactiveSvcProvider = wire.NewSet(
-	service.NewInteractiveService,
-	repository.NewCachedInteractiveRepository,
-	dao.NewGORMInteractiveDAO,
-	cache.NewRedisInteractiveCache,
+	service2.NewInteractiveService,
+	repository2.NewCachedInteractiveRepository,
+	dao2.NewGORMInteractiveDAO,
+	cache2.NewRedisInteractiveCache,
 )
 
 var rankingServiceSet = wire.NewSet(
 	cache.NewRankingRedisCache,
 	repository.NewCachedRankingRepository,
 	service.NewBatchRankingService,
-	articleEve.NewInteractiveReadEventBatchConsumer,
+	events.NewInteractiveReadEventBatchConsumer,
 )
 
 func InitWebServer() *App {

@@ -13,16 +13,3 @@ type Interactive struct {
 	Liked     bool `json:"liked"`
 	Collected bool `json:"collected"`
 }
-
-type Self struct {
-	Liked     bool `json:"liked"`
-	Collected bool `json:"collected"`
-}
-
-type Collection struct {
-	Name  string
-	Uid   int64
-	Items []Resource
-}
-
-// max(发送者总速率/单一分区写入速率, 发送者总速率/单一消费者速率) + buffer

@@ -1,6 +1,8 @@
 package web
 
 import (
+	domain2 "basic-go/webook/interactive/domain"
+	service2 "basic-go/webook/interactive/service"
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/service"
 	ijwt "basic-go/webook/internal/web/jwt"
@@ -20,7 +22,7 @@ var _ handler = (*ArticleHandler)(nil)
 type ArticleHandler struct {
 	svc     service.ArticleService
 	l       logger.LoggerV1
-	intrSvc service.InteractiveService
+	intrSvc service2.InteractiveService
 	biz     string
 }
 
@@ -112,7 +114,7 @@ func (a *ArticleHandler) PubDetail(ctx *gin.Context) {
 		return err
 	})
 
-	var intr domain.Interactive
+	var intr domain2.Interactive
 	eg.Go(func() error {
 		// 这个地方可以容忍错误
 		intr, err = a.intrSvc.Get(ctx, a.biz, id, uc.Id)

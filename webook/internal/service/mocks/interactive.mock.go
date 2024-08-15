@@ -10,7 +10,7 @@
 package svcmocks
 
 import (
-	domain "basic-go/webook/internal/domain"
+	"basic-go/webook/interactive/domain"
 	context "context"
 	reflect "reflect"
 

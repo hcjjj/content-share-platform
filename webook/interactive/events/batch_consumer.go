@@ -1,10 +1,10 @@
-package article
+package events
 
 import (
+	"basic-go/webook/interactive/repository"
 	"context"
 	"time"
 
-	"basic-go/webook/internal/repository"
 	"basic-go/webook/pkg/logger"
 	"basic-go/webook/pkg/saramax"
 

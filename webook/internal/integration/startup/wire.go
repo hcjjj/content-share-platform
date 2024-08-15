@@ -3,6 +3,10 @@
 package startup
 
 import (
+	repository2 "basic-go/webook/interactive/repository"
+	cache2 "basic-go/webook/interactive/repository/cache"
+	dao2 "basic-go/webook/interactive/repository/dao"
+	service2 "basic-go/webook/interactive/service"
 	article3 "basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	article2 "basic-go/webook/internal/repository/article"
@@ -33,10 +37,10 @@ var articleSvcProvider = wire.NewSet(
 	service.NewArticleService)
 
 var interactiveSvcProvider = wire.NewSet(
-	service.NewInteractiveService,
-	repository.NewCachedInteractiveRepository,
-	dao.NewGORMInteractiveDAO,
-	cache.NewRedisInteractiveCache,
+	service2.NewInteractiveService,
+	repository2.NewCachedInteractiveRepository,
+	dao2.NewGORMInteractiveDAO,
+	cache2.NewRedisInteractiveCache,
 )
 
 func InitWebServer() *gin.Engine {
@@ -101,7 +105,7 @@ func InitJwtHdl() ijwt.Handler {
 	return ijwt.NewRedisJWTHandler(nil)
 }
 
-func InitInteractiveService() service.InteractiveService {
+func InitInteractiveService() service2.InteractiveService {
 	wire.Build(thirdProvider, interactiveSvcProvider)
-	return service.NewInteractiveService(nil, nil)
+	return service2.NewInteractiveService(nil, nil)
 }

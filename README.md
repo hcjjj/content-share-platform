@@ -21,7 +21,6 @@ graph LR;
 
 **单体应用版本**
 
-* 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
 * Service - Repository - DAO (Data Access Object) 三层结构 
   * service：领域服务（domain service），一个业务的完整处理过程
   * repository：领域对象的存储，存储数据的抽象
@@ -29,6 +28,7 @@ graph LR;
     * cache 缓存操作
   * domain：领域对象
 * handler（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
+* 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
 
 ## 开发进度
 

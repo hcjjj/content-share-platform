@@ -7,6 +7,7 @@
 package ioc
 
 import (
+	dao2 "basic-go/webook/interactive/repository/dao"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/pkg/logger"
 	"time"
@@ -101,10 +102,16 @@ func InitDB(l logger.LoggerV1) *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
+	// 数据库表初始化
 	err = dao.InitTable(db)
 	if err != nil {
 		panic(err)
 	}
+	err = dao2.InitTable(db)
+	if err != nil {
+		panic(err)
+	}
+
 	return db
 }
 
