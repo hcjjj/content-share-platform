@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+option go_package = "/basic-go/grpc";
+
+// 这种是不可行的
+//option go_package = "abc";
+
+message User {
+  int64 id = 1;
+  string name = 2;
+
+  string avatar = 4;
+
+  map<string, string> attributes = 5;
+  repeated string nicknames = 6;
+
+  optional int32 age = 7;
+
+  Address address = 8;
+
+  oneof contacts {
+    string email = 9;
+    string phone = 10;
+  }
+
+  Gender gender = 11;
+}
+
+message Address {
+  string province = 1;
+  string city = 3;
+}
+
+enum Gender {
+  GENDER_UNKNOWN = 0;
+  GENDER_MALE = 1;
+  GENDER_FEMALE = 2;
+}
+
+service UserService {
+  rpc GetByID(GetByIDRequest) returns(GetByIDResponse);
+}
+
+service VipService {
+//  rpc GetByID(VipGetByIDRequest) returns(GetByIDResponse);
+}
+
+message GetByIDRequest {
+  int64 id = 1;
+}
+
+message GetByIDResponse {
+  User user = 1;
+}

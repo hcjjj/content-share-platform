@@ -7,8 +7,8 @@
 package wiredemo
 
 import (
-	"basic-go/others/wiredemo/repository"
-	"basic-go/others/wiredemo/repository/dao"
+	"basic-go/demo/wiredemo/repository"
+	"basic-go/demo/wiredemo/repository/dao"
 )
 
 // Injectors from wire.go:

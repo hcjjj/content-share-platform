@@ -1,7 +1,36 @@
 # 建设中 🔨
 
+## 总体架构
+> 待补充
 
-## 项目介绍
+## 项目结构
+
+**拆分微服务**
+
+```mermaid
+graph LR;
+    A[单体应用-混沌一片] -->|模块划分| B(单体应用-模块化)
+    B -->|模块独立维护| C(单体应用-模块依赖化)
+    C -->|模块独立部署| D(微服务化)
+    style D fill:#f9d6d6
+```
+
+
+
+> 待完善
+
+**单体应用版本**
+
+* 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
+* Service - Repository - DAO (Data Access Object) 三层结构 
+  * service：领域服务（domain service），一个业务的完整处理过程
+  * repository：领域对象的存储，存储数据的抽象
+    * dao：数据库操作
+    * cache 缓存操作
+  * domain：领域对象
+* handler（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
+
+## 开发进度
 
 **开发环境**
 
@@ -11,12 +40,12 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 
 **开发计划**
 
-- [x] 用户登录服务 👤
+- [x] 用户服务 👤
   - [x] 注册、登录态校验与刷新
   - [x] 保护登录系统
   - [x] 优化登录性能
   - [x] 短信验证码登录
-  - [x] 微信扫码登录
+  - [ ] 微信扫码登录
   - [x] 长短 Token 与退出
 - [x] 接入配置模块 ⚙️
 - [x] 接入日志模块 📋️
@@ -32,15 +61,58 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 - [ ] 即时通讯 💬
 - [ ] 单元/集成测试 ✅
 
-**项目结构**
+## 业务分析
 
-* 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
-* Service - Repository - DAO (Data Access Object) 三层结构 
-  * service：领域服务（domain service），一个业务的完整处理过程
-  * repository：领域对象的存储，存储数据的抽象
-    * dao：数据库操作
-  * domain：领域对象
-* handler（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
+**用户服务**
+
+用户模块是一个非常常见的模块，几乎所有系统在记录用户信息时都需要这个模块。
+
+* 登录系统的关键问题包括安全性、可用性和性能。安全性是最重要的，其次是可用性。虽然性能也很关键，但相对而言，登录是一个低频行为，因此性能问题不如前两者重要。如果用户频繁使用系统，则不应该让用户每次都登录。
+
+* 安全问题主要关注的是如果有人试图入侵系统，登录过程将成为他们攻击的重点。相关知识点包括：
+
+  * 加密算法
+  * 保护 session 或 JWT token，并在这些信息泄露后，尽可能识别伪装成真实用户的攻击者
+* 可用性问题则涉及到保证登录系统的稳定性，不会轻易崩溃。要提供多种登录方式，以便即使一种途径崩溃，仍有其他途径可用。例如，短信登录需要确保短信服务不会崩溃，或者在崩溃时提供备用方案。
+* 在资源管理方面，可以考虑 JWT token 和长短期 token 的方案。需要理解使用 Session 和 JWT 的区别。
+
+**短信服务**
+
+基本的功能实现是比较简单的，重点难点在于：
+
+* 需求分析能力：当实现像“验证码登录”这样的复合功能时，需要识别出应拆分出的独立模块。
+* 接口抽象与扩展：掌握如何抽象出接口，并在接口基础上使用装饰器来扩展功能的技巧。
+  * 重试机制：重试是常用的策略，需要考虑重试的间隔和次数。
+  * 故障转移：简单的故障 转移方式是直接轮询，复杂的则需要动态判断下游服务的状态。
+  * 客户端限流：实现客户端限流的策略
+  * 同步转异步：转为异步后，需要考虑如何确保短信最终会发出去
+ * 要注意并发问题，在这一过程中，Lua 脚本的使用尤为重要，虽然 Redis 是线程安全的，但它不能保证在连续执行多个命令时不会插入其他命令。
+
+**文章服务**
+
+* 理解内容生产平台常见的制作库和线上库的设计思路。虽然被称为制作库和线上库，它们可以是不同的数据库，也可以是同一数据库中的不同表。
+
+- 文档型数据库：类似于 MongoDB 的 NoSQL 文档型数据库非常适合存储文章、帖子等内容。
+- 多媒体存储：对于真正的多媒体内容，如图片、视频、音频等，使用 OSS（对象存储服务）加 CDN（内容分发网络）会更为合适。
+- 数据库事务：需要学习手动控制事务，以及使用闭包事务。虽然闭包事务能够满足大多数场景的需求，但在某些特定场景下，仍需手动控制事务。
+
+**榜单功能**
+
+* 常见的榜单模型，只需要有基本了解，核心是记住榜单通常与用户行为正相关，与文章发表时间负相关。
+
+* 榜单的整体计算过程稍微复杂，需要注意以下几点：
+
+  - 优先级队列：用于维持榜单的前 n 名数据。
+
+  - 分批次计算：因为无法一次性将所有数据加载到内存中，所以需要分批计算。
+* 榜单的查询接口需要强调高并发和高可用性（位于应用的首页）：
+
+  - 数据库崩溃：考虑到如果数据库崩溃，榜单是否仍能正确查询。
+  - Redis 崩溃：考虑到如果 Redis 崩溃，榜单是否仍能正确查询。通常，使用 Redis 作为缓存就足够了。但在追求极高性能时，Redis 可能无法满足需求，需要使用本地缓存。此外，本地缓存未命中的情况也要尽可能避免。
+  - 极致性能：在追求极致性能的情况下，本地缓存可能无法满足需求，可能需要考虑借助 CDN 等技术。
+* 榜单的计算本身是一个定时任务，因此涉及到定时任务的调度。
+  - 节点选择：有些定时任务，如榜单计算，只需要一个节点来执行。因此需要调度一个节点来执行任务，而不是所有节点都去执行，以避免资源浪费。
+  - 负载均衡：在定时任务调度时，需要考虑负载均衡的问题。如果所有任务都被调度到同一个节点执行，该节点可能会过载。因此，需要选择负载最低的节点进行任务执行。在执行过程中，如果发现节点负载过高，立即中断任务并选择其他节点执行。
 
 ## 技术栈
 
@@ -68,13 +140,13 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [sarama](https://github.com/IBM/sarama) - Sarama is a Go library for Apache Kafka
 * [prometheus](https://github.com/prometheus)/[client_golang](https://github.com/prometheus/client_golang) - Prometheus instrumentation library for Go applications
 * [cron](https://github.com/robfig/cron) - a cron library for go 定时任务
-* [redis-lock](https://github.com/gotomicro/redis-lock) - 基于 Redis 实现的分布式锁
+* ~~[redis-lock](https://github.com/gotomicro/redis-lock) - 基于 Redis 实现的分布式锁~~
+* [protobuf](https://github.com/golang/protobuf) - Go support for Google's protocol buffers
+* [grpc-go](https://github.com/grpc/grpc-go) - The Go language implementation of gRPC. HTTP/2 based RPC
 
 **相关环境**
 
 * [Node.js](https://nodejs.org/en)
-  * 启动前端：在 webook-fe 目录下先 `npm install` 后 `npm run dev`
-  * 前端不完善，采用测试驱动开发
 * [Docker](https://www.docker.com/)
   * [镜像源](https://yeasy.gitbook.io/docker_practice/install/mirror)（还是挂代理方便）
   * [mysql](https://hub.docker.com/_/mysql) - An open-source relational database management system (RDBMS)
@@ -91,236 +163,70 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [HELM](https://helm.sh/) - The package manager for Kubernetes
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
 * [wrk](https://github.com/wg/wrk) - Modern HTTP benchmarking tool
+* [protobuf](https://github.com/protocolbuffers/protobuf) - Protocol Buffers - Google's data interchange format
 
-## 技术要点
-**业务功能**
+## 编程能力
 
-* 用户登录服务
-  * 注册、密码加密存储
-  * 登录、登录态校验
-    * Cookie + Session
-    * Session 存储基于 Redis 实现（多实例部署环境）
-      * 但是每次请求都要访问 Redis，性能瓶颈问题
-      * 换为 JWT（JSON Web Token）机制
-        * 这边有个问题需要解决，多实例部署的退出登录功能
-    *   刷新登录状态
-      * 在登录校验处执行相关逻辑
-      * 控制 Session 的有效期
-      * 生成一个新的 Token
-  * 保护登录系统
-    * 限流（限制每个用户每秒最多发送固定数量的请求  ）
-      * 基于 Redis 的 IP 限流
-    * 增强登录安全
-      * 利用 User-Agent 增强安全性  
-  * 优化登录性能
-  * 短信验证码登录
-    * 验证码是一个独立的功能 （登录、修改密码、危险操作的二次验证）
-    * 短信服务也是独立的（方便更换供应商）
-    * 验证码登录功能 → 验证码功能 → 短信服务（最基础的服务）
-    * 发送验证码功能做用户限流（存入所生成验证码到 Redis 的时候检查有效期）
-    * 提高可用性：重试机制、客户端限流、failover（轮询，实时检测）
-  * 长短 Token 与登出
-  * 微信扫码登录（未完成）
-  
-* 接入配置模块
-  * 不同环境读取不同配置文件
-  * viper 接入 etcd，实现远程配置中心
-  
-* 接入日志模块
-  * 抽象日志接口并使用 zap 实现
-  * 利用 Gin 的 middleware 打印日志
-  * 实现 GORM 的日志接口 
-  
-* 文章服务
+**面向失败编程**
 
-  * 新建、修改、保存和发布
+面向失败编程（Failure-oriented Programming，FOP）是一种编程范式，强调在编写逻辑时尽可能考虑边界条件和失败情况，以增强程序的稳定性。
 
-    * 测试驱动开发 TDD，专注于某个功能的实现
-    * 文章领域中用户的两重身份
-    * 新建、修改、保存、发布
-    * 发布时制作库和线上库数据的同步问题
-    * *Mysql → MongoDB （未做）*
-    * *OSS + CDN （未做）*
+简单来说，就是时刻考虑系统可能会崩溃。无论是系统本身、依赖的服务还是依赖的数据库，都可能会崩溃。
 
-  * 阅读、点赞、收藏
+面向失败编程不仅仅是对输入进行校验，它还包括：
 
-    * 三者聚合的表设计、索引的设计策略
-    * 采用 Redis 的 map 结构缓存三者的总数
-    * 使用软删除缓解性能问题
-    * 使用 errgroup.Group 并发查询文章内容和相关数据
-    * 用 Kafka 改造阅读计数功能，批量处理消息提高性能
-    
-  * 榜单模型
+- 错误处理：需要严密处理各种可能的错误情况
+- 容错设计：长期培养的能力是针对业务和系统特征设计容错策略。这通常是较难掌握的，而其余部分可以通过规范来达成。
 
-    * 综合考虑用户的各种行为、时间的衰减特性和权重因子
-    * 滑动窗口 + 优先队列，定时计算热榜文章后缓存
-    * 分布式定时任务，为了解决不同实例计算结果可能出现偏差
-      * 基于 Redis 的分布式锁
-      * 基于 MySQL 实现通用的分布式任务调度机制（乐观锁）
+在面向失败编程中，需要长期培养的能力是针对业务和系统特征设计容错策略。其他方面较容易掌握，或者公司可以通过规范来达成。
 
-* 监控、埋点和告警
+在项目中，我们讨论了许多容错方案，包括：
 
-  * 利用 Gin middleware 来统计 HTTP 请求  
-* 测试：`wrk -t1 -d1m -c2 http://localhost:8080/test/metric`
-  * 利用 GORM 的 Plugin 来监控和数据库有关的信息  
-  * 使用 Callback 来监控 GROM 执行时间
-  * HTTP 接口里面设计的 Code 字段可以考虑用于监控埋点
-  * 利用 Redis 的 Hook 功能监控缓存命中率
-  * *接入 OpenTelemetry 集成 zipkin（未做）*
-  * *prometheus 集成 Grafana 告警（未做）* 
+- 重试机制：需要考虑重试的间隔和次数，以及最后可能需要人工介入。
+- 监控与告警：在追求高可用时，还要考虑自动修复的程度
+- 限流：用于保护系统本身。
+- 下游服务治理：如果下游服务可能崩溃，需使用一些治理技巧：
+  - 轮询：可以是每次都轮询，也可以针对某个下游节点失败后的限流。
+  - 客户端限流：限制客户端的请求速率以保护系统资源。
+  - 同步转异步：在转为异步后，必须保证请求会被处理而不会遗漏
+- 考虑安全性：例如，防止 token 泄露以增强系统的安全性。
 
-**编程思想**
+在设计容错方案时，尽可能在平时收集别人使用的容错方案，以了解各种处理方式。根据自己实际处理的业务设计合适的容错方案。简单地生搬硬套别人的方案，效果可能不佳。
 
-* 控制反转（Inversion of Control, IoC）
-  * 依赖注入（Dependency Injection）
-  * 依赖查找、依赖发现（Go 里面没有）
-* 面向接口编程
-  * 扩展性强
-  * 超前设计，最小化实现
+**灵活的缓存方案**
 
-**测试**
+在整个单体应用中，已经充分接触了缓存方案。相比传统的缓存方案，项目中的缓存方案更具“趣味性”。在实践中，除非逼不得已，我通常不会使用看起来非常特殊的缓存方案。
 
-* 单元测试
+使用过和讨论过的缓存方案包括：
 
-  * Table Driven 模式
-  * 最起码做到分支覆盖  
-  * 注意与时间相关的测试
-* 集成测试
+* 只使用 Redis：更新缓存的常见方案是更新数据库后删除缓存。
+* 本地缓存与 Redis 缓存结合使用。大多数系统完成这些步骤即可，
+  * 查找顺序：本地缓存 -  Redis - 数据库
+  * 更新顺序：数据库 - 本地缓存 - Redis
+* 根据业务特征动态设置缓存的过期时间。例如，如果能判定某个用户是大 V，则他的数据过期时间应设得更长。
+* 淘汰对象：根据业务特征来淘汰缓存对象。
+* 缓存崩溃：需要考虑缓存崩溃的问题。在实践中，缓存崩溃可能导致数据库也一起崩溃。
 
-  * 至少测完业务层面的主要正常流程和主要异常流程
+在上述缓存方案的基础上，需要能够举一反三，根据业务特征设计针对性的解决方案。在整个职业生涯中，如果能有效使用缓存，就能解决 90% 的性能问题。剩下的 10% 则需要依靠各种技巧和优化手段。
 
-**第三方服务治理**
+**注意并发问题**
 
-* 提高可用性：重试机制、客户端限流、failover（轮询，实时检测）
-* 提高安全性，完整的资源申请与审批流程
-* 提高可观测性：日志、metrics、tracing，丰富完善的排查手段
+无论是代码中的 Go 实例，还是外部数据库，在实现任何功能时操作对象或 Redis 缓存数据时，都必须考虑并发问题。具体来说，需要关注是否有多个 goroutine 在同一时刻读写对象，这些 goroutine 可能在不同的实例（机器）上，也可能在同一实例（机器）上。
 
-# 部署应用
+在项目中，使用了多种方法来解决并发问题：
 
-**环境配置**
+- SELECT FOR UPDATE：用于确保读取的数据在操作期间不会被修改，简单且有效。
+- 分布式锁：用于保证同一时刻只有一个 goroutine 可以执行特定操作。
+- Lua 脚本：在 Redis 中使用 Lua 脚本来确保在执行多个操作时没有其他 goroutine 修改 Redis 数据。
+- 乐观锁：使用数据库 version 加 CAS（Compare and Swap）机制来保证在修改数据时，数据未被其他操作修改过。
+- Go 对象锁：使用 `sync.Mutex` 和 `sync.RWMutex` 来管理对 Go 对象的并发访问，在某些情况下，还可以使用原子操作（`atomic` 包）来处理简单的并发问题。
 
-```shell
-# Ubuntu 22.04.3 LTS
-# Golang
-wget https://golang.google.cn/dl/go1.22.1.linux-amd64.tar.gz
-sudo tar xfz go1.22.1.linux-amd64.tar.gz -C /usr/local
-sudo vim /etc/profile
-# export GOROOT=/usr/local/go
-# export GOPATH=$HOME/go
-# export GOBIN=$GOPATH/bin
-# export PATH=$GOPATH:$GOBIN:$GOROOT/bin:$PATH
-source /etc/profile
-go version
-go env -w GOPROXY="https://goproxy.cn"
-go env -w GO111MODULE=on
+在实践中，只能通过长期训练来培养并发意识。在项目开始时，就应有意识地培养自己对并发问题的关注和敏感度。
 
-# Docker
-# 
+**依赖注入**
 
-# Kubernetes
-#
-```
+首先要整体上领悟依赖注入和面向接口编程的优势，这些优点在项目中体现得非常明显：
 
-**用 Kubernetes 部署 Web 服务**
-
-交叉编译
-
-```shell
-# Windows → Linux
-# powershell
-$env:GOOS="linux"
-$env:GOARCH="amd64"
-go build -o .\build\webook
-go build -tags=k8s -o .\build\webook
-# Mac → Linux
-GOOS=linux GOARCH=amd64 go build -o /build/webook
-```
-
-编写 `Dockerfile`
-
-```dockerfile
-# 基础镜像
-FROM ubuntu:20.04
-# 把编译后的打包进这个镜像，放到工作目录 /app
-COPY /build/webook /app/webook
-WORKDIR /app
-# CMD 是执行命令
-# 最佳
-ENTRYPOINT ["/app/webook"]
-```
-
-```shell
-# 构建
-docker build -t hcjjj/webook:v0.0.1 .
-# 删除
-docker rmi -f hcjjj/webook:v0.0.1
-# 可以将上述命令都写在 Makefile 里面
-```
-
-编写 `k8s.yaml` 后
-
-```shell
-# 启动 deployment
-kubectl apply -f k8s-webook-deployment.yaml
-# 查看 
-kubectl get deployments
-kubectl get pods
-# 查看 POD 的日志
-kebectl get logs -f webook-5b4c5b9-4g74z
-# 启动 services
-kubectl apply -f k8s-webook-service.yaml
-# 查看
-kubectl get services
-# 停止
-kubectl delete service webook
-kubectl delete deployment webook
-```
-
-**用 Kubernetes 部署 Mysql**
-
-```shell
-# Mysql 持久化
-# 启动
-kubectl apply -f k8s-mysql-deployment.yaml
-kubectl apply -f k8s-mysql-service.yaml
-kubectl apply -f k8s-mysql-pv.yaml
-kubectl apply -f k8s-mysql-pvc.yaml
-# 查看
-kubectl get pv
-kubectl get pvc
-# 停止
-kubectl delete service webook-mysql
-kubectl delete deployment webook-mysql
-kubectl delete pvc webook-mysql-claim
-kubectl delete pv webook-mysql-pv
-```
-
-**用 Kubernetes 部署 Redis**
-
-```shell
-kubectl apply -f k8s-redis-deployment.yaml
-kubectl apply -f k8s-redis-service.yaml
-kubectl delete service webook-redis
-kubectl delete deployment webook-redis
-```
-
-**用 Kubernetes 部署 nginx**
-
-```shell
-# 本地环境需要修改 host 到 ip 的映射，host 在 k8s-ingress-nginx.yaml 里面
-# ❯ ping  hcjjj.webook.com
-# PING hcjjj.webook.com (127.0.0.1) 56(84) bytes of data.
-# 64 bytes from localhost (127.0.0.1): icmp_seq=1 ttl=64 time=0.028 ms
-# 使用 clash for windows 的话，同时需要在 Bypass Domain/IPNet 中添加 
-
-# 安装 ingress-nignx 
-helm upgrade --install ingress-nginx ingress-nginx  --repo https://kubernetes.github.io/ingress-nginx  --namespace ingress-nginx --create-namespace
-# 查看
-kubectl get service --namespace ingress-nginx
-# 启动
-kubectl apply -f k8s-ingress-nginx.yaml
-# 停止
-kubectl get ingresses
-kubectl delete ingress webook-ingress
-kubectl delete namespaces ingress-nginx
-```
+- 依赖注入完全达成了控制反转的目标。我们不再关心如何创建依赖对象。例如，在 cache 模块中，虽然使用了 Redis 客户端，但 cache 实现并不关心具体的实现或客户端的相关参数。
+- 依赖注入提高了代码的可测试性。我们可以在单元测试中注入由 `gomock` 生成的实例。在集成测试阶段，为了节省公司资源，第三方依赖通常被替换为内存实现或 mock 实现。
+- 依赖注入叠加面向接口编程后，装饰器模式效果更佳。在我们的 sms 模块中，有各种装饰器的实现，这些实现都是基于面向接口编程和依赖注入的。这使得装饰器可以自由组合，提升了系统的灵活性和扩展性。

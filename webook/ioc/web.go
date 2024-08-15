@@ -86,6 +86,7 @@ func InitMiddlewares(redisClient redis.Cmdable,
 
 		// 不校验
 		middleware.NewLoginJWTMiddlewareBuilder(jwtHdl).
+			IgnorePaths("/hello").
 			IgnorePaths("/users/signup").
 			IgnorePaths("/users/login_sms/code/send").
 			IgnorePaths("/users/login_sms").
