@@ -3,13 +3,18 @@
 package startup
 
 import (
-	article3 "basic-go/webook/internal/events/article"
+	repository2 "basic-go/webook/interactive/repository"
+	cache2 "basic-go/webook/interactive/repository/cache"
+	dao2 "basic-go/webook/interactive/repository/dao"
+	service2 "basic-go/webook/interactive/service"
+	"basic-go/webook/internal/events/article"
+	"basic-go/webook/internal/job"
 	"basic-go/webook/internal/repository"
-	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
-	"basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
+	"basic-go/webook/internal/service/sms"
+	"basic-go/webook/internal/service/sms/async"
 	"basic-go/webook/internal/web"
 	ijwt "basic-go/webook/internal/web/jwt"
 	"basic-go/webook/ioc"
@@ -18,90 +23,93 @@ import (
 	"github.com/google/wire"
 )
 
-var thirdProvider = wire.NewSet(InitRedis, InitTestDB, InitLog)
+var thirdPartySet = wire.NewSet( // 第三方依赖
+	InitRedis, InitDB,
+	InitSaramaClient,
+	InitSyncProducer,
+	InitLogger)
+
+var jobProviderSet = wire.NewSet(
+	service.NewCronJobService,
+	repository.NewPreemptJobRepository,
+	dao.NewGORMJobDAO)
 
 var userSvcProvider = wire.NewSet(
 	dao.NewUserDAO,
 	cache.NewUserCache,
-	repository.NewUserRepository,
+	repository.NewCachedUserRepository,
 	service.NewUserService)
 
-var articleSvcProvider = wire.NewSet(
-	article.NewGORMArticleDAO,
-	cache.NewRedisArticleCache,
-	article2.NewArticleRepository,
+var articlSvcProvider = wire.NewSet(
+	repository.NewCachedArticleRepository,
+	cache.NewArticleRedisCache,
+	dao.NewArticleGORMDAO,
 	service.NewArticleService)
 
-//var interactiveSvcProvider = wire.NewSet(
-//	service2.NewInteractiveService,
-//	repository2.NewCachedInteractiveRepository,
-//	dao2.NewGORMInteractiveDAO,
-//	cache2.NewRedisInteractiveCache,
-//)
+var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO,
+	cache2.NewInteractiveRedisCache,
+	repository2.NewCachedInteractiveRepository,
+	service2.NewInteractiveService,
+	ioc.InitIntrClient,
+)
 
 func InitWebServer() *gin.Engine {
 	wire.Build(
-		thirdProvider,
+		thirdPartySet,
 		userSvcProvider,
-		articleSvcProvider,
-		// kafka
-		ioc.InitKafka,
-		ioc.NewSyncProducer,
-		article3.NewKafkaProducer,
-
+		articlSvcProvider,
+		interactiveSvcSet,
+		// cache 部分
 		cache.NewCodeCache,
-		repository.NewCodeRepository,
-		// service 部分
-		// 集成测试显式指定使用内存实现
-		ioc.InitSMSService,
 
-		// 指定啥也不干的 wechat service
-		//InitPhantomWechatService,
+		// repository 部分
+		repository.NewCodeRepository,
+
+		article.NewSaramaSyncProducer,
+
+		// Service 部分
+		ioc.InitSMSService,
 		service.NewCodeService,
+		//InitWechatService,
+
 		// handler 部分
 		web.NewUserHandler,
-		//web.NewOAuth2WechatHandler,
 		web.NewArticleHandler,
+		//web.NewOAuth2WechatHandler,
 		ijwt.NewRedisJWTHandler,
-
-		// gin 的中间件
-		ioc.InitMiddlewares,
-
-		// Web 服务器
+		ioc.InitGinMiddlewares,
 		ioc.InitWebServer,
 	)
-	// 随便返回一个
 	return gin.Default()
 }
 
-func InitArticleHandler(dao article.ArticleDAO) *web.ArticleHandler {
-	wire.Build(thirdProvider,
-		//userSvcProvider,
-		cache.NewRedisArticleCache,
-		//wire.InterfaceValue(new(article.ArticleDAO), dao),
+func InitAsyncSmsService(svc sms.Service) *async.Service {
+	wire.Build(
+		thirdPartySet,
+		repository.NewAsyncSMSRepository,
+		dao.NewGORMAsyncSmsDAO,
+		async.NewService,
+	)
+	return &async.Service{}
+}
 
-		// kafka
-		ioc.InitKafka,
-		ioc.NewSyncProducer,
-		article3.NewKafkaProducer,
-
-		article2.NewArticleRepository,
+func InitArticleHandler(dao dao.ArticleDAO) *web.ArticleHandler {
+	wire.Build(
+		thirdPartySet,
+		userSvcProvider,
+		interactiveSvcSet,
+		repository.NewCachedArticleRepository,
+		cache.NewArticleRedisCache,
 		service.NewArticleService,
+		article.NewSaramaSyncProducer,
 		web.NewArticleHandler)
-	return new(web.ArticleHandler)
+	return &web.ArticleHandler{}
 }
 
-func InitUserSvc() service.UserService {
-	wire.Build(thirdProvider, userSvcProvider)
-	return service.NewUserService(nil, nil)
+func InitJobScheduler() *job.Scheduler {
+	wire.Build(
+		jobProviderSet,
+		thirdPartySet,
+		job.NewScheduler)
+	return &job.Scheduler{}
 }
-
-func InitJwtHdl() ijwt.Handler {
-	wire.Build(thirdProvider, ijwt.NewRedisJWTHandler)
-	return ijwt.NewRedisJWTHandler(nil)
-}
-
-//func InitInteractiveService() service2.InteractiveService {
-//	wire.Build(thirdProvider, interactiveSvcProvider)
-//	return service2.NewInteractiveService(nil, nil)
-//}

@@ -8,22 +8,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-func InitGRPCxServer(intrServer *grpc2.InteractiveServiceServer) *grpcx.Server {
-	type Config struct {
-		Addr string `yaml:"addr"`
-	}
-
-	var cfg Config
-	err := viper.UnmarshalKey("grpc.server", &cfg)
-	if err != nil {
-		panic(err)
-	}
-
-	server := grpc.NewServer()
-	intrServer.Register(server)
-
+func NewGrpcxServer(intrSvc *grpc2.InteractiveServiceServer) *grpcx.Server {
+	s := grpc.NewServer()
+	intrSvc.Register(s)
+	addr := viper.GetString("grpc.server.addr")
 	return &grpcx.Server{
-		Server: server,
-		Addr:   cfg.Addr,
+		Server: s,
+		Addr:   addr,
 	}
 }

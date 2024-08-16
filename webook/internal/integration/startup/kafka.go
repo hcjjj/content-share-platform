@@ -1,40 +1,23 @@
 package startup
 
 import (
-	events2 "basic-go/webook/interactive/events"
-	"basic-go/webook/internal/events"
-
 	"github.com/IBM/sarama"
-	"github.com/spf13/viper"
 )
 
-func InitKafka() sarama.Client {
-	type Config struct {
-		Addrs []string `yaml:"addrs"`
-	}
-	saramaCfg := sarama.NewConfig()
-	saramaCfg.Producer.Return.Successes = true
-	var cfg Config
-	err := viper.UnmarshalKey("kafka", &cfg)
-	if err != nil {
-		panic(err)
-	}
-	client, err := sarama.NewClient(cfg.Addrs, saramaCfg)
+func InitSaramaClient() sarama.Client {
+	scfg := sarama.NewConfig()
+	scfg.Producer.Return.Successes = true
+	client, err := sarama.NewClient([]string{"localhost:9094"}, scfg)
 	if err != nil {
 		panic(err)
 	}
 	return client
 }
 
-func NewSyncProducer(client sarama.Client) sarama.SyncProducer {
-	res, err := sarama.NewSyncProducerFromClient(client)
+func InitSyncProducer(c sarama.Client) sarama.SyncProducer {
+	p, err := sarama.NewSyncProducerFromClient(c)
 	if err != nil {
 		panic(err)
 	}
-	return res
-}
-
-// NewConsumers 面临的问题依旧是所有的 Consumer 在这里注册一下
-func NewConsumers(c1 *events2.InteractiveReadEventBatchConsumer) []events.Consumer {
-	return []events.Consumer{c1}
+	return p
 }

@@ -12,7 +12,7 @@ import (
 
 func InitScheduler(l logger.LoggerV1,
 	local *job.LocalFuncExecutor,
-	svc service.JobService) *job.Scheduler {
+	svc service.CronJobService) *job.Scheduler {
 	res := job.NewScheduler(svc, l)
 	res.RegisterExecutor(local)
 	return res

@@ -1,32 +1,31 @@
 package ioc
 
 import (
-	"basic-go/webook/interactive/events"
-	"basic-go/webook/pkg/saramax"
+	events2 "basic-go/webook/interactive/events"
+	"basic-go/webook/internal/events"
 
 	"github.com/IBM/sarama"
 	"github.com/spf13/viper"
 )
 
-func InitKafka() sarama.Client {
+func InitSaramaClient() sarama.Client {
 	type Config struct {
-		Addrs []string `yaml:"addrs"`
+		Addr []string `yaml:"addr"`
 	}
-	saramaCfg := sarama.NewConfig()
-	saramaCfg.Producer.Return.Successes = true
 	var cfg Config
 	err := viper.UnmarshalKey("kafka", &cfg)
 	if err != nil {
 		panic(err)
 	}
-	client, err := sarama.NewClient(cfg.Addrs, saramaCfg)
+	scfg := sarama.NewConfig()
+	scfg.Producer.Return.Successes = true
+	client, err := sarama.NewClient(cfg.Addr, scfg)
 	if err != nil {
 		panic(err)
 	}
 	return client
 }
 
-// NewConsumers 面临的问题依旧是所有的 Consumer 在这里注册一下
-func NewConsumers(c1 *events.InteractiveReadEventConsumer) []saramax.Consumer {
-	return []saramax.Consumer{c1}
+func InitConsumers(c1 *events2.InteractiveReadEventConsumer) []events.Consumer {
+	return []events.Consumer{c1}
 }

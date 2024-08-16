@@ -14,7 +14,7 @@ type Server struct {
 
 func (s *Server) Serve() error {
 	l, err := net.Listen("tcp", s.Addr)
-	fmt.Println("grpc server listen on", s.Addr)
+	fmt.Printf("grpc server listen on %s ...", s.Addr)
 	if err != nil {
 		return err
 	}

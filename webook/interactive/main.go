@@ -13,7 +13,7 @@ func main() {
 	// 读取配置文件信息
 	initViper()
 	// 初始化服务
-	app := InitAPP()
+	app := InitApp()
 	// 启动消费者
 	for _, c := range app.consumers {
 		err := c.Start()

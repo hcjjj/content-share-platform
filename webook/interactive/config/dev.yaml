@@ -5,7 +5,7 @@ redis:
   addr: "localhost:16379"
 
 kafka:
-  addrs:
+  addr:
     - "localhost:9094"
 
 grpc:
