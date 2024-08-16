@@ -1,13 +1,8 @@
-// Package middleware -----------------------------
-// @file      : login.go
-// @author    : hcjjj
-// @contact   : hcjjj@foxmail.com
-// @time      : 2024-03-11 16:29
-// -------------------------------------------
 package middleware
 
 import (
 	"encoding/gob"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -16,89 +11,45 @@ import (
 )
 
 type LoginMiddlewareBuilder struct {
-	paths []string
 }
 
-func NewLoginMiddlewareBuilder() *LoginMiddlewareBuilder {
-	return &LoginMiddlewareBuilder{}
-}
-
-func (l *LoginMiddlewareBuilder) IgnorePaths(path string) *LoginMiddlewareBuilder {
-	l.paths = append(l.paths, path)
-	return l
-}
-
-func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
-	// 用 go 的方式编码解码
+func (m *LoginMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
+	// 注册一下这个类型
 	gob.Register(time.Now())
-
 	return func(ctx *gin.Context) {
-		for _, path := range l.paths {
-			if ctx.Request.URL.Path == path {
-				return
-			}
+		path := ctx.Request.URL.Path
+		if path == "/users/signup" || path == "/users/login" {
+			// 不需要登录校验
+			return
 		}
-		// 从 ctx 中拿出 session
 		sess := sessions.Default(ctx)
-		id := sess.Get("userId")
-		if id == nil {
-			// 没有登录
+		userId := sess.Get("userId")
+		if userId == nil {
+			// 中断，不要往后执行，也就是不要执行后面的业务逻辑
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
-		// 刷新登录状态（session的有效期）
-		// 固定间隔时间刷新，比如说每分钟内第一次访问都刷新
-		updateTime := sess.Get("update_time")
-		sess.Set("userId", id)
-		sess.Options(sessions.Options{
-			MaxAge: 60 * 10,
-		})
+
 		now := time.Now()
-		if updateTime == nil {
-			// 刚登录还没刷新过，第一次登录的第一个请求
-			sess.Set("update_time", now)
-			//sess.Save()
-			if err := sess.Save(); err != nil {
-				panic(err)
-			}
-			return
-		}
-		// updateTime 是有的
-		updateTimeVal, ok := updateTime.(time.Time)
-		if !ok {
-			ctx.AbortWithStatus(http.StatusInternalServerError)
-			return
-		}
-		// 超过 1 min了， 刷新
-		if now.Sub(updateTimeVal) > time.Minute*1 {
-			sess.Set("update_time", now)
-			if err := sess.Save(); err != nil {
-				panic(err)
-			}
-		}
-	}
-}
+		//ctx.Next()// 执行业务
+		// 在执行业务之后搞点什么
+		//duration := time.Now().Sub(now)
 
-// CheckLogin 这种没上面的方式好
-func CheckLogin() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		// 这些是不需要登录校验的
-		if ctx.Request.URL.Path == "/users/login" ||
-			ctx.Request.URL.Path == "/users/signup" {
-			return
-		}
-		// 从 ctx 中拿出 session
-		sess := sessions.Default(ctx)
-		//if sess == nil {
-		//	// 没有登录
-		//	ctx.AbortWithStatus(http.StatusUnauthorized)
-		//	return
-		//}
-		id := sess.Get("userId")
-		if id == nil {
-			// 没有登录
-			ctx.AbortWithStatus(http.StatusUnauthorized)
-			return
+		// 我怎么知道，要刷新了呢？
+		// 假如说，我们的策略是每分钟刷一次，我怎么知道，已经过了一分钟？
+		const updateTimeKey = "update_time"
+		// 试着拿出上一次刷新时间
+		val := sess.Get(updateTimeKey)
+		lastUpdateTime, ok := val.(time.Time)
+		if val == nil || !ok || now.Sub(lastUpdateTime) > time.Second*10 {
+			// 你这是第一次进来
+			sess.Set(updateTimeKey, now)
+			sess.Set("userId", userId)
+			err := sess.Save()
+			if err != nil {
+				// 打日志
+				fmt.Println(err)
+			}
 		}
 	}
 }

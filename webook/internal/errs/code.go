@@ -1,35 +1,19 @@
 package errs
 
+// User 相关
 const (
-	// CommonInvalidInput 任何模块都可以使用的表达输入错误
-	CommonInvalidInput   = 400001
-	CommonInternalServer = 500001
-)
-
-// 用户模块
-const (
-	// UserInvalidInput 用户模块输入错误，这是一个含糊的错误
-	UserInvalidInput        = 401001
-	UserInternalServerError = 501001
-	// UserInvalidOrPassword 用户不存在或者密码错误，这个你要小心，
-	// 防止有人跟你过不去
+	// UserInvalidInput 统一的用户模块的输入错误
+	UserInvalidInput = 401001
+	// UserInvalidOrPassword 用户名错误或者密码不对
 	UserInvalidOrPassword = 401002
+	// UserDuplicateEmail 用户邮箱冲突
+	UserDuplicateEmail = 401003
+	// UserInternalServerError 统一的用户模块的系统错误
+	UserInternalServerError = 501001
 )
 
 const (
+	// ArticleInvalidInput 文章模块的统一的错误码
 	ArticleInvalidInput        = 402001
 	ArticleInternalServerError = 502001
 )
-
-var (
-	// UserInvalidInputV1 这个东西是 DEBUG 用的，不是给 C 端用户用的
-	UserInvalidInputV1 = Code{
-		Number: 401001,
-		Msg:    "用户输入错误",
-	}
-)
-
-type Code struct {
-	Number int
-	Msg    string
-}

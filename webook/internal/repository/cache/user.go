@@ -1,9 +1,3 @@
-// Package cache -----------------------------
-// @file      : user.go
-// @author    : hcjjj
-// @contact   : hcjjj@foxmail.com
-// @time      : 2024-03-18 17:04
-// -------------------------------------------
 package cache
 
 import (
@@ -16,73 +10,75 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-//var ErrKeyNotExist = errors.New("Key 不存在")
-
 var ErrKeyNotExist = redis.Nil
 
+//go:generate mockgen -source=./user.go -package=cachemocks -destination=./mocks/user.mock.go UserCache
 type UserCache interface {
-	Get(ctx context.Context, id int64) (domain.User, error)
-	//Del(ctx context.Context, id int64) error
-	Set(ctx context.Context, u domain.User) error
-	//key(id int64) string
+	Get(ctx context.Context, uid int64) (domain.User, error)
+	Set(ctx context.Context, du domain.User) error
+	Del(ctx context.Context, id int64) error
 }
 
 type RedisUserCache struct {
-	// 传单机 Redis 可以
-	// 传 cluster 的 Redis 也可以
-	client     redis.Cmdable
+	cmd        redis.Cmdable
 	expiration time.Duration
 }
 
-// A 用到了 B, B 一定是接口 【面向接口编程】
-// A 用到了 B, B 一定是 A 的字段 【规避包变量包方法，缺乏拓展性】
-// A 用到了 B, A 绝对不初始化 B 而是外面注入 【保持依赖注入和依赖反转】
-
-func NewUserCache(client redis.Cmdable) UserCache {
-	return &RedisUserCache{
-		client:     client,
-		expiration: time.Minute * 15,
-	}
+func (c *RedisUserCache) Del(ctx context.Context, id int64) error {
+	return c.cmd.Del(ctx, c.key(id)).Err()
 }
 
-func (cache *RedisUserCache) Get(ctx context.Context, id int64) (domain.User, error) {
-	// 可用于监控
-	//ctx = context.WithValue(ctx, "biz", "user")
-	//ctx = context.WithValue(ctx, "pattern", "user:info:%d")
-	// error 为 nil，即有数据
-	// 如果没有数据 返回一个特定的 error
-	key := cache.key(id)
-	val, err := cache.client.Get(ctx, key).Bytes()
-	//  redis.Nil
+func (c *RedisUserCache) Get(ctx context.Context, uid int64) (domain.User, error) {
+	key := c.key(uid)
+	// 我假定这个地方用 JSON 来
+	data, err := c.cmd.Get(ctx, key).Result()
+	//data, err := c.cmd.Get(ctx, firstKey).Bytes()
 	if err != nil {
 		return domain.User{}, err
 	}
 	var u domain.User
-	// 反序列化
-	err = json.Unmarshal(val, &u)
+	err = json.Unmarshal([]byte(data), &u)
+	//if err != nil {
+	//	return domain.User{}, err
+	//}
+	//return u, nil
 	return u, err
 }
 
-func (cache *RedisUserCache) Set(ctx context.Context, u domain.User) error {
-	// 序列化为 json
-	val, err := json.Marshal(u)
+func (c *RedisUserCache) Set(ctx context.Context, du domain.User) error {
+	key := c.key(du.Id)
+	// 我假定这个地方用 JSON
+	data, err := json.Marshal(du)
 	if err != nil {
 		return err
 	}
-	key := cache.key(u.Id)
-	cache.client.Set(ctx, key, val, cache.expiration)
-	return nil
+	return c.cmd.Set(ctx, key, data, c.expiration).Err()
 }
 
-//func (cache *RedisUserCache) Del(ctx context.Context, id int64) error {
-//	key := cache.key(id)
-//	cache.client.Del(ctx, key)
-//	return nil
+func (c *RedisUserCache) key(uid int64) string {
+	// user-info-
+	// user.info.
+	// user/info/
+	// user_info_
+	return fmt.Sprintf("user:info:%d", uid)
+}
+
+type UserCacheV1 struct {
+	client *redis.Client
+}
+
+func NewUserCache(cmd redis.Cmdable) UserCache {
+	return &RedisUserCache{
+		cmd:        cmd,
+		expiration: time.Minute * 15,
+	}
+}
+
+// 一定不要自己去初始化你需要的东西，让外面传进来
+//func NewUserCacheV1(addr string) *RedisUserCache {
+//	cmd := redis.NewClient(&redis.Options{Addr: addr})
+//	return &RedisUserCache{
+//		cmd:        cmd,
+//		expiration: time.Minute * 15,
+//	}
 //}
-
-func (cache *RedisUserCache) key(id int64) string {
-	// user:info:123
-	// user_info_123
-	// bumen_xiaozu_user_info_key
-	return fmt.Sprintf("user:info:%d", id)
-}

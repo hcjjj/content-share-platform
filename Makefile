@@ -18,3 +18,7 @@ mock:
 	@mockgen -source ./webook/pkg/limiter/types.go -package limitermocks -destination ./webook/pkg/limiter/mocks/limiter.mock.go
 
 	@go mod tidy
+
+.PHONY: grpc
+grpc:
+	@buf generate webook/api/proto

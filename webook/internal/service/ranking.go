@@ -1,10 +1,11 @@
 package service
 
 import (
-	"basic-go/webook/interactive/service"
+	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
 	"context"
+	"errors"
 	"github.com/ecodeclub/ekit/queue"
 	"github.com/ecodeclub/ekit/slice"
 	"math"
@@ -19,20 +20,26 @@ type RankingService interface {
 
 type BatchRankingService struct {
 	artSvc    ArticleService
-	intrSvc   service.InteractiveService
+	intrSvc   intrv1.InteractiveServiceClient
 	repo      repository.RankingRepository
 	batchSize int
 	n         int
 	// scoreFunc 不能返回负数
 	scoreFunc func(t time.Time, likeCnt int64) float64
+
+	// 负载
+	load int64
 }
 
-func NewBatchRankingService(artSvc ArticleService, intrSvc service.InteractiveService) RankingService {
+func NewBatchRankingService(artSvc ArticleService,
+	repo repository.RankingRepository,
+	intrSvc intrv1.InteractiveServiceClient) RankingService {
 	return &BatchRankingService{
 		artSvc:    artSvc,
 		intrSvc:   intrSvc,
 		batchSize: 100,
 		n:         100,
+		repo:      repo,
 		scoreFunc: func(t time.Time, likeCnt int64) float64 {
 			sec := time.Since(t).Seconds()
 			return float64(likeCnt-1) / math.Pow(float64(sec+2), 1.5)
@@ -83,14 +90,19 @@ func (svc *BatchRankingService) topN(ctx context.Context) ([]domain.Article, err
 				return src.Id
 			})
 		// 要去找到对应的点赞数据
-		intrs, err := svc.intrSvc.GetByIds(ctx, "article", ids)
+		intrs, err := svc.intrSvc.GetByIds(ctx, &intrv1.GetByIdsRequest{
+			Biz: "article", Ids: ids,
+		})
 		if err != nil {
 			return nil, err
+		}
+		if len(intrs.Intrs) == 0 {
+			return nil, errors.New("没有数据")
 		}
 		// 合并计算 score
 		// 排序
 		for _, art := range arts {
-			intr := intrs[art.Id]
+			intr := intrs.Intrs[art.Id]
 			//if !ok {
 			//	// 你都没有，肯定不可能是热榜
 			//	continue
@@ -119,7 +131,7 @@ func (svc *BatchRankingService) topN(ctx context.Context) ([]domain.Article, err
 		// 一批已经处理完了，问题来了，我要不要进入下一批？我怎么知道还有没有？
 		if len(arts) < svc.batchSize ||
 			now.Sub(arts[len(arts)-1].Utime).Hours() > 7*24 {
-			// 这一批都没取够，当然可以肯定没有下一批了
+			// 我这一批都没取够，我当然可以肯定没有下一批了
 			// 又或者已经取到了七天之前的数据了，说明可以中断了
 			break
 		}

@@ -1,7 +1,5 @@
 package logger
 
-// 风格一
-
 type Logger interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -9,13 +7,10 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
-func LoggerExample() {
+func example() {
 	var l Logger
-	phone := "152xxxx1234"
-	l.Info("用户未注册，手机号码是 %s", phone)
+	l.Info("用户的微信 id %d", 123)
 }
-
-// 风格二  zap 风格
 
 type LoggerV1 interface {
 	Debug(msg string, args ...Field)
@@ -25,31 +20,20 @@ type LoggerV1 interface {
 }
 
 type Field struct {
-	Key   string
-	Value any
+	Key string
+	Val any
 }
 
-func LoggerV1Example() {
+func exampleV1() {
 	var l LoggerV1
-	phone := "152xxxx1234"
-	l.Info("用户未注册", Field{
-		Key:   "phone",
-		Value: phone,
-	})
+	// 这是一个新用户 union_id=123
+	l.Info("这是一个新用户", Field{Key: "union_id", Val: 123})
 }
-
-// 风格三
 
 type LoggerV2 interface {
-	//  args 必须是偶数，并且按照 key-value, key-value 来组织
+	// 它要去 args 必须是偶数，并且是以 key1,value1,key2,value2 的形式传递
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
 	Warn(msg string, args ...any)
 	Error(msg string, args ...any)
-}
-
-func LoggerV2Example() {
-	var l LoggerV2
-	phone := "152xxxx1234"
-	l.Info("用户未注册", "phone", phone)
 }

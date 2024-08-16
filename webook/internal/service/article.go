@@ -2,193 +2,138 @@ package service
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"basic-go/webook/internal/domain"
-	events "basic-go/webook/internal/events/article"
-	"basic-go/webook/internal/repository/article"
+	"basic-go/webook/internal/events/article"
+	"basic-go/webook/internal/repository"
 	"basic-go/webook/pkg/logger"
 )
 
-//go:generate mockgen -source=article.go -package=svcmocks -destination=mocks/article.mock.go ArticleService
+//go:generate mockgen -source=./article.go -package=svcmocks -destination=./mocks/article.mock.go ArticleService
 type ArticleService interface {
 	Save(ctx context.Context, art domain.Article) (int64, error)
-	Withdraw(ctx context.Context, art domain.Article) error
 	Publish(ctx context.Context, art domain.Article) (int64, error)
-	PublishV1(ctx context.Context, art domain.Article) (int64, error)
-	List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error)
-	// ListPub 根据这个 start 时间来查询
-	ListPub(ctx context.Context, start time.Time, offset, limit int) ([]domain.Article, error)
+	Withdraw(ctx context.Context, uid int64, id int64) error
+	GetByAuthor(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error)
 	GetById(ctx context.Context, id int64) (domain.Article, error)
-	GetPublishedById(ctx context.Context, id, uid int64) (domain.Article, error)
+	GetPubById(ctx context.Context, id, uid int64) (domain.Article, error)
+	ListPub(ctx context.Context, start time.Time, offset, limit int) ([]domain.Article, error)
 }
 
 type articleService struct {
-	repo article.ArticleRepository
+	repo     repository.ArticleRepository
+	producer article.Producer
 
-	// V1 依靠两个不同的 repository 来解决这种跨表，或者跨库的问题
-	author   article.ArticleAuthorRepository
-	reader   article.ArticleReaderRepository
-	l        logger.LoggerV1
-	producer events.Producer
+	userRepo repository.UserRepository
 
-	ch chan readInfo
+	// V1 写法专用
+	readerRepo repository.ArticleReaderRepository
+	authorRepo repository.ArticleAuthorRepository
+	l          logger.LoggerV1
 }
 
-func (svc *articleService) ListPub(ctx context.Context,
+func (a *articleService) ListPub(ctx context.Context,
 	start time.Time, offset, limit int) ([]domain.Article, error) {
-	return svc.repo.ListPub(ctx, start, offset, limit)
+	return a.repo.ListPub(ctx, start, offset, limit)
 }
 
-type readInfo struct {
-	uid int64
-	aid int64
-}
-
-func (svc *articleService) GetPublishedById(ctx context.Context, id, uid int64) (domain.Article, error) {
-	// 另一个选项，在这里组装 Author，调用 UserService
-	art, err := svc.repo.GetPublishedById(ctx, id)
-	if err == nil {
-		go func() {
-			// 生产者也可以通过改批量来提高性能
-			er := svc.producer.ProduceReadEvent(
-				ctx,
-				events.ReadEvent{
-					// 即便你的消费者要用 art 的里面的数据，
-					// 让它去查询，你不要在 event 里面带
-					Uid: uid,
-					Aid: id,
-				})
-			if er == nil {
-				svc.l.Error("发送读者阅读事件失败")
+func (a *articleService) GetPubById(ctx context.Context, id, uid int64) (domain.Article, error) {
+	res, err := a.repo.GetPubById(ctx, id)
+	go func() {
+		if err == nil {
+			// 在这里发一个消息
+			er := a.producer.ProduceReadEvent(article.ReadEvent{
+				Aid: id,
+				Uid: uid,
+			})
+			if er != nil {
+				a.l.Error("发送 ReadEvent 失败",
+					logger.Int64("aid", id),
+					logger.Int64("uid", uid),
+					logger.Error(err))
 			}
-		}()
+		}
+	}()
 
-		go func() {
-			// 改批量的做法
-			svc.ch <- readInfo{
-				aid: id,
-				uid: uid,
-			}
-		}()
-	}
-	return art, err
+	return res, err
 }
 
 func (a *articleService) GetById(ctx context.Context, id int64) (domain.Article, error) {
-	return a.repo.GetByID(ctx, id)
+	return a.repo.GetById(ctx, id)
 }
 
-func (a *articleService) List(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error) {
-	return a.repo.List(ctx, uid, offset, limit)
+func (a *articleService) GetByAuthor(ctx context.Context, uid int64, offset int, limit int) ([]domain.Article, error) {
+	return a.repo.GetByAuthor(ctx, uid, offset, limit)
 }
 
-func (a *articleService) Withdraw(ctx context.Context, art domain.Article) error {
-	// art.Status = domain.ArticleStatusPrivate 然后直接把整个 art 往下传
-	return a.repo.SyncStatus(ctx, art.Id, art.Author.Id, domain.ArticleStatusPrivate)
+func (a *articleService) Withdraw(ctx context.Context, uid int64, id int64) error {
+	return a.repo.SyncStatus(ctx, uid, id, domain.ArticleStatusPrivate)
+	// 2023.12.12 答疑演示
+	//err := a.repo.SyncStatus(ctx, uid, id, domain.ArticleStatusPrivate)
+	//if err != nil {
+	//	return fmt.Errorf("uid %d, id %d, %w", err)
+	//}
+	//return nil
 }
 
 func (a *articleService) Publish(ctx context.Context, art domain.Article) (int64, error) {
 	art.Status = domain.ArticleStatusPublished
-	// 制作库
-	//id, err := a.repo.Create(ctx, art)
-	//// 线上库呢？
-	//a.repo.SyncToLiveDB(ctx, art)
 	return a.repo.Sync(ctx, art)
 }
 
 func (a *articleService) PublishV1(ctx context.Context, art domain.Article) (int64, error) {
+	// 想到这里要先操作制作库
+	// 这里操作线上库
 	var (
 		id  = art.Id
 		err error
 	)
+
 	if art.Id > 0 {
-		err = a.author.Update(ctx, art)
+		err = a.authorRepo.Update(ctx, art)
 	} else {
-		id, err = a.author.Create(ctx, art)
+		id, err = a.authorRepo.Create(ctx, art)
 	}
 	if err != nil {
 		return 0, err
 	}
 	art.Id = id
 	for i := 0; i < 3; i++ {
-		time.Sleep(time.Second * time.Duration(i))
-		id, err = a.reader.Save(ctx, art)
-		if err == nil {
-			break
+		// 我可能线上库已经有数据了
+		// 也可能没有
+		err = a.readerRepo.Save(ctx, art)
+		if err != nil {
+			// 多接入一些 tracing 的工具
+			a.l.Error("保存到制作库成功但是到线上库失败",
+				logger.Int64("aid", art.Id),
+				logger.Error(err))
+		} else {
+			return id, nil
 		}
-		a.l.Error("部分失败，保存到线上库失败",
-			logger.Int64("art_id", art.Id),
-			logger.Error(err))
 	}
-	if err != nil {
-		a.l.Error("部分失败，重试彻底失败",
-			logger.Int64("art_id", art.Id),
-			logger.Error(err))
-		// 接入你的告警系统，手工处理一下
-		// 走异步，我直接保存到本地文件
-		// 走 Canal
-		// 打 MQ
-	}
-	return id, err
+	a.l.Error("保存到制作库成功但是到线上库失败，重试耗尽",
+		logger.Int64("aid", art.Id),
+		logger.Error(err))
+	return id, errors.New("保存到线上库失败，重试次数耗尽")
 }
 
-func NewArticleService(repo article.ArticleRepository,
-	l logger.LoggerV1,
-	producer events.Producer) ArticleService {
+func NewArticleServiceV1(
+	readerRepo repository.ArticleReaderRepository,
+	authorRepo repository.ArticleAuthorRepository, l logger.LoggerV1) *articleService {
+	return &articleService{
+		readerRepo: readerRepo,
+		authorRepo: authorRepo,
+		l:          l,
+	}
+}
+
+func NewArticleService(repo repository.ArticleRepository,
+	producer article.Producer) ArticleService {
 	return &articleService{
 		repo:     repo,
 		producer: producer,
-		l:        l,
-		//ch:       make(chan readInfo, 10),
-	}
-}
-
-func NewArticleServiceV2(repo article.ArticleRepository,
-	l logger.LoggerV1,
-	producer events.Producer) ArticleService {
-	ch := make(chan readInfo, 10)
-	go func() {
-		for {
-			uids := make([]int64, 0, 10)
-			aids := make([]int64, 0, 10)
-			ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-			for i := 0; i < 10; i++ {
-				select {
-				case info, ok := <-ch:
-					if !ok {
-						cancel()
-						return
-					}
-					uids = append(uids, info.uid)
-					aids = append(aids, info.aid)
-				case <-ctx.Done():
-					break
-				}
-			}
-			cancel()
-			ctx, cancel = context.WithTimeout(context.Background(), time.Second)
-			producer.ProduceReadEventV1(ctx, events.ReadEventV1{
-				Uids: uids,
-				Aids: aids,
-			})
-			cancel()
-		}
-	}()
-	return &articleService{
-		repo:     repo,
-		producer: producer,
-		l:        l,
-		ch:       ch,
-	}
-}
-
-func NewArticleServiceV1(author article.ArticleAuthorRepository,
-	reader article.ArticleReaderRepository, l logger.LoggerV1) ArticleService {
-	return &articleService{
-		author: author,
-		reader: reader,
-		l:      l,
 	}
 }
 
@@ -199,14 +144,4 @@ func (a *articleService) Save(ctx context.Context, art domain.Article) (int64, e
 		return art.Id, err
 	}
 	return a.repo.Create(ctx, art)
-}
-
-func (a *articleService) update(ctx context.Context, art domain.Article) error {
-	// 只要你不更新 author_id
-	// 但是性能比较差
-	//artInDB := a.repo.FindById(ctx, art.Id)
-	//if art.Author.Id != artInDB.Author.Id {
-	//	return errors.New("更新别人的数据")
-	//}
-	return a.repo.Update(ctx, art)
 }

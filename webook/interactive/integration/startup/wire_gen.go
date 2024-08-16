@@ -7,6 +7,7 @@
 package startup
 
 import (
+	"basic-go/webook/interactive/grpc"
 	"basic-go/webook/interactive/repository"
 	"basic-go/webook/interactive/repository/cache"
 	"basic-go/webook/interactive/repository/dao"
@@ -27,9 +28,23 @@ func InitInteractiveService() service.InteractiveService {
 	return interactiveService
 }
 
+func InitInteractiveGRPCServer() *grpc.InteractiveServiceServer {
+	gormDB := InitTestDB()
+	interactiveDAO := dao.NewGORMInteractiveDAO(gormDB)
+	cmdable := InitRedis()
+	interactiveCache := cache.NewRedisInteractiveCache(cmdable)
+	loggerV1 := InitLog()
+	interactiveRepository := repository.NewCachedInteractiveRepository(interactiveDAO, interactiveCache, loggerV1)
+	interactiveService := service.NewInteractiveService(interactiveRepository, loggerV1)
+	interactiveServiceServer := grpc.NewInteractiveServiceServer(interactiveService)
+	return interactiveServiceServer
+}
+
 // wire.go:
 
+// 第三方依赖
 var thirdProvider = wire.NewSet(InitRedis,
 	InitTestDB, InitLog)
 
+// 服务依赖
 var interactiveSvcProvider = wire.NewSet(service.NewInteractiveService, repository.NewCachedInteractiveRepository, dao.NewGORMInteractiveDAO, cache.NewRedisInteractiveCache)

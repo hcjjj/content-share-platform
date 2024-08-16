@@ -1,60 +1,54 @@
-// Package service -----------------------------
-// @file      : user.go
-// @author    : hcjjj
-// @contact   : hcjjj@foxmail.com
-// @time      : 2024-02-25 11:19
-// -------------------------------------------
 package service
 
 import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
-	"basic-go/webook/pkg/logger"
 	"context"
 	"errors"
 
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
 
 var (
-	ErrUserDuplicate         = repository.ErrUserDuplicate
-	ErrInvalidUserOrPassword = errors.New("邮箱或密码不对")
+	ErrDuplicateEmail        = repository.ErrDuplicateUser
+	ErrInvalidUserOrPassword = errors.New("用户不存在或者密码不对")
 )
 
+//go:generate mockgen -source=./user.go -package=svcmocks -destination=./mocks/user.mock.go UserService
 type UserService interface {
-	SignUp(ctx context.Context, u domain.User) error
+	Signup(ctx context.Context, u domain.User) error
 	Login(ctx context.Context, email string, password string) (domain.User, error)
+	UpdateNonSensitiveInfo(ctx context.Context,
+		user domain.User) error
+	FindById(ctx context.Context,
+		uid int64) (domain.User, error)
 	FindOrCreate(ctx context.Context, phone string) (domain.User, error)
-	FindOrCreateByWechat(ctx context.Context, wechatInfo domain.WechatInfo) (domain.User, error)
-	Profile(ctx context.Context, id int64) (domain.User, error)
+	FindOrCreateByWechat(ctx context.Context, info domain.WechatInfo) (domain.User, error)
 }
 
-type UserServiceV1 struct {
+type userService struct {
 	repo repository.UserRepository
-	l    logger.LoggerV1
+	//logger *zap.Logger
 }
 
-// NewUserService 传入的是接口 返回的是接口 为了符合 wire
-func NewUserService(repo repository.UserRepository, l logger.LoggerV1) UserService {
-	return &UserServiceV1{
+func NewUserService(repo repository.UserRepository) UserService {
+	return &userService{
 		repo: repo,
-		l:    l,
+		//logger: zap.L(),
 	}
 }
 
-func (svc *UserServiceV1) SignUp(ctx context.Context, u domain.User) error {
-	// 加密 password，会影响性能
+func (svc *userService) Signup(ctx context.Context, u domain.User) error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
 	}
 	u.Password = string(hash)
-	// 保存加密后的 password
 	return svc.repo.Create(ctx, u)
 }
 
-func (svc *UserServiceV1) Login(ctx context.Context, email string, password string) (domain.User, error) {
-	// 先找用户
+func (svc *userService) Login(ctx context.Context, email string, password string) (domain.User, error) {
 	u, err := svc.repo.FindByEmail(ctx, email)
 	if err == repository.ErrUserNotFound {
 		return domain.User{}, ErrInvalidUserOrPassword
@@ -62,59 +56,62 @@ func (svc *UserServiceV1) Login(ctx context.Context, email string, password stri
 	if err != nil {
 		return domain.User{}, err
 	}
-	// 再比较密码
+	// 检查密码对不对
 	err = bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
 	if err != nil {
-		// 打印日志
 		return domain.User{}, ErrInvalidUserOrPassword
 	}
 	return u, nil
 }
 
-func (svc *UserServiceV1) FindOrCreate(ctx context.Context, phone string) (domain.User, error) {
-	// 先查询一下这个手机号注册过没有
+func (svc *userService) UpdateNonSensitiveInfo(ctx context.Context,
+	user domain.User) error {
+	// UpdateNicknameAndXXAnd
+	return svc.repo.UpdateNonZeroFields(ctx, user)
+}
+
+func (svc *userService) FindById(ctx context.Context,
+	uid int64) (domain.User, error) {
+	return svc.repo.FindById(ctx, uid)
+}
+
+func (svc *userService) FindOrCreate(ctx context.Context, phone string) (domain.User, error) {
+	// 先找一下，我们认为，大部分用户是已经存在的用户
 	u, err := svc.repo.FindByPhone(ctx, phone)
 	if err != repository.ErrUserNotFound {
-		// nil 会进来
-		// 用户存在也会进来
+		// 有两种情况
+		// err == nil, u 是可用的
+		// err != nil，系统错误，
 		return u, err
 	}
-
-	svc.l.Info("用户未注册", logger.String("phone", phone))
-
-	// 没有这个用户的话
-	u = domain.User{
+	// 用户没找到
+	err = svc.repo.Create(ctx, domain.User{
 		Phone: phone,
+	})
+	// 有两种可能，一种是 err 恰好是唯一索引冲突（phone）
+	// 一种是 err != nil，系统错误
+	if err != nil && err != repository.ErrDuplicateUser {
+		return domain.User{}, err
 	}
-	// 通过新用户的手机号注册
-	err = svc.repo.Create(ctx, u)
-	if err != nil && err != ErrUserDuplicate {
-		return u, err
-	}
-	// 然后再查询其 Id
-	// 可能会有主从延迟的坑🕳
+	// 要么 err ==nil，要么ErrDuplicateUser，也代表用户存在
+	// 主从延迟，理论上来讲，强制走主库
 	return svc.repo.FindByPhone(ctx, phone)
 }
 
-func (svc *UserServiceV1) FindOrCreateByWechat(ctx context.Context,
-	info domain.WechatInfo) (domain.User, error) {
-	u, err := svc.repo.FindByWechat(ctx, info.OpenID)
+func (svc *userService) FindOrCreateByWechat(ctx context.Context, wechatInfo domain.WechatInfo) (domain.User, error) {
+	u, err := svc.repo.FindByWechat(ctx, wechatInfo.OpenId)
 	if err != repository.ErrUserNotFound {
 		return u, err
 	}
-	u = domain.User{
-		WechatInfo: info,
+	// 这边就是意味着是一个新用户
+	// JSON 格式的 wechatInfo
+	zap.L().Info("新用户", zap.Any("wechatInfo", wechatInfo))
+	//svc.logger.Info("新用户", zap.Any("wechatInfo", wechatInfo))
+	err = svc.repo.Create(ctx, domain.User{
+		WechatInfo: wechatInfo,
+	})
+	if err != nil && err != repository.ErrDuplicateUser {
+		return domain.User{}, err
 	}
-	err = svc.repo.Create(ctx, u)
-	if err != nil && err != repository.ErrUserDuplicate {
-		return u, err
-	}
-	// 因为这里会遇到主从延迟的问题
-	return svc.repo.FindByWechat(ctx, info.OpenID)
-}
-
-func (svc *UserServiceV1) Profile(ctx context.Context, id int64) (domain.User, error) {
-	// 在系统内部，基本上都是用 ID 的
-	// 有些人的系统比较复杂，有一个 GUID（global unique ID）
-	return svc.repo.FindById(ctx, id)
+	return svc.repo.FindByWechat(ctx, wechatInfo.OpenId)
 }

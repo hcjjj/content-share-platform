@@ -12,12 +12,10 @@ import (
 	cache2 "basic-go/webook/interactive/repository/cache"
 	dao2 "basic-go/webook/interactive/repository/dao"
 	service2 "basic-go/webook/interactive/service"
-	article3 "basic-go/webook/internal/events/article"
+	"basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
-	article2 "basic-go/webook/internal/repository/article"
 	"basic-go/webook/internal/repository/cache"
 	"basic-go/webook/internal/repository/dao"
-	"basic-go/webook/internal/repository/dao/article"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web"
 	"basic-go/webook/internal/web/jwt"
@@ -33,36 +31,39 @@ import (
 
 func InitWebServer() *App {
 	cmdable := ioc.InitRedis()
-	loggerV1 := ioc.InitLogger()
 	handler := jwt.NewRedisJWTHandler(cmdable)
-	v := ioc.InitMiddlewares(cmdable, loggerV1, handler)
+	loggerV1 := ioc.InitLogger()
+	v := ioc.InitGinMiddlewares(cmdable, handler, loggerV1)
 	db := ioc.InitDB(loggerV1)
 	userDAO := dao.NewUserDAO(db)
 	userCache := cache.NewUserCache(cmdable)
-	userRepository := repository.NewUserRepository(userDAO, userCache)
-	userService := service.NewUserService(userRepository, loggerV1)
+	userRepository := repository.NewCachedUserRepository(userDAO, userCache)
+	userService := service.NewUserService(userRepository)
 	codeCache := cache.NewCodeCache(cmdable)
 	codeRepository := repository.NewCodeRepository(codeCache)
 	smsService := ioc.InitSMSService(cmdable)
 	codeService := service.NewCodeService(codeRepository, smsService)
-	userHandler := web.NewUserHandler(userService, codeService, handler)
-	articleDAO := article.NewGORMArticleDAO(db)
-	articleCache := cache.NewRedisArticleCache(cmdable)
-	articleRepository := article2.NewArticleRepository(articleDAO, loggerV1, articleCache)
-	client := ioc.InitKafka()
-	syncProducer := ioc.NewSyncProducer(client)
-	producer := article3.NewKafkaProducer(syncProducer)
-	articleService := service.NewArticleService(articleRepository, loggerV1, producer)
-	articleHandler := web.NewArticleHandler(articleService, loggerV1)
-	engine := ioc.InitWebServer(v, userHandler, articleHandler)
+	userHandler := web.NewUserHandler(userService, handler, codeService)
+	articleDAO := dao.NewArticleGORMDAO(db)
+	articleCache := cache.NewArticleRedisCache(cmdable)
+	articleRepository := repository.NewCachedArticleRepository(articleDAO, userRepository, articleCache)
+	client := ioc.InitSaramaClient()
+	syncProducer := ioc.InitSyncProducer(client)
+	producer := article.NewSaramaSyncProducer(syncProducer)
+	articleService := service.NewArticleService(articleRepository, producer)
 	interactiveDAO := dao2.NewGORMInteractiveDAO(db)
-	interactiveCache := cache2.NewRedisInteractiveCache(cmdable)
+	interactiveCache := cache2.NewInteractiveRedisCache(cmdable)
 	interactiveRepository := repository2.NewCachedInteractiveRepository(interactiveDAO, interactiveCache, loggerV1)
-	interactiveReadEventBatchConsumer := events.NewInteractiveReadEventBatchConsumer(client, interactiveRepository, loggerV1)
-	v2 := ioc.NewConsumers(interactiveReadEventBatchConsumer)
 	interactiveService := service2.NewInteractiveService(interactiveRepository, loggerV1)
-	rankingService := service.NewBatchRankingService(articleService, interactiveService)
-	rlockClient := ioc.InitRLockClient(cmdable)
+	interactiveServiceClient := ioc.InitIntrClient(interactiveService)
+	articleHandler := web.NewArticleHandler(loggerV1, articleService, interactiveServiceClient)
+	engine := ioc.InitWebServer(v, userHandler, articleHandler)
+	interactiveReadEventConsumer := events.NewInteractiveReadEventConsumer(interactiveRepository, client, loggerV1)
+	v2 := ioc.InitConsumers(interactiveReadEventConsumer)
+	rankingCache := cache.NewRankingRedisCache(cmdable)
+	rankingRepository := repository.NewCachedRankingRepository(rankingCache)
+	rankingService := service.NewBatchRankingService(articleService, rankingRepository, interactiveServiceClient)
+	rlockClient := ioc.InitRlockClient(cmdable)
 	rankingJob := ioc.InitRankingJob(rankingService, rlockClient, loggerV1)
 	cron := ioc.InitJobs(loggerV1, rankingJob)
 	app := &App{
@@ -75,6 +76,6 @@ func InitWebServer() *App {
 
 // wire.go:
 
-var interactiveSvcProvider = wire.NewSet(service2.NewInteractiveService, repository2.NewCachedInteractiveRepository, dao2.NewGORMInteractiveDAO, cache2.NewRedisInteractiveCache)
+var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO, cache2.NewInteractiveRedisCache, repository2.NewCachedInteractiveRepository, service2.NewInteractiveService)
 
-var rankingServiceSet = wire.NewSet(cache.NewRankingRedisCache, repository.NewCachedRankingRepository, service.NewBatchRankingService, events.NewInteractiveReadEventBatchConsumer)
+var rankingSvcSet = wire.NewSet(cache.NewRankingRedisCache, repository.NewCachedRankingRepository, service.NewBatchRankingService)

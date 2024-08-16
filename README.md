@@ -9,15 +9,20 @@
 
 ```mermaid
 graph LR;
-    A[单体应用-混沌一片] -->|模块划分| B(单体应用-模块化)
-    B -->|模块独立维护| C(单体应用-模块依赖化)
-    C -->|模块独立部署| D(微服务化)
+    A[单体应用-混沌一片] -->|模块划分| B[单体应用-模块化]
+    B -->|模块独立维护| C[单体应用-模块依赖化]
+    C -->|模块独立部署| D[微服务化]
     style D fill:#f9d6d6
 ```
 
 
 
-> 待完善
+> 1. 拆分为模块化（代码抽离，模块独立）
+> 2. 改造服务端（添加 RPC 接口和服务）
+> 3. 集成测试代码调整（ service 层 → rpc server 层）
+> 4. 改造客户端（替换原来用到该模块 service 接口的代码）
+
+
 
 **单体应用版本**
 
@@ -45,8 +50,8 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   - [x] 保护登录系统
   - [x] 优化登录性能
   - [x] 短信验证码登录
-  - [ ] 微信扫码登录
   - [x] 长短 Token 与退出
+  - [ ] 微信扫码登录
 - [x] 接入配置模块 ⚙️
 - [x] 接入日志模块 📋️
 - [x] 系统监控埋点 📹️
@@ -144,7 +149,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
 * [protobuf](https://github.com/golang/protobuf) - Go support for Google's protocol buffers
 * [grpc-go](https://github.com/grpc/grpc-go) - The Go language implementation of gRPC. HTTP/2 based RPC
 
-**相关环境**
+**环境/工具**
 
 * [Node.js](https://nodejs.org/en)
 * [Docker](https://www.docker.com/)
@@ -164,6 +169,7 @@ OS🪟🐧：[Ubuntu 22.04.3 LTS (WSL2)](https://ubuntu.com/desktop/wsl)
   * [ingress-nignx](https://github.com/kubernetes/ingress-nginx) - Ingress-NGINX Controller for Kubernetes
 * [wrk](https://github.com/wg/wrk) - Modern HTTP benchmarking tool
 * [protobuf](https://github.com/protocolbuffers/protobuf) - Protocol Buffers - Google's data interchange format
+* [buf](https://github.com/bufbuild/buf) - The best way of working with Protocol Buffers
 
 ## 编程能力
 

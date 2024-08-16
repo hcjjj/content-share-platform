@@ -3,24 +3,34 @@
 package startup
 
 import (
-	repository2 "basic-go/webook/interactive/repository"
-	cache2 "basic-go/webook/interactive/repository/cache"
-	dao2 "basic-go/webook/interactive/repository/dao"
-	service2 "basic-go/webook/interactive/service"
+	"basic-go/webook/interactive/repository"
+	"basic-go/webook/interactive/repository/cache"
+	"basic-go/webook/interactive/repository/dao"
+	"basic-go/webook/interactive/service"
+
+	"basic-go/webook/interactive/grpc"
 
 	"github.com/google/wire"
 )
 
+// 第三方依赖
 var thirdProvider = wire.NewSet(InitRedis,
 	InitTestDB, InitLog)
+
+// 服务依赖
 var interactiveSvcProvider = wire.NewSet(
-	service2.NewInteractiveService,
-	repository2.NewCachedInteractiveRepository,
-	dao2.NewGORMInteractiveDAO,
-	cache2.NewRedisInteractiveCache,
+	service.NewInteractiveService,
+	repository.NewCachedInteractiveRepository,
+	dao.NewGORMInteractiveDAO,
+	cache.NewRedisInteractiveCache,
 )
 
-func InitInteractiveService() service2.InteractiveService {
+func InitInteractiveService() service.InteractiveService {
 	wire.Build(thirdProvider, interactiveSvcProvider)
-	return service2.NewInteractiveService(nil, nil)
+	return service.NewInteractiveService(nil, nil)
+}
+
+func InitInteractiveGRPCServer() *grpc.InteractiveServiceServer {
+	wire.Build(thirdProvider, interactiveSvcProvider, grpc.NewInteractiveServiceServer)
+	return new(grpc.InteractiveServiceServer)
 }

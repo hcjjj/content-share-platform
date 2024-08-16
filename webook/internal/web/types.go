@@ -2,6 +2,11 @@ package web
 
 import "github.com/gin-gonic/gin"
 
-type handler interface {
+type Handler interface {
 	RegisterRoutes(server *gin.Engine)
+}
+
+type Page struct {
+	Limit  int
+	Offset int
 }

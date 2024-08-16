@@ -1,52 +1,43 @@
 package article
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/IBM/sarama"
 )
 
+const TopicReadEvent = "article_read"
+
 type Producer interface {
-	ProduceReadEvent(ctx context.Context, evt ReadEvent) error
-	ProduceReadEventV1(ctx context.Context, v1 ReadEventV1)
-}
-
-type KafkaProducer struct {
-	producer sarama.SyncProducer
-}
-
-func (k *KafkaProducer) ProduceReadEventV1(ctx context.Context, v1 ReadEventV1) {
-	//TODO implement me
-	panic("implement me")
-}
-
-// ProduceReadEvent 如果有复杂的重试逻辑，就用装饰器
-// 重试逻辑很简单，就放这里
-func (k *KafkaProducer) ProduceReadEvent(ctx context.Context, evt ReadEvent) error {
-	data, err := json.Marshal(evt)
-	if err != nil {
-		return err
-	}
-	_, _, err = k.producer.SendMessage(&sarama.ProducerMessage{
-		Topic: "read_article",
-		Value: sarama.ByteEncoder(data),
-	})
-	return err
-}
-
-func NewKafkaProducer(pc sarama.SyncProducer) Producer {
-	return &KafkaProducer{
-		producer: pc,
-	}
+	ProduceReadEvent(evt ReadEvent) error
 }
 
 type ReadEvent struct {
-	Uid int64
 	Aid int64
+	Uid int64
 }
 
-type ReadEventV1 struct {
-	Uids []int64
+type BatchReadEvent struct {
 	Aids []int64
+	Uids []int64
+}
+
+type SaramaSyncProducer struct {
+	producer sarama.SyncProducer
+}
+
+func NewSaramaSyncProducer(producer sarama.SyncProducer) Producer {
+	return &SaramaSyncProducer{producer: producer}
+}
+
+func (s *SaramaSyncProducer) ProduceReadEvent(evt ReadEvent) error {
+	val, err := json.Marshal(evt)
+	if err != nil {
+		return err
+	}
+	_, _, err = s.producer.SendMessage(&sarama.ProducerMessage{
+		Topic: TopicReadEvent,
+		Value: sarama.StringEncoder(val),
+	})
+	return err
 }

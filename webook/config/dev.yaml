@@ -1,14 +1,17 @@
-#remote：
-#db:
-#  dsn: "root:root@tcp(localhost:13306)/webook"
-
-db:
-  mysql:
-    dsn: "root:root@tcp(localhost:13306)/webook"
+test:
+  key: value1234
 
 redis:
   addr: "localhost:16379"
 
+db:
+  dsn: "root:root@tcp(localhost:13306)/webook"
 kafka:
-  addrs:
+  addr:
     - "localhost:9094"
+
+grpc:
+  client:
+    intr:
+      addr: "localhost:8090"
+      threshold: 100

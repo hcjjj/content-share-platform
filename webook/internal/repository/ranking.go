@@ -1,10 +1,9 @@
 package repository
 
 import (
-	"context"
-
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository/cache"
+	"context"
 )
 
 type RankingRepository interface {
@@ -13,35 +12,44 @@ type RankingRepository interface {
 }
 
 type CachedRankingRepository struct {
-	// 使用具体实现，可读性更好，对测试不友好，因为没有面向接口编程
-	redis *cache.RankingRedisCache
-	local *cache.RankingLocalCache
+	cache cache.RankingCache
+
+	// 下面是给 v1 用的
+	redisCache *cache.RankingRedisCache
+	localCache *cache.RankingLocalCache
 }
 
-func (c *CachedRankingRepository) GetTopN(ctx context.Context) ([]domain.Article, error) {
-	// 先本地再Redis
-	data, err := c.local.Get(ctx)
+func NewCachedRankingRepositoryV1(redisCache *cache.RankingRedisCache, localCache *cache.RankingLocalCache) *CachedRankingRepository {
+	return &CachedRankingRepository{redisCache: redisCache, localCache: localCache}
+
+}
+
+func (repo *CachedRankingRepository) GetTopNV1(ctx context.Context) ([]domain.Article, error) {
+	res, err := repo.localCache.Get(ctx)
 	if err == nil {
-		return data, nil
+		return res, nil
 	}
-	data, err = c.redis.Get(ctx)
-	if err == nil {
-		c.local.Set(ctx, data)
-	} else {
-		return c.local.ForceGet(ctx)
+	res, err = repo.redisCache.Get(ctx)
+	if err != nil {
+		return repo.localCache.ForceGet(ctx)
 	}
-	return data, err
+	_ = repo.localCache.Set(ctx, res)
+	return res, nil
 }
 
-func NewCachedRankingRepository(
-	redis *cache.RankingRedisCache,
-	local *cache.RankingLocalCache,
-) RankingRepository {
-	return &CachedRankingRepository{local: local, redis: redis}
+func (repo *CachedRankingRepository) GetTopN(ctx context.Context) ([]domain.Article, error) {
+	return repo.cache.Get(ctx)
 }
 
-func (c *CachedRankingRepository) ReplaceTopN(ctx context.Context, arts []domain.Article) error {
-	// 先本地再Redis
-	_ = c.local.Set(ctx, arts)
-	return c.redis.Set(ctx, arts)
+func NewCachedRankingRepository(cache cache.RankingCache) RankingRepository {
+	return &CachedRankingRepository{cache: cache}
+}
+
+func (repo *CachedRankingRepository) ReplaceTopNV1(ctx context.Context, arts []domain.Article) error {
+	_ = repo.localCache.Set(ctx, arts)
+	return repo.redisCache.Set(ctx, arts)
+}
+
+func (repo *CachedRankingRepository) ReplaceTopN(ctx context.Context, arts []domain.Article) error {
+	return repo.cache.Set(ctx, arts)
 }
