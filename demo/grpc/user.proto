@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "/basic-go/grpc";
+option go_package = "basic-go/grpc";
 
 // 这种是不可行的
 //option go_package = "abc";

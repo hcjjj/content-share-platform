@@ -58,6 +58,7 @@ func (c *FixedWindowLimiter) BuildServerInterceptor() grpc.UnaryServerIntercepto
 			c.lastWindowStart = now
 		}
 		cnt := c.cnt + 1
+		// 注意锁的范围
 		c.lock.Unlock()
 		if cnt <= c.threshold {
 			resp, err = handler(ctx, req)
