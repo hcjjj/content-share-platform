@@ -23,7 +23,7 @@ func TestServer(t *testing.T) {
 
 func TestClient(t *testing.T) {
 	//cc, err := grpc.Dial("localhost:8090", grpc.WithInsecure())
-	cc, err := grpc.Dial("localhost:8090",
+	cc, err := grpc.NewClient("localhost:8090",
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 
 	require.NoError(t, err)

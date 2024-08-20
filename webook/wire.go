@@ -3,11 +3,6 @@
 package main
 
 import (
-	"basic-go/webook/interactive/events"
-	repository2 "basic-go/webook/interactive/repository"
-	cache2 "basic-go/webook/interactive/repository/cache"
-	dao2 "basic-go/webook/interactive/repository/dao"
-	service2 "basic-go/webook/interactive/service"
 	"basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/repository"
 	"basic-go/webook/internal/repository/cache"
@@ -20,11 +15,11 @@ import (
 	"github.com/google/wire"
 )
 
-var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO,
-	cache2.NewInteractiveRedisCache,
-	repository2.NewCachedInteractiveRepository,
-	service2.NewInteractiveService,
-)
+//var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO,
+//	cache2.NewInteractiveRedisCache,
+//	repository2.NewCachedInteractiveRepository,
+//	service2.NewInteractiveService,
+//)
 
 var rankingSvcSet = wire.NewSet(
 	cache.NewRankingRedisCache,
@@ -40,18 +35,20 @@ func InitWebServer() *App {
 		ioc.InitSaramaClient,
 		ioc.InitSyncProducer,
 		ioc.InitRlockClient,
+		ioc.InitEtcd,
 		// DAO 部分
 		dao.NewUserDAO,
 		dao.NewArticleGORMDAO,
 
-		interactiveSvcSet,
+		//interactiveSvcSet,
 		ioc.InitIntrClient,
+
 		rankingSvcSet,
 		ioc.InitJobs,
 		ioc.InitRankingJob,
 
 		article.NewSaramaSyncProducer,
-		events.NewInteractiveReadEventConsumer,
+		//events.NewInteractiveReadEventConsumer,
 		ioc.InitConsumers,
 
 		// cache 部分

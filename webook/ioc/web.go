@@ -75,9 +75,9 @@ func InitGinMiddlewares(redisClient redis.Cmdable,
 			},
 			MaxAge: 12 * time.Hour,
 		}),
-		func(ctx *gin.Context) {
-			println("这是我的 Middleware")
-		},
+		//func(ctx *gin.Context) {
+		//	println("这是我的 Middleware")
+		//},
 		pb.BuildResponseTime(),
 		pb.BuildActiveRequest(),
 		//otelgin.Middleware("webook"),

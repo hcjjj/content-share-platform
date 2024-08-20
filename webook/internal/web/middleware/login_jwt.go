@@ -21,7 +21,8 @@ func NewLoginJWTMiddlewareBuilder(hdl ijwt.Handler) *LoginJWTMiddlewareBuilder {
 func (m *LoginJWTMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		path := ctx.Request.URL.Path
-		if path == "/users/signup" ||
+		if path == "/hello" ||
+			path == "/users/signup" ||
 			path == "/users/login" ||
 			path == "/users/login_sms/code/send" ||
 			path == "/users/login_sms" ||

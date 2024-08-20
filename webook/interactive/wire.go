@@ -18,7 +18,8 @@ var thirdPartySet = wire.NewSet(
 	ioc.InitDB,
 	ioc.InitLogger,
 	ioc.InitSaramaClient,
-	ioc.InitRedis)
+	ioc.InitRedis,
+)
 
 var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO,
 	cache2.NewInteractiveRedisCache,

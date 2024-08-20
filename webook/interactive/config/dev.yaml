@@ -7,11 +7,8 @@ redis:
 kafka:
   addr:
     - "localhost:9094"
-
 grpc:
   server:
-    addr: "0.0.0.0:8090"
-#  client:
-#    user:
-#      addr: "user.mycompany.com:8090"
-#    intr:
+    etcdAddr: "localhost:12379"
+    port: 8090
+    name: "interactive"

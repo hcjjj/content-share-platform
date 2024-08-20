@@ -11,36 +11,36 @@ services:
       - ./script/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       # 这里映射为了 13306 端口
-      - "13306:3306"
+      - 13306:3306
+
+  #  mongo:
+  #    image: mongo:6.0
+  #    restart: always
+  #    environment:
+  #      MONGO_INITDB_ROOT_USERNAME: root
+  #      MONGO_INITDB_ROOT_PASSWORD: example
+  #    ports:
+  #      - 27017:27017
 
   redis:
     image: bitnami/redis:7.0.15
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - '16379:6379'
+      - 16379:6379
 
-#  etcd:
-#    image: bitnami/etcd:3.5.13
-#    environment:
-#      - ALLOW_NONE_AUTHENTICATION=yes
-#    ports:
-#      - 12379:2379
-#
-#  mongo:
-#    image: mongo:6.0
-#    restart: always
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: root
-#      MONGO_INITDB_ROOT_PASSWORD: example
-#    ports:
-#      - 27017:27017
+  etcd:
+    image: bitnami/etcd:3.5.13
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+    ports:
+      - 12379:2379
 
   kafka:
-    image: 'bitnami/kafka:3.6.0'
+    image: bitnami/kafka:3.6.0
     ports:
-      - '9092:9092'
-      - '9094:9094'
+      - 9092:9092
+      - 9094:9094
     environment:
       - KAFKA_CFG_NODE_ID=0
       #      - 允许自动创建 topic，线上不要开启

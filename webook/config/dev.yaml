@@ -6,12 +6,18 @@ redis:
 
 db:
   dsn: "root:root@tcp(localhost:13306)/webook"
+
 kafka:
   addr:
     - "localhost:9094"
+# - 表示切片
+
+etcd:
+  addrs:
+    - "localhost:12379"
 
 grpc:
   client:
     intr:
-      addr: "localhost:8090"
+      addr: "etcd:///service/interactive"
       threshold: 100
