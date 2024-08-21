@@ -19,7 +19,7 @@ type HistoryRecordConsumer struct {
 }
 
 func (i *HistoryRecordConsumer) Start() error {
-	cg, err := sarama.NewConsumerGroupFromClient("interactive", i.client)
+	cg, err := sarama.NewConsumerGroupFromClient("interaction", i.client)
 	if err != nil {
 		return err
 	}

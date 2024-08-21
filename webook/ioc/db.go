@@ -1,7 +1,7 @@
 package ioc
 
 import (
-	dao2 "basic-go/webook/interactive/repository/dao"
+	dao2 "basic-go/webook/interaction/repository/dao"
 	"basic-go/webook/internal/repository/dao"
 	"basic-go/webook/pkg/gormx"
 	"basic-go/webook/pkg/logger"

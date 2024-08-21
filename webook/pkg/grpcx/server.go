@@ -4,6 +4,7 @@ import (
 	"basic-go/webook/pkg/logger"
 	"basic-go/webook/pkg/netx"
 	"context"
+	"fmt"
 	"net"
 	"strconv"
 	"time"
@@ -37,7 +38,11 @@ func (s *Server) Serve() error {
 		return err
 	}
 	// 我们要在这里完成注册
-	s.register()
+	err = s.register()
+	if err != nil {
+		panic("服务注册失败")
+	}
+	fmt.Printf("grpc server start at %s ...\n", l.Addr())
 	return s.Server.Serve(l)
 }
 

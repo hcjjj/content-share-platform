@@ -1,0 +1,8 @@
+db:
+  dsn: "root:root@tcp(localhost:13306)/webook"
+
+grpc:
+  server:
+    etcdAddr: "localhost:12379"
+    port: 8091
+    name: "comment"

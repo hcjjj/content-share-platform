@@ -1,8 +1,8 @@
 package startup
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
-	"basic-go/webook/interactive/service"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
+	"basic-go/webook/interaction/service"
 	"basic-go/webook/internal/client"
 	"context"
 

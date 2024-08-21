@@ -1,7 +1,7 @@
 package web
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/service"
 	"basic-go/webook/internal/web/jwt"

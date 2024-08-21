@@ -1,9 +1,9 @@
 package client
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
-	"basic-go/webook/interactive/domain"
-	"basic-go/webook/interactive/service"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
+	"basic-go/webook/interaction/domain"
+	"basic-go/webook/interaction/service"
 	"context"
 
 	"google.golang.org/grpc"

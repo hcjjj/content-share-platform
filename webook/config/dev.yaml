@@ -19,5 +19,5 @@ etcd:
 grpc:
   client:
     intr:
-      addr: "etcd:///service/interactive"
+      addr: "etcd:///service/interaction"
       threshold: 100

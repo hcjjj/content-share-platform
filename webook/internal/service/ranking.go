@@ -1,7 +1,7 @@
 package service
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
 	"context"
@@ -104,7 +104,7 @@ func (b *BatchRankingService) topN(ctx context.Context) ([]domain.Article, error
 		intrMap := intrResp.Intrs
 		for _, art := range arts {
 			intr := intrMap[art.Id]
-			//intr, ok := intrMap[art.Id]
+			//interaction, ok := intrMap[art.Id]
 			//if !ok {
 			//	continue
 			//}

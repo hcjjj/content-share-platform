@@ -4,11 +4,10 @@ managed:
   go_package_prefix:
     default: "basic-go/webook/api/proto/gen"
 plugins:
-  # protoc-gen-go 插件
   - plugin: buf.build/protocolbuffers/go
     out: webook/api/proto/gen
     opt: paths=source_relative
- # protoc-gen-go-grpc 插件
   - plugin: buf.build/grpc/go
     out: webook/api/proto/gen
-    opt: paths=source_relative
+    opt:
+      - paths=source_relative

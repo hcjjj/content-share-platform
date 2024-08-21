@@ -1,7 +1,7 @@
 package startup
 
 import (
-	dao2 "basic-go/webook/interactive/repository/dao"
+	dao2 "basic-go/webook/interaction/repository/dao"
 	"basic-go/webook/internal/repository/dao"
 
 	"gorm.io/driver/mysql"

@@ -1,7 +1,7 @@
 package client
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
 	"context"
 	"github.com/ecodeclub/ekit/syncx/atomicx"
 	"google.golang.org/grpc"

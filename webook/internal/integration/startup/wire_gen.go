@@ -7,10 +7,10 @@
 package startup
 
 import (
-	repository2 "basic-go/webook/interactive/repository"
-	cache2 "basic-go/webook/interactive/repository/cache"
-	dao2 "basic-go/webook/interactive/repository/dao"
-	service2 "basic-go/webook/interactive/service"
+	repository2 "basic-go/webook/interaction/repository"
+	cache2 "basic-go/webook/interaction/repository/cache"
+	dao2 "basic-go/webook/interaction/repository/dao"
+	service2 "basic-go/webook/interaction/service"
 	"basic-go/webook/internal/events/article"
 	"basic-go/webook/internal/job"
 	"basic-go/webook/internal/repository"

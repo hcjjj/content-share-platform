@@ -1,8 +1,8 @@
 package ioc
 
 import (
-	intrv1 "basic-go/webook/api/proto/gen/intr/v1"
-	"basic-go/webook/interactive/service"
+	intrv1 "basic-go/webook/api/proto/gen/interaction/v1"
+	"basic-go/webook/interaction/service"
 	"basic-go/webook/internal/client"
 
 	"github.com/fsnotify/fsnotify"
@@ -20,7 +20,7 @@ func InitIntrClient(client *etcdv3.Client) intrv1.InteractiveServiceClient {
 		Secure bool   `yaml:"secure"`
 	}
 	var cfg Config
-	err := viper.UnmarshalKey("grpc.client.intr", &cfg)
+	err := viper.UnmarshalKey("grpc.client.interaction", &cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -50,7 +50,7 @@ func InitIntrClientWithThreshold(svc service.InteractiveService) intrv1.Interact
 		Threshold int32
 	}
 	var cfg Config
-	err := viper.UnmarshalKey("grpc.client.intr", &cfg)
+	err := viper.UnmarshalKey("grpc.client.interaction", &cfg)
 	if err != nil {
 		panic(err)
 	}
@@ -68,7 +68,7 @@ func InitIntrClientWithThreshold(svc service.InteractiveService) intrv1.Interact
 	res := client.NewInteractiveClient(remote, local)
 	viper.OnConfigChange(func(in fsnotify.Event) {
 		cfg = Config{}
-		err := viper.UnmarshalKey("grpc.client.intr", &cfg)
+		err := viper.UnmarshalKey("grpc.client.interaction", &cfg)
 		if err != nil {
 			// 这边做不了什么
 			panic(err)

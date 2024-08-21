@@ -15,7 +15,7 @@ type InterceptorBuilder struct {
 	key     string
 }
 
-// NewInterceptorBuilder key 1. limiter:interactive-service => 整个点赞的应用限流
+// NewInterceptorBuilder key 1. limiter:interaction-service => 整个点赞的应用限流
 func NewInterceptorBuilder(limiter limiter.Limiter, key string) *InterceptorBuilder {
 	return &InterceptorBuilder{limiter: limiter, key: key}
 }
