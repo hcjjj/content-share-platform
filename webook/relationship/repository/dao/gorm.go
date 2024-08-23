@@ -27,6 +27,7 @@ func (g *GORMFollowRelationDAO) CntFollowee(ctx context.Context, uid int64) (int
 	var res int64
 	err := g.db.WithContext(ctx).
 		Select("count(followee)").
+		// 注意要和索引的设置一致
 		// <follower, followee>
 		Where("follower = ? AND status = ?",
 			uid, FollowRelationStatusActive).Count(&res).Error

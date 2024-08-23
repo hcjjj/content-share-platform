@@ -26,13 +26,13 @@ type CachedRelationRepository struct {
 	l     logger.LoggerV1
 }
 
-// 获得个人的关注了多少人，以及粉丝的数量
+// GetFollowStatics 获得个人的关注了多少人，以及粉丝的数量
 func (d *CachedRelationRepository) GetFollowStatics(ctx context.Context, uid int64) (domain.FollowStatics, error) {
-	res, err := d.cache.StaticsInfo(ctx, uid)
+	res, err := d.cache.GetStaticsInfo(ctx, uid)
 	if err == nil {
 		return res, nil
 	}
-	// 没有就去数据库里查询，
+	// 没有就去数据库里查询
 	res.Followers, err = d.dao.CntFollower(ctx, uid)
 	if err != nil {
 		return domain.FollowStatics{}, err
@@ -43,7 +43,7 @@ func (d *CachedRelationRepository) GetFollowStatics(ctx context.Context, uid int
 	}
 	err = d.cache.SetStaticsInfo(ctx, uid, res)
 	if err != nil {
-		// 这里，记录一下日志就行
+		// 这里，记录一下日志
 	}
 	return res, nil
 }

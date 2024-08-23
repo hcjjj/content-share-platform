@@ -31,6 +31,7 @@ func (r *RedisFollowCache) CancelFollow(ctx context.Context, follower, followee 
 }
 
 func (r *RedisFollowCache) updateStaticsInfo(ctx context.Context, follower, followee int64, delta int64) error {
+	// Redis 的事务（只能保证两条命令的连续到达 Redis，不具备 ACID 的特性，没有回滚）
 	tx := r.client.TxPipeline()
 	// 这两个操作，只是记录了一下，还没发过去 redis
 	tx.HIncrBy(ctx, r.staticsKey(follower), fieldFolloweeCnt, delta)
@@ -40,7 +41,7 @@ func (r *RedisFollowCache) updateStaticsInfo(ctx context.Context, follower, foll
 	return err
 }
 
-func (r *RedisFollowCache) StaticsInfo(ctx context.Context, uid int64) (domain.FollowStatics, error) {
+func (r *RedisFollowCache) GetStaticsInfo(ctx context.Context, uid int64) (domain.FollowStatics, error) {
 	data, err := r.client.HGetAll(ctx, r.staticsKey(uid)).Result()
 	if err != nil {
 		return domain.FollowStatics{}, err

@@ -30,7 +30,8 @@ func (t *TableStoreFollowRelationDao) FollowRelationList(ctx context.Context, fo
 		// WHERE username = 'abc' or 1=1 AND password = '';
 		// WHERE username = 'abc' AND password = ''; TRUNCATE table mysql.`users`;
 		Query: fmt.Sprintf("select id,follower,followee from %s where follower = %d AND status = %d OFFSET %d LIMIT %d",
-			FollowRelationTableName, follower, FollowRelationStatusActive, offset, limit)}
+			FollowRelationTableName, follower, FollowRelationStatusActive, offset, limit),
+	}
 	response, err := t.client.SQLQuery(request)
 	if err != nil {
 		return nil, err
