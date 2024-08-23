@@ -125,7 +125,7 @@ func (h *ArticleHandler) List(ctx *gin.Context) {
 	if err := ctx.Bind(&page); err != nil {
 		return
 	}
-	// 我要不要检测一下？
+	// 要不要检测一下？
 	uc := ctx.MustGet("user").(jwt.UserClaims)
 	arts, err := h.svc.GetByAuthor(ctx, uc.Uid, page.Offset, page.Limit)
 	if err != nil {
@@ -149,7 +149,7 @@ func (h *ArticleHandler) List(ctx *gin.Context) {
 
 				//Content:  src.Content,
 				AuthorId: src.Author.Id,
-				// 列表，你不需要
+				// 列表，不需要
 				Status: src.Status.ToUint8(),
 				Ctime:  src.Ctime.Format(time.DateTime),
 				Utime:  src.Utime.Format(time.DateTime),
@@ -202,7 +202,7 @@ func (h *ArticleHandler) Detail(ctx *gin.Context) {
 
 		Content:  art.Content,
 		AuthorId: art.Author.Id,
-		// 列表，你不需要
+		// 列表，不需要
 		Status: art.Status.ToUint8(),
 		Ctime:  art.Ctime.Format(time.DateTime),
 		Utime:  art.Utime.Format(time.DateTime),
@@ -259,8 +259,8 @@ func (h *ArticleHandler) PubDetail(ctx *gin.Context) {
 	}
 
 	//go func() {
-	// 1. 如果你想摆脱原本主链路的超时控制，你就创建一个新的
-	// 2. 如果你不想，你就用 ctx
+	// 1. 如果想摆脱原本主链路的超时控制，就创建一个新的
+	// 2. 如果不想，就用 ctx
 	//newCtx, cancel := context.WithTimeout(context.Background(), time.Second)
 	//defer cancel()
 	//er := h.intrSvc.IncrReadCnt(newCtx, h.biz, art.Id)

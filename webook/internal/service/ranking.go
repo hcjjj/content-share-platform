@@ -126,7 +126,7 @@ func (b *BatchRankingService) topN(ctx context.Context) ([]domain.Article, error
 			}
 		}
 		offset = offset + len(arts)
-		// 没有取够一批，我们就直接中断执行
+		// 没有取够一批，就直接中断执行
 		// 没有下一批了
 		if len(arts) < b.batchSize ||
 			// 这个是一个优化

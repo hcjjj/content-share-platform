@@ -36,7 +36,7 @@ func (s *KratosTestSuite) TestClient() {
 		grpc.WithEndpoint("discovery:///user"),
 		grpc.WithDiscovery(r),
 		//grpc.WithNodeFilter(func(ctx context.Context, nodes []selector.Node) []selector.Node {
-		//	// 你可以在这里过滤一些东西
+		//	// 可以在这里过滤一些东西
 		//	res := make([]selector.Node, 0, len(nodes))
 		//	for _, n := range nodes {
 		//		if n.Metadata()["vip"] == "true" {

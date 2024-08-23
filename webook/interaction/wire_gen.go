@@ -14,7 +14,6 @@ import (
 	"basic-go/webook/interaction/repository/cache"
 	"basic-go/webook/interaction/repository/dao"
 	"basic-go/webook/interaction/service"
-	"fmt"
 
 	"github.com/google/wire"
 )
@@ -38,7 +37,6 @@ func InitApp() *App {
 		consumers: v,
 		server:    server,
 	}
-	fmt.Println("app init success")
 	return app
 }
 

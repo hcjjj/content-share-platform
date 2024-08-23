@@ -20,7 +20,7 @@ func (b *Builder) PeerName(ctx context.Context) string {
 // PeerIP 获取对端ip
 func (b *Builder) PeerIP(ctx context.Context) string {
 	// 如果在 ctx 里面传入。或者说客户端里面设置了，就直接用它设置的
-	// 有些时候你经过网关之类的东西，就需要客户端主动设置，防止后面拿到网关的 IP
+	// 有些时候经过网关之类的东西，就需要客户端主动设置，防止后面拿到网关的 IP
 	clientIP := b.grpcHeaderValue(ctx, "client-ip")
 	if clientIP != "" {
 		return clientIP

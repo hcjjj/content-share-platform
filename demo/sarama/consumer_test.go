@@ -31,7 +31,7 @@ func TestConsumer(t *testing.T) {
 		[]string{"test_topic"}, testConsumerGroupHandler{})
 	//err = consumer.Consume(ctx,
 	//	[]string{"read_article"}, testConsumerGroupHandler{})
-	// 你消费结束，就会到这里
+	// 消费结束，就会到这里
 	t.Log(err, time.Since(start).String())
 }
 
@@ -92,9 +92,9 @@ func (t testConsumerGroupHandler) ConsumeClaim(
 				}
 				last = msg
 				eg.Go(func() error {
-					// 我就在这里消费
+					// 在这里消费
 					time.Sleep(time.Second)
-					// 你在这里重试
+					// 在这里重试
 					log.Println(string(msg.Value))
 					return nil
 				})
@@ -118,7 +118,7 @@ func (t testConsumerGroupHandler) ConsumeClaim(
 }
 
 func (t testConsumerGroupHandler) ConsumeClaimV1(
-	// 代表的是你和Kafka 的会话（从建立连接到连接彻底断掉的那一段时间）
+	// 代表的是和Kafka 的会话（从建立连接到连接彻底断掉的那一段时间）
 	session sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim) error {
 	msgs := claim.Messages()

@@ -52,7 +52,7 @@ func TestContextErr(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	cancel()
 	ctx.Err()
-	// 你怎么区别被取消，还是超时了呢？
+	// 怎么区别被取消，还是超时了呢？
 	if ctx.Err() == context.Canceled {
 
 	} else if ctx.Err() == context.DeadlineExceeded {
@@ -103,6 +103,6 @@ func TestContextSubCancel(t *testing.T) {
 //		// 监听超时 或者用户主动取消
 //
 //	case <-biz.Signal():
-//		// 监听你的正常业务
+//		// 监听的正常业务
 //	}
 //}

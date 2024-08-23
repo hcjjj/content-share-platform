@@ -187,7 +187,7 @@ func (s *ArticleHandlerSuite) TestArticle_Publish() {
 					Ctime:   456,
 					Utime:   234,
 					Status:  1,
-					// 注意。这个 AuthorID 我们设置为另外一个人的ID
+					// 注意。这个 AuthorID 设置为另外一个人的ID
 					AuthorId: 789,
 				}
 				s.db.Create(&art)
@@ -285,7 +285,7 @@ func (s *ArticleHandlerSuite) TestEdit() {
 			name:   "新建帖子",
 			before: func(t *testing.T) {},
 			after: func(t *testing.T) {
-				// 你要验证，保存到了数据库里面
+				// 要验证，保存到了数据库里面
 				var art dao.Article
 				err := s.db.Where("author_id=?", 123).
 					First(&art).Error
@@ -308,7 +308,7 @@ func (s *ArticleHandlerSuite) TestEdit() {
 			},
 			wantCode: http.StatusOK,
 			wantRes: Result[int64]{
-				// 我希望你的 ID 是 1
+				// 希望 ID 是 1
 				Data: 1,
 			},
 		},
@@ -329,7 +329,7 @@ func (s *ArticleHandlerSuite) TestEdit() {
 				assert.NoError(t, err)
 			},
 			after: func(t *testing.T) {
-				// 你要验证，保存到了数据库里面
+				// 要验证，保存到了数据库里面
 				var art dao.Article
 				err := s.db.Where("id=?", 11).
 					First(&art).Error
@@ -353,7 +353,7 @@ func (s *ArticleHandlerSuite) TestEdit() {
 			},
 			wantCode: http.StatusOK,
 			wantRes: Result[int64]{
-				// 我希望你的 ID 是 11
+				// 希望 ID 是 11
 				Data: 11,
 			},
 		},
@@ -374,7 +374,7 @@ func (s *ArticleHandlerSuite) TestEdit() {
 				assert.NoError(t, err)
 			},
 			after: func(t *testing.T) {
-				// 你要验证，保存到了数据库里面
+				// 要验证，保存到了数据库里面
 				var art dao.Article
 				err := s.db.Where("id=?", 22).
 					First(&art).Error

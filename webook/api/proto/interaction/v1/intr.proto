@@ -26,7 +26,7 @@ message GetByIdsResponse {
 
 message GetRequest {
   string biz = 1;
-  // protobuf 比较推荐下划线。你也可以用驼峰
+  // protobuf 比较推荐下划线。也可以用驼峰
   int64 biz_id = 2;
   int64 uid = 3;
 }
@@ -48,7 +48,7 @@ message Interactive {
 
 message CollectRequest {
   string biz = 1;
-  // protobuf 比较推荐下划线。你也可以用驼峰
+  // protobuf 比较推荐下划线。也可以用驼峰
   int64 biz_id = 2;
   int64 uid = 3;
   int64 cid = 4;
@@ -83,7 +83,7 @@ message LikeResponse {
 
 message IncrReadCntRequest {
   string biz = 1;
-  // protobuf 比较推荐下划线。你也可以用驼峰
+  // protobuf 比较推荐下划线。也可以用驼峰
   int64 biz_id = 2;
 }
 

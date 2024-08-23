@@ -184,7 +184,7 @@ func (s *BalancerTestSuite) startServer(addr string, weight int, svc UserService
 	require.NoError(t, err)
 
 	err = em.AddEndpoint(ctx, key, endpoints.Endpoint{
-		// 定位信息，客户端怎么连你
+		// 定位信息，客户端怎么连
 		Addr: addr,
 		Metadata: map[string]any{
 			"weight": weight,

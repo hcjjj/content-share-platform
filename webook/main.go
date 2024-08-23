@@ -78,7 +78,7 @@ func main() {
 	})
 	server.Run(":8080")
 	// 服务关闭
-	// 一分钟内你要关完，要退出
+	// 一分钟内要关完，要退出
 	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
 	ctx = app.cron.Stop()
@@ -103,7 +103,7 @@ func initLogger() {
 		panic(err)
 	}
 	zap.L().Info("这是 replace 之前")
-	// 如果你不 replace，直接用 zap.L()，你啥都打不出来。
+	// 如果不 replace，直接用 zap.L()，啥都打不出来。
 	zap.ReplaceGlobals(logger)
 	//zap.L().Info("zap start!")
 
@@ -130,7 +130,7 @@ func initViper() {
 	viper.AddConfigPath("./webook/config")
 	//viper.AddConfigPath("/tmp/config")
 	//viper.AddConfigPath("/etc/webook")
-	// 读取配置到 viper 里面，或者你可以理解为加载到内存里面
+	// 读取配置到 viper 里面，或者可以理解为加载到内存里面
 	err := viper.ReadInConfig()
 	if err != nil {
 		panic(err)
@@ -174,10 +174,10 @@ func initViperWithArg() {
 
 	// 实时监听配置变更
 	viper.WatchConfig()
-	// 只能告诉你文件变了，不能告诉你，文件的哪些内容变了
+	// 只能告诉文件变了，不能告诉，文件的哪些内容变了
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		// 比较好的设计，它会在 in 里面告诉你变更前的数据，和变更后的数据
-		// 更好的设计是，它会直接告诉你差异。
+		// 比较好的设计，它会在 in 里面告诉变更前的数据，和变更后的数据
+		// 更好的设计是，它会直接告诉差异。
 		fmt.Println(in.Name, in.Op)
 		fmt.Println(viper.GetString("db.dsn"))
 	})

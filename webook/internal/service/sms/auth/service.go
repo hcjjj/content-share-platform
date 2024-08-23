@@ -24,7 +24,7 @@ func (s *SMSService) Send(ctx context.Context, biz string,
 	var tc Claims
 	// 是不是就在这？
 	// 如果这里能解析成功，说明就是对应的业务方
-	// 没有 error 就说明，token 是我发的
+	// 没有 error 就说明，token 是发的
 	token, err := jwt.ParseWithClaims(biz, &tc, func(token *jwt.Token) (interface{}, error) {
 		return s.key, nil
 	})

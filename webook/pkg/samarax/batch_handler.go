@@ -59,7 +59,7 @@ func (b *BatchHandler[T]) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 			}
 		}
 		cancel()
-		// 凑够了一批，然后你就处理
+		// 凑够了一批，然后就处理
 		err := b.fn(batch, ts)
 		if err != nil {
 			b.l.Error("处理消息失败",

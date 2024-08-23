@@ -35,14 +35,14 @@ func (m *LoginMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 		// 在执行业务之后搞点什么
 		//duration := time.Now().Sub(now)
 
-		// 我怎么知道，要刷新了呢？
-		// 假如说，我们的策略是每分钟刷一次，我怎么知道，已经过了一分钟？
+		// 怎么知道，要刷新了呢？
+		// 假如说，策略是每分钟刷一次，怎么知道，已经过了一分钟？
 		const updateTimeKey = "update_time"
 		// 试着拿出上一次刷新时间
 		val := sess.Get(updateTimeKey)
 		lastUpdateTime, ok := val.(time.Time)
 		if val == nil || !ok || now.Sub(lastUpdateTime) > time.Second*10 {
-			// 你这是第一次进来
+			// 这是第一次进来
 			sess.Set(updateTimeKey, now)
 			sess.Set("userId", userId)
 			err := sess.Save()

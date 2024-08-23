@@ -7,7 +7,7 @@ import (
 )
 
 type TimeoutFailoverSMSService struct {
-	// 你的服务商
+	// 服务商
 	svcs []sms.Service
 	// 当前正在使用节点
 	idx int32
@@ -49,10 +49,10 @@ func (t *TimeoutFailoverSMSService) Send(ctx context.Context, tplId string, args
 	case context.DeadlineExceeded:
 		atomic.AddInt32(&t.cnt, 1)
 	default:
-		// 遇到了错误，但是又不是超时错误，这个时候，你要考虑怎么搞
+		// 遇到了错误，但是又不是超时错误，这个时候，要考虑怎么搞
 		// 可以增加，也可以不增加
 		// 如果强调一定是超时，那么就不增加
-		// 如果是 EOF 之类的错误，你还可以考虑直接切换
+		// 如果是 EOF 之类的错误，还可以考虑直接切换
 	}
 	return err
 }

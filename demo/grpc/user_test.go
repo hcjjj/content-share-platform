@@ -37,7 +37,7 @@ func TestOneOf(t *testing.T) {
 	u := &User{}
 	email, ok := u.Contacts.(*User_Email)
 	if ok {
-		t.Log("我传入的是 email", email)
+		t.Log("传入的是 email", email)
 		return
 	}
 }

@@ -62,7 +62,7 @@ func (s ArticleStatus) String() string {
 	}
 }
 
-// ArticleStatusV1 如果你的状态很复杂，有很多行为（就是你要搞很多方法），状态里面需要一些额外字段
+// ArticleStatusV1 如果的状态很复杂，有很多行为（就是要搞很多方法），状态里面需要一些额外字段
 // 就用这个版本
 type ArticleStatusV1 struct {
 	Val  uint8

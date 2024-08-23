@@ -185,7 +185,7 @@ func (dao *GORMInteractiveDAO) Get(ctx context.Context, biz string, bizId int64)
 }
 
 // 正常来说，一张主表和与它有关联关系的表会共用一个DAO，
-// 所以我们就用一个 DAO 来操作
+// 所以用一个 DAO 来操作
 
 type Interactive struct {
 	Id         int64  `gorm:"primaryKey,autoIncrement"`
@@ -194,11 +194,11 @@ type Interactive struct {
 	ReadCnt    int64
 	CollectCnt int64
 	// 作业：就是直接在 LikeCnt 上创建一个索引
-	// 1. 而后查询前 100 的，直接就命中索引，这样你前 100 最多 100 次回表
+	// 1. 而后查询前 100 的，直接就命中索引，这样前 100 最多 100 次回表
 	// SELECT * FROM interactives ORDER BY like_cnt limit 0, 100
 	// 还有一种优化思路是
 	// SELECT * FROM interactives WHERE like_cnt > 1000 ORDER BY like_cnt limit 0, 100
-	// 2. 如果你只需要 biz_id 和 biz_type，你就创建联合索引 <like_cnt, biz_id, biz>
+	// 2. 如果只需要 biz_id 和 biz_type，就创建联合索引 <like_cnt, biz_id, biz>
 	LikeCnt int64
 	Ctime   int64
 	Utime   int64
@@ -232,7 +232,7 @@ type Collection struct {
 type UserCollectionBiz struct {
 	Id int64 `gorm:"primaryKey,autoIncrement"`
 	// 收藏夹 ID
-	// 作为关联关系中的外键，我们这里需要索引
+	// 作为关联关系中的外键，这里需要索引
 	Cid   int64  `gorm:"index"`
 	BizId int64  `gorm:"uniqueIndex:biz_type_id_uid"`
 	Biz   string `gorm:"type:varchar(128);uniqueIndex:biz_type_id_uid"`

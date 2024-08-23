@@ -88,6 +88,7 @@ func (c *GORMCommentDAO) FindOneByIDs(ctx context.Context, ids []int64) ([]Comme
 func (c *GORMCommentDAO) FindByBiz(ctx context.Context, biz string,
 	bizId, minID, limit int64) ([]Comment, error) {
 	var res []Comment
+	// 找的根评论
 	err := c.db.WithContext(ctx).
 		Where("biz = ? AND biz_id = ? AND id < ? AND pid IS NULL", biz, bizId, minID).
 		Limit(int(limit)).
@@ -129,6 +130,8 @@ func (c *GORMCommentDAO) FindCommentList(ctx context.Context, u Comment) ([]Comm
 	return res, err
 
 }
+
+// 借助外键
 
 func (c *GORMCommentDAO) Delete(ctx context.Context, u Comment) error {
 	return c.db.WithContext(ctx).Delete(&Comment{

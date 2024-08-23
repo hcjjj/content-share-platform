@@ -65,7 +65,7 @@ message Comment {
   string content = 5;
   Comment root_comment = 6;
   Comment parent_comment = 7;
-  // 正常来说，你在时间传递上，如果不想用 int64 之类的
+  // 正常来说，在时间传递上，如果不想用 int64 之类的时间戳
   // 就可以考虑使用这个 Timestamp
   google.protobuf.Timestamp ctime = 9;
   google.protobuf.Timestamp utime = 10;

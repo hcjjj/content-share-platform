@@ -48,7 +48,7 @@ func (i *interactiveService) IncrReadCnt(ctx context.Context, biz string, bizId 
 func (i *interactiveService) Get(
 	ctx context.Context, biz string,
 	bizId, uid int64) (domain.Interactive, error) {
-	// 你也可以考虑将分发的逻辑也下沉到 repository 里面
+	// 也可以考虑将分发的逻辑也下沉到 repository 里面
 	intr, err := i.repo.Get(ctx, biz, bizId)
 	if err != nil {
 		return domain.Interactive{}, err

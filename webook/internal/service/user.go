@@ -76,7 +76,7 @@ func (svc *userService) FindById(ctx context.Context,
 }
 
 func (svc *userService) FindOrCreate(ctx context.Context, phone string) (domain.User, error) {
-	// 先找一下，我们认为，大部分用户是已经存在的用户
+	// 先找一下，大部分用户是已经存在的用户
 	u, err := svc.repo.FindByPhone(ctx, phone)
 	if err != repository.ErrUserNotFound {
 		// 有两种情况

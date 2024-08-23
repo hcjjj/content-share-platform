@@ -46,7 +46,7 @@ func (pcb *Callbacks) Initialize(db *gorm.DB) error {
 
 func newCallbacks() *Callbacks {
 	vector := promsdk.NewSummaryVec(promsdk.SummaryOpts{
-		// 在这边，你要考虑设置各种 Namespace
+		// 在这边，要考虑设置各种 Namespace
 		Namespace: "geekbang_daming",
 		Subsystem: "webook",
 		Name:      "gorm_query_time",
@@ -142,7 +142,7 @@ func (c *Callbacks) after(typ string) func(db *gorm.DB) {
 		val, _ := db.Get("start_time")
 		startTime, ok := val.(time.Time)
 		if !ok {
-			// 你啥都干不了
+			// 啥都干不了
 			return
 		}
 		table := db.Statement.Table

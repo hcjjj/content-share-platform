@@ -17,7 +17,7 @@ func InitGrpcxServer(comment *grpc2.CommentServiceServer, l logger.LoggerV1) *gr
 		Name     string `yaml:"name"`
 	}
 	var cfg Config
-	err := viper.UnmarshalKey("grpc", &cfg)
+	err := viper.UnmarshalKey("grpc.server", &cfg)
 	if err != nil {
 		panic(err)
 	}

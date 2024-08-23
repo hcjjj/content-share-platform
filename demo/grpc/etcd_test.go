@@ -65,7 +65,7 @@ func (s *EtcdTestSuite) TestServer() {
 	require.NoError(t, err)
 
 	err = em.AddEndpoint(ctx, key, endpoints.Endpoint{
-		// 定位信息，客户端怎么连你
+		// 定位信息，客户端怎么连
 		Addr: addr,
 	}, etcdv3.WithLease(leaseResp.ID))
 	require.NoError(t, err)

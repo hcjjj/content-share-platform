@@ -25,7 +25,7 @@ func (b *InterceptorBuilder) BuildServerUnaryInterceptorBiz() grpc.UnaryServerIn
 			key := fmt.Sprintf("limiter:user:get_by_id:%d", getReq.Id)
 			limited, err := b.limiter.Limit(ctx, key)
 			if err != nil {
-				// 你有保守的做法，也有激进的做法
+				// 有保守的做法，也有激进的做法
 				// 这个是保守的做法
 				return nil, status.Errorf(codes.ResourceExhausted, "限流")
 			}

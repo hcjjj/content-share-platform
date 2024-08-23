@@ -42,7 +42,7 @@ func (a *ArticleRedisCache) Get(ctx context.Context, id int64) (domain.Article, 
 func (a *ArticleRedisCache) Set(ctx context.Context, art domain.Article) error {
 	// JSON 序列化大部分场景，都不会引起性能问题
 	// 万一有性能问题怎么办？
-	// 换一个序列化方法，我推荐 protobuf
+	// 换一个序列化方法，推荐 protobuf
 	// 如果不想用 protobuf，可以考虑别的，例如 gob(Go Object Binary)
 	val, err := json.Marshal(art)
 	if err != nil {

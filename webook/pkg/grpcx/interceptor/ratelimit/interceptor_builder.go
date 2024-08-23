@@ -26,7 +26,7 @@ func (b *InterceptorBuilder) BuildServerUnaryInterceptor() grpc.UnaryServerInter
 		handler grpc.UnaryHandler) (resp any, err error) {
 		limited, err := b.limiter.Limit(ctx, b.key)
 		if err != nil {
-			// 你有保守的做法，也有激进的做法
+			// 有保守的做法，也有激进的做法
 			// 这个是保守的做法
 			return nil, status.Errorf(codes.ResourceExhausted, "限流")
 		}
@@ -57,7 +57,7 @@ func (b *InterceptorBuilder) BuildServerUnaryInterceptorService() grpc.UnaryServ
 			// 这个 key，limiter:UserService
 			limited, err := b.limiter.Limit(ctx, b.key)
 			if err != nil {
-				// 你有保守的做法，也有激进的做法
+				// 有保守的做法，也有激进的做法
 				// 这个是保守的做法
 				return nil, status.Errorf(codes.ResourceExhausted, "限流")
 			}

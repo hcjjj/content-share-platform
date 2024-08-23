@@ -129,7 +129,7 @@ type GetRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	Biz string `protobuf:"bytes,1,opt,name=biz,proto3" json:"biz,omitempty"`
-	// protobuf 比较推荐下划线。你也可以用驼峰
+	// protobuf 比较推荐下划线。也可以用驼峰
 	BizId int64 `protobuf:"varint,2,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`
 	Uid   int64 `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`
 }
@@ -335,7 +335,7 @@ type CollectRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	Biz string `protobuf:"bytes,1,opt,name=biz,proto3" json:"biz,omitempty"`
-	// protobuf 比较推荐下划线。你也可以用驼峰
+	// protobuf 比较推荐下划线。也可以用驼峰
 	BizId int64 `protobuf:"varint,2,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`
 	Uid   int64 `protobuf:"varint,3,opt,name=uid,proto3" json:"uid,omitempty"`
 	Cid   int64 `protobuf:"varint,4,opt,name=cid,proto3" json:"cid,omitempty"`
@@ -649,7 +649,7 @@ type IncrReadCntRequest struct {
 	unknownFields protoimpl.UnknownFields
 
 	Biz string `protobuf:"bytes,1,opt,name=biz,proto3" json:"biz,omitempty"`
-	// protobuf 比较推荐下划线。你也可以用驼峰
+	// protobuf 比较推荐下划线。也可以用驼峰
 	BizId int64 `protobuf:"varint,2,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`
 }
 

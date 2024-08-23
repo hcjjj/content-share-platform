@@ -62,7 +62,7 @@ func InitGinMiddlewares(redisClient redis.Cmdable,
 			AllowCredentials: true,
 
 			AllowHeaders: []string{"Content-Type", "Authorization"},
-			// 这个是允许前端访问你的后端响应中带的头部
+			// 这个是允许前端访问的后端响应中带的头部
 			ExposeHeaders: []string{"x-jwt-token", "x-refresh-token"},
 			//AllowHeaders: []string{"content-type"},
 			//AllowMethods: []string{"POST"},

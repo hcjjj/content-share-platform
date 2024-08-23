@@ -50,10 +50,13 @@ func (c *CachedCommentRepo) FindByBiz(ctx context.Context, biz string,
 	}
 	res := make([]domain.Comment, 0, len(daoComments))
 	// 这时候要去找子评论了，找三条
+	// 并发找
 	var eg errgroup.Group
 	downgrade := ctx.Value("downgrade") == "true"
 	for _, dc := range daoComments {
+		// for 循环变量的问题，是指针引用
 		dc := dc
+
 		cm := c.toDomain(dc)
 		res = append(res, cm)
 		if downgrade {

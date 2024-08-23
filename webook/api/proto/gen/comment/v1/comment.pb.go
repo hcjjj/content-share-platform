@@ -7,11 +7,12 @@
 package commentv1
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -434,7 +435,7 @@ type Comment struct {
 	Content       string   `protobuf:"bytes,5,opt,name=content,proto3" json:"content,omitempty"`
 	RootComment   *Comment `protobuf:"bytes,6,opt,name=root_comment,json=rootComment,proto3" json:"root_comment,omitempty"`
 	ParentComment *Comment `protobuf:"bytes,7,opt,name=parent_comment,json=parentComment,proto3" json:"parent_comment,omitempty"`
-	// 正常来说，你在时间传递上，如果不想用 int64 之类的
+	// 正常来说，在时间传递上，如果不想用 int64 之类的
 	// 就可以考虑使用这个 Timestamp
 	Ctime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=ctime,proto3" json:"ctime,omitempty"`
 	Utime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=utime,proto3" json:"utime,omitempty"`

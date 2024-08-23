@@ -35,7 +35,7 @@ func (s *AsyncSMSTestSuite) TestSend() {
 	testCases := []struct {
 		name string
 
-		// 虽然是集成测试，但是我们也不想真的发短信，所以用 mock
+		// 虽然是集成测试，但是也不想真的发短信，所以用 mock
 		mock func(ctrl *gomock.Controller) sms.Service
 
 		tplId   string
@@ -67,7 +67,7 @@ func (s *AsyncSMSTestSuite) TestAsyncCycle() {
 	now := time.Now()
 	testCases := []struct {
 		name string
-		// 虽然是集成测试，但是我们也不想真的发短信，所以用 mock
+		// 虽然是集成测试，但是也不想真的发短信，所以用 mock
 		mock func(ctrl *gomock.Controller) sms.Service
 		// 准备数据
 		before func(t *testing.T)

@@ -73,7 +73,7 @@ func (h *OAuth2WechatHandler) setStateCookie(ctx *gin.Context, state string) err
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, StateClaims{
 		State: state,
 		RegisteredClaims: jwt.RegisteredClaims{
-			// 过期时间，你预期中一个用户完成登录的时间
+			// 过期时间，预期中一个用户完成登录的时间
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute * 10)),
 		},
 	})

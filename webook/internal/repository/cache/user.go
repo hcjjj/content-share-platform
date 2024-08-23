@@ -30,7 +30,7 @@ func (c *RedisUserCache) Del(ctx context.Context, id int64) error {
 
 func (c *RedisUserCache) Get(ctx context.Context, uid int64) (domain.User, error) {
 	key := c.key(uid)
-	// 我假定这个地方用 JSON 来
+	// 假定这个地方用 JSON 来
 	data, err := c.cmd.Get(ctx, key).Result()
 	//data, err := c.cmd.Get(ctx, firstKey).Bytes()
 	if err != nil {
@@ -47,7 +47,7 @@ func (c *RedisUserCache) Get(ctx context.Context, uid int64) (domain.User, error
 
 func (c *RedisUserCache) Set(ctx context.Context, du domain.User) error {
 	key := c.key(du.Id)
-	// 我假定这个地方用 JSON
+	// 假定这个地方用 JSON
 	data, err := json.Marshal(du)
 	if err != nil {
 		return err
@@ -74,7 +74,7 @@ func NewUserCache(cmd redis.Cmdable) UserCache {
 	}
 }
 
-// 一定不要自己去初始化你需要的东西，让外面传进来
+// 一定不要自己去初始化需要的东西，让外面传进来
 //func NewUserCacheV1(addr string) *RedisUserCache {
 //	cmd := redis.NewClient(&redis.Options{Addr: addr})
 //	return &RedisUserCache{

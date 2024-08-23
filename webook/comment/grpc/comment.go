@@ -12,7 +12,7 @@ import (
 )
 
 type CommentServiceServer struct {
-	// 正常我都会组合这个
+	// 正常都会组合这个
 	commentv1.UnimplementedCommentServiceServer
 
 	svc service.CommentService

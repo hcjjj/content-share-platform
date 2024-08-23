@@ -31,10 +31,10 @@ func main() {
 //	server := grpc2.NewServer()
 //	// 这里暂时随便搞一下
 //	// 搞成依赖注入
-//	// 这种写法的缺陷是，如果我有很多个 grpc API 服务端的实现
+//	// 这种写法的缺陷是，如果有很多个 grpc API 服务端的实现
 //	intrSvc := InitGRPCServer()
 //	intrv1.RegisterInteractiveServiceServer(server, intrSvc)
-//	// 监听 8090 端口，你可以随便写
+//	// 监听 8090 端口，可以随便写
 //	l, err := net.Listen("tcp", ":8090")
 //	if err != nil {
 //		panic(err)
@@ -53,10 +53,10 @@ func initViper() {
 
 	// 实时监听配置变更
 	viper.WatchConfig()
-	// 只能告诉你文件变了，不能告诉你，文件的哪些内容变了
+	// 只能告诉文件变了，不能告诉，文件的哪些内容变了
 	viper.OnConfigChange(func(in fsnotify.Event) {
-		// 比较好的设计，它会在 in 里面告诉你变更前的数据，和变更后的数据
-		// 更好的设计是，它会直接告诉你差异。
+		// 比较好的设计，它会在 in 里面告诉更前的数据，和变更后的数据
+		// 更好的设计是，它会直接告诉差异。
 		fmt.Println(in.Name, in.Op)
 		fmt.Println(viper.GetString("db.dsn"))
 	})

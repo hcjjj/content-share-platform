@@ -10,7 +10,7 @@ import (
 
 func TestChannel(t *testing.T) {
 	// 声明一个放 int 类型的 channel
-	// 声明了但是没有初始化，你读写这个都会崩溃
+	// 声明了但是没有初始化，读写这个都会崩溃
 	//var ch chan int
 	//ch <- 123
 	//val := <-ch
@@ -90,7 +90,7 @@ func (m *MyStruct) Close() error {
 //}
 
 type MyStructBV1 struct {
-	// 暴露出去了，你就不知道用户啥时候会给你关了
+	// 暴露出去了，就不知道用户啥时候会给关了
 	Ch        chan struct{}
 	closeOnce sync.Once
 }

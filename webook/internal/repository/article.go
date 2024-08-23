@@ -25,7 +25,7 @@ type ArticleRepository interface {
 type CachedArticleRepository struct {
 	dao   dao.ArticleDAO
 	cache cache.ArticleCache
-	// 因为如果你直接访问 UserDAO，你就绕开了 repository，
+	// 因为如果直接访问 UserDAO，就绕开了 repository，
 	// repository 一般都有一些缓存机制
 	userRepo UserRepository
 
@@ -55,12 +55,12 @@ func (c *CachedArticleRepository) GetPubById(ctx context.Context, id int64) (dom
 	if err != nil {
 		return domain.Article{}, err
 	}
-	// 我现在要去查询对应的 User 信息，拿到创作者信息
+	// 现在要去查询对应的 User 信息，拿到创作者信息
 	res = c.toDomain(dao.Article(art))
 	author, err := c.userRepo.FindById(ctx, art.AuthorId)
 	if err != nil {
 		return domain.Article{}, err
-		// 要额外记录日志，因为你吞掉了错误信息
+		// 要额外记录日志，因为吞掉了错误信息
 		//return res, nil
 	}
 	res.Author.Name = author.Nickname
@@ -104,7 +104,7 @@ func (c *CachedArticleRepository) GetByAuthor(ctx context.Context, uid int64, of
 			return res, err
 		} else {
 			// 要考虑记录日志
-			// 缓存未命中，你是可以忽略的
+			// 缓存未命中，是可以忽略的
 		}
 	}
 	arts, err := c.dao.GetByAuthor(ctx, uid, offset, limit)
@@ -123,7 +123,7 @@ func (c *CachedArticleRepository) GetByAuthor(ctx context.Context, uid int64, of
 			err = c.cache.SetFirstPage(ctx, uid, res)
 			if err != nil {
 				// 记录日志
-				// 我需要监控这里
+				// 需要监控这里
 			}
 		}
 	}()
@@ -158,7 +158,7 @@ func (c *CachedArticleRepository) Sync(ctx context.Context, art domain.Article) 
 	go func() {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
-		// 你可以灵活设置过期时间
+		// 可以灵活设置过期时间
 		user, er := c.userRepo.FindById(ctx, art.Author.Id)
 		if er != nil {
 			// 要记录日志

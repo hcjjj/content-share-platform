@@ -37,7 +37,7 @@ func (s *Server) Serve() error {
 	if err != nil {
 		return err
 	}
-	// 我们要在这里完成注册
+	// 要在这里完成注册
 	err = s.register()
 	if err != nil {
 		panic("服务注册失败")
@@ -66,7 +66,7 @@ func (s *Server) register() error {
 	}
 
 	err = em.AddEndpoint(ctx, key, endpoints.Endpoint{
-		// 定位信息，客户端怎么连你
+		// 定位信息，客户端怎么连
 		Addr: addr,
 	}, etcdv3.WithLease(leaseResp.ID))
 	if err != nil {
@@ -90,7 +90,7 @@ func (s *Server) Close() error {
 		s.kaCancel()
 	}
 	if s.client != nil {
-		// 依赖注入，你就不要关
+		// 依赖注入，就不要关
 		return s.client.Close()
 	}
 	s.GracefulStop()

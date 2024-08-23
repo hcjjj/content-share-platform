@@ -81,7 +81,7 @@ func (c *SlidingWindowLimiter) BuildServerInterceptor() grpc.UnaryServerIntercep
 	return func(ctx context.Context, req any,
 		info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp any, err error) {
 		c.lock.Lock()
-		// 我先考虑队列里面的时间戳是不是都在我的窗口范围内
+		// 先考虑队列里面的时间戳是不是都在窗口范围内
 		now := time.Now()
 
 		// 快路径检测

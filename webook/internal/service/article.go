@@ -101,7 +101,7 @@ func (a *articleService) PublishV1(ctx context.Context, art domain.Article) (int
 	}
 	art.Id = id
 	for i := 0; i < 3; i++ {
-		// 我可能线上库已经有数据了
+		// 可能线上库已经有数据了
 		// 也可能没有
 		err = a.readerRepo.Save(ctx, art)
 		if err != nil {

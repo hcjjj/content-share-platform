@@ -177,7 +177,7 @@ func (s *InteractiveTestSuite) TestIncrReadCnt() {
 		},
 	}
 
-	// 不同于 AsyncSms 服务，我们不需要 mock，所以创建一个就可以
+	// 不同于 AsyncSms 服务，不需要 mock，所以创建一个就可以
 	// 不需要每个测试都创建
 	for _, tc := range testCases {
 		s.T().Run(tc.name, func(t *testing.T) {

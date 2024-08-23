@@ -76,8 +76,8 @@ func (p *Picker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {
 			// failover 要在这里做文章
 			// 根据调用结果的具体错误信息进行容错
 			// 1. 如果要是触发了限流了，
-			// 1.1 你可以考虑直接挪走这个节点，后面再挪回来
-			// 1.2 你可以考虑直接将 weight/currentWeight 调整到极低
+			// 1.1 可以考虑直接挪走这个节点，后面再挪回来
+			// 1.2 可以考虑直接将 weight/currentWeight 调整到极低
 			// 2. 触发了熔断呢？
 			// 3. 降级呢？
 		},

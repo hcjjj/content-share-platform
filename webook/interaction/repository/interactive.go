@@ -89,7 +89,7 @@ func (c *CachedReadCntRepository) IncrReadCnt(ctx context.Context,
 	if err != nil {
 		return err
 	}
-	// 这边会有部分失败引起的不一致的问题，但是你其实不需要解决，
+	// 这边会有部分失败引起的不一致的问题，但是其实不需要解决，
 	// 因为阅读数不准确完全没有问题
 	return c.cache.IncrReadCntIfPresent(ctx, biz, bizId)
 }
@@ -119,7 +119,7 @@ func (c *CachedReadCntRepository) Get(ctx context.Context,
 	if err == nil {
 		// 缓存只缓存了具体的数字，但是没有缓存自身有没有点赞的信息
 		// 因为一个人反复刷，重复刷一篇文章是小概率的事情
-		// 也就是说，你缓存了某个用户是否点赞的数据，命中率会很低
+		// 也就是说，缓存了某个用户是否点赞的数据，命中率会很低
 		return intr, nil
 	}
 	ie, err := c.dao.Get(ctx, biz, bizId)

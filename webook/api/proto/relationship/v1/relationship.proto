@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package follow.v1;
+option go_package="relationship/v1;followv1";
+
+
+message FollowRelation {
+  int64 id = 1;
+  int64 follower = 2;
+  int64 followee = 3;
+}
+
+service FollowService {
+  // 增删
+  rpc Follow (FollowRequest) returns (FollowResponse);
+  rpc CancelFollow(CancelFollowRequest) returns (CancelFollowResponse);
+
+  // 改，例如说准备支持备注、标签类的，那么就会有对应的修改功能
+
+  // 获得某个人的关注列表
+  rpc GetFollowee (GetFolloweeRequest) returns (GetFolloweeResponse);
+  // 获得某个人关注另外一个人的详细信息
+  rpc FollowInfo (FollowInfoRequest) returns (FollowInfoResponse);
+}
+
+message GetFolloweeRequest {
+  // 关注者，也就是某人查看自己的关注列表
+  int64 follower = 1;
+  // 最为普通的分页接口设计
+  int64 offset = 2;
+  int64 limit =3;
+}
+
+message GetFolloweeResponse {
+  repeated FollowRelation follow_relations = 1;
+}
+
+message FollowInfoRequest {
+  // 关注者
+  int64 follower = 1;
+  // 被关注者
+  int64 followee = 2;
+}
+
+message FollowInfoResponse {
+  FollowRelation follow_relation = 1;
+}
+
+message FollowRequest {
+  // 被关注者
+  int64 followee = 1;
+  // 关注者
+  int64 follower = 2;
+}
+
+message FollowResponse {
+}
+
+message CancelFollowRequest {
+  // 被关注者
+  int64 followee = 1;
+  // 关注者
+  int64 follower = 2;
+}
+
+message CancelFollowResponse {
+}
+
+

@@ -103,7 +103,7 @@ func (h *UserHandler) LoginSMS(ctx *gin.Context,
 
 func (h *UserHandler) SendSMSLoginCode(ctx *gin.Context,
 	req SendSMSCodeReq) (ginx.Result, error) {
-	// 你这边可以校验 Req
+	// 这边可以校验 Req
 	if req.Phone == "" {
 		return ginx.Result{
 			Code: 4,
@@ -119,7 +119,7 @@ func (h *UserHandler) SendSMSLoginCode(ctx *gin.Context,
 	case service.ErrCodeSendTooMany:
 		// 事实上，防不住有人不知道怎么触发了
 		// 少数这种错误，是可以接受的
-		// 但是频繁出现，就代表有人在搞你的系统
+		// 但是频繁出现，就代表有人在搞的系统
 		return ginx.Result{
 			Code: 4,
 			Msg:  "短信发送太频繁，请稍后再试",

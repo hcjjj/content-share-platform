@@ -90,7 +90,7 @@ func (s *Scheduler) Schedule(ctx context.Context) error {
 		// 肯定要调度执行 j
 		exec, ok := s.executors[j.Executor]
 		if !ok {
-			// 你可以直接中断了，也可以下一轮
+			// 可以直接中断了，也可以下一轮
 			s.l.Error("找不到执行器",
 				logger.Int64("jid", j.Id),
 				logger.String("executor", j.Executor))

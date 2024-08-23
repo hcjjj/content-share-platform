@@ -181,7 +181,7 @@ func (a *ArticleGORMDAO) UpdateById(ctx context.Context, art Article) error {
 	if res.Error != nil {
 		return res.Error
 	}
-	// 我怎么知道有没有更新数据？
+	// 怎么知道有没有更新数据？
 	if res.RowsAffected == 0 {
 		// 创作者不对，说明有人在瞎搞
 		return errors.New("ID 不对或者创作者不对")
@@ -207,7 +207,7 @@ type Article struct {
 	Id      int64  `gorm:"primaryKey,autoIncrement" bson:"id,omitempty"`
 	Title   string `gorm:"type=varchar(4096)" bson:"title,omitempty"`
 	Content string `gorm:"type=BLOB" bson:"content,omitempty"`
-	// 我要根据创作者ID来查询
+	// 要根据创作者ID来查询
 	AuthorId int64 `gorm:"index" bson:"author_id,omitempty"`
 	Status   uint8 `bson:"status,omitempty"`
 	Ctime    int64 `bson:"ctime,omitempty"`

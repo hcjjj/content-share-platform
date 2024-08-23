@@ -18,7 +18,7 @@ func InitCounter(opt prometheus.CounterOpts) {
 	prometheus.MustRegister(vector)
 }
 
-// WrapBodyAndClaims bizFn 就是你的业务逻辑
+// WrapBodyAndClaims bizFn 就是的业务逻辑
 func WrapBodyAndClaims[Req any, Claims jwt.Claims](
 	bizFn func(ctx *gin.Context, req Req, uc Claims) (Result, error),
 ) gin.HandlerFunc {

@@ -72,7 +72,7 @@ func (l *LogMiddlewareBuilder) Build() gin.HandlerFunc {
 
 		// 直接执行下一个 middleware...直到业务逻辑
 		ctx.Next()
-		// 在这里，你就拿到了响应
+		// 在这里，就拿到了响应
 	}
 }
 

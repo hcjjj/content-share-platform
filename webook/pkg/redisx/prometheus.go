@@ -26,7 +26,7 @@ func NewPrometheusHook(opt prometheus.SummaryOpts) *PrometheusHook {
 
 func (p *PrometheusHook) DialHook(next redis.DialHook) redis.DialHook {
 	return func(ctx context.Context, network, addr string) (net.Conn, error) {
-		// 相当于，你这里啥也不干
+		// 相当于，这里啥也不干
 		return next(ctx, network, addr)
 	}
 }

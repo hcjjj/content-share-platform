@@ -25,7 +25,7 @@ func NewRankingJob(svc service.RankingService,
 	client *rlock.Client,
 	l logger.LoggerV1,
 	timeout time.Duration) *RankingJob {
-	// 根据你的数据量来，如果要是七天内的帖子数量很多，你就要设置长一点
+	// 根据的数据量来，如果要是七天内的帖子数量很多，就要设置长一点
 	return &RankingJob{svc: svc,
 		timeout:   timeout,
 		client:    client,
@@ -45,10 +45,10 @@ func (r *RankingJob) Run() error {
 	r.localLock.Lock()
 	defer r.localLock.Unlock()
 	if r.lock == nil {
-		// 说明你没拿到锁，你得试着拿锁
+		// 说明没拿到锁，得试着拿锁
 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 		defer cancel()
-		// 我可以设置一个比较短的过期时间
+		// 可以设置一个比较短的过期时间
 		lock, err := r.client.Lock(ctx, r.key, r.timeout, &rlock.FixIntervalRetry{
 			Interval: time.Millisecond * 100,
 			Max:      0,
@@ -58,7 +58,7 @@ func (r *RankingJob) Run() error {
 			return nil
 		}
 		r.lock = lock
-		// 怎么保证我这里，一直拿着这个锁？？？
+		// 怎么保证这里，一直拿着这个锁？？？
 		go func() {
 			r.localLock.Lock()
 			defer r.localLock.Unlock()

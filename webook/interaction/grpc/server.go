@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// InteractiveServiceServer 我这里只是把 service 包装成一个 grpc 而已
+// InteractiveServiceServer 这里只是把 service 包装成一个 grpc 而已
 // 和 grpc 有关的操作，就限定在这里
 type InteractiveServiceServer struct {
 	intrv1.UnimplementedInteractiveServiceServer

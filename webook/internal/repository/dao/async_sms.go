@@ -42,11 +42,11 @@ func (g *GORMAsyncSmsDAO) Insert(ctx context.Context, s AsyncSms) error {
 
 func (g *GORMAsyncSmsDAO) GetWaitingSMS(ctx context.Context) (AsyncSms, error) {
 	// 如果在高并发情况下,SELECT for UPDATE 对数据库的压力很大
-	// 但是我们不是高并发，因为你部署N台机器，才有 N 个goroutine 来查询
+	// 但是不是高并发，因为部署N台机器，才有 N 个goroutine 来查询
 	// 并发不过百，随便写
 	var s AsyncSms
 	err := g.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 为了避开一些偶发性的失败，我们只找 1 分钟前的异步短信发送
+		// 为了避开一些偶发性的失败，只找 1 分钟前的异步短信发送
 		now := time.Now().UnixMilli()
 		endTime := now - time.Minute.Milliseconds()
 		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
@@ -57,12 +57,12 @@ func (g *GORMAsyncSmsDAO) GetWaitingSMS(ctx context.Context) (AsyncSms, error) {
 			return err
 		}
 
-		// 只要更新了更新时间，根据我们前面的规则，就不可能被别的节点抢占了
+		// 只要更新了更新时间，根据前面的规则，就不可能被别的节点抢占了
 		err = tx.Model(&AsyncSms{}).
 			Where("id = ?", s.Id).
 			Updates(map[string]any{
 				"retry_cnt": gorm.Expr("retry_cnt + 1"),
-				// 更新成了当前时间戳，确保我在发送过程中，没人会再次抢到它
+				// 更新成了当前时间戳，确保发送过程中，没人会再次抢到它
 				// 也相当于，重试间隔一分钟
 				"utime": now,
 			}).Error
@@ -94,7 +94,7 @@ func (g *GORMAsyncSmsDAO) MarkFailed(ctx context.Context, id int64) error {
 
 type AsyncSms struct {
 	Id int64
-	// 使用我在 ekit 里面支持的 JSON 字段
+	// 使用 ekit 里面支持的 JSON 字段
 	Config sqlx.JsonColumn[SmsConfig]
 	// 重试次数
 	RetryCnt int
