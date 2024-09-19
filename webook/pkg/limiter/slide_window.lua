@@ -15,14 +15,17 @@ local now = tonumber(ARGV[3])
 -- 窗口的起始时间
 local min = now - window
 
+--删除集合中时间早于 min 的记录，确保有序集合只保留当前窗口内的请求
 redis.call('ZREMRANGEBYSCORE', key, '-inf', min)
+--计当前窗口内的请求数
 local cnt = redis.call('ZCOUNT', key, '-inf', '+inf')
--- local cnt = redis.call('ZCOUNT', key, min, '+inf')
 if cnt >= threshold then
     -- 执行限流
     return "true"
 else
     -- 把 score 和 member 都设置成 now
+    --分数用于排序，成员用于唯一性标识
+    --向有序集合中添加当前请求的时间戳
     redis.call('ZADD', key, now, now)
     redis.call('PEXPIRE', key, window)
     return "false"

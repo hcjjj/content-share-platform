@@ -11,6 +11,8 @@ import (
 )
 
 var (
+	// 避免跨层依赖的问题
+
 	ErrDuplicateEmail        = repository.ErrDuplicateUser
 	ErrInvalidUserOrPassword = errors.New("用户不存在或者密码不对")
 )
@@ -50,7 +52,7 @@ func (svc *userService) Signup(ctx context.Context, u domain.User) error {
 
 func (svc *userService) Login(ctx context.Context, email string, password string) (domain.User, error) {
 	u, err := svc.repo.FindByEmail(ctx, email)
-	if err == repository.ErrUserNotFound {
+	if errors.Is(err, repository.ErrUserNotFound) {
 		return domain.User{}, ErrInvalidUserOrPassword
 	}
 	if err != nil {

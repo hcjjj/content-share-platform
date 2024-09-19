@@ -9,9 +9,9 @@ package tencent
 import (
 	"context"
 	"fmt"
+	"github.com/ecodeclub/ekit"
 	"github.com/ecodeclub/ekit/slice"
 
-	"github.com/ecodeclub/ekit"
 	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20210111"
 )
 

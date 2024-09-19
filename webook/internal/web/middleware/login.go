@@ -13,8 +13,9 @@ import (
 type LoginMiddlewareBuilder struct {
 }
 
+// CheckLogin 登录校验实现（刷新登录态）
 func (m *LoginMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
-	// 注册一下这个类型
+	// Gin 的 session 机制使用了 GOB 来将对象转化为字节切片[]byte，所以需要提前注册一下 Gob
 	gob.Register(time.Now())
 	return func(ctx *gin.Context) {
 		path := ctx.Request.URL.Path
@@ -22,6 +23,7 @@ func (m *LoginMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 			// 不需要登录校验
 			return
 		}
+
 		sess := sessions.Default(ctx)
 		userId := sess.Get("userId")
 		if userId == nil {
@@ -35,12 +37,13 @@ func (m *LoginMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 		// 在执行业务之后搞点什么
 		//duration := time.Now().Sub(now)
 
-		// 怎么知道，要刷新了呢？
-		// 假如说，策略是每分钟刷一次，怎么知道，已经过了一分钟？
+		// 固定时间间隔刷新策略
+		// 假如说，策略是每分钟刷一次，怎么知道，已经过了一分钟
 		const updateTimeKey = "update_time"
 		// 试着拿出上一次刷新时间
 		val := sess.Get(updateTimeKey)
 		lastUpdateTime, ok := val.(time.Time)
+
 		if val == nil || !ok || now.Sub(lastUpdateTime) > time.Second*10 {
 			// 这是第一次进来
 			sess.Set(updateTimeKey, now)

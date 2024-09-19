@@ -11,6 +11,7 @@ package config
 
 var Config = config{
 	DB: DBConfig{
+		// DSN（Data Source Name）
 		DSN: "root:root@tcp(localhost:13306)/webook",
 	},
 	Redis: RedisConfig{

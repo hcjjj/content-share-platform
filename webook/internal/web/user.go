@@ -35,6 +35,7 @@ func NewUserHandler(svc service.UserService,
 	hdl ijwt.Handler,
 	codeSvc service.CodeService) *UserHandler {
 	return &UserHandler{
+		// 预编译正则表达式来提高校验速度
 		emailRexExp:    regexp.MustCompile(emailRegexPattern, regexp.None),
 		passwordRexExp: regexp.MustCompile(passwordRegexPattern, regexp.None),
 		svc:            svc,
@@ -226,12 +227,14 @@ func (h *UserHandler) Login(ctx *gin.Context) {
 		Password string `json:"password"`
 	}
 	var req Req
+	// Bind 方法会根据 HTTP 请求的 Content-Type 来决定怎么处理
 	if err := ctx.Bind(&req); err != nil {
 		return
 	}
 	u, err := h.svc.Login(ctx, req.Email, req.Password)
 	switch err {
 	case nil:
+		//Gin 的session 插件，会从 Cookie 里面找到 sess_id，再根据 sess_id 找到对应的 Session
 		sess := sessions.Default(ctx)
 		sess.Set("userId", u.Id)
 		sess.Options(sessions.Options{

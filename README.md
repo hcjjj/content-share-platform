@@ -5,6 +5,26 @@
 
 ## 项目结构
 
+**单体应用**（遵循单一职责原则）
+
+```mermaid
+flowchart LR
+    A[Handler] <--> B[Service]
+    B <--> C[Repository]
+    C <--> D[DAO]
+    C <--> E[Cache]
+
+```
+
+
+
+* Handler：负责接收和解析 HTTP 请求，调用 Service 层进行业务处理，然后返回响应
+* Service：处理业务逻辑，协调 Repository 层和其他业务操作
+* Repository：上层业务逻辑和数据层的桥梁，不关心数据存储的具体实现
+  * DAO（Data Access Object）：与数据库交互，执行具体的 CRUD 操作
+  * Cache：通用的缓存层，减少对数据库的频繁访问，提高系统的读性能
+> 参考 [go-zero](https://go-zero.dev/) 、[Kratos](https://go-kratos.dev/)、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
+
 **拆分微服务**
 
 ```mermaid
@@ -21,19 +41,6 @@ graph LR;
 > 2. 改造服务端（添加 RPC 接口和服务）
 > 3. 集成测试代码调整（ service 层 → rpc server 层）
 > 4. 改造客户端（替换原来用到该模块 service 接口的代码）
-
-
-
-**单体应用版本**
-
-* Service - Repository - DAO (Data Access Object) 三层结构 
-  * service：领域服务（domain service），一个业务的完整处理过程
-  * repository：领域对象的存储，存储数据的抽象
-    * dao：数据库操作
-    * cache 缓存操作
-  * domain：领域对象
-* handler（和HTTP打交道） → service（主要业务逻辑） → repository（数据存储抽象） → dao（数据库操作）
-* 参考 [Kratos](https://go-kratos.dev/)、[go-zero](https://go-zero.dev/) 、[Domain-Driven Design](https://zhuanlan.zhihu.com/p/91525839)
 
 ## 开发进度
 

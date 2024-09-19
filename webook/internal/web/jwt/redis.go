@@ -74,8 +74,9 @@ func (h *RedisJWTHandler) ClearToken(ctx *gin.Context) error {
 
 func (h *RedisJWTHandler) SetJWTToken(ctx *gin.Context, uid int64, ssid string) error {
 	uc := UserClaims{
-		Uid:       uid,
-		Ssid:      ssid,
+		Uid:  uid,
+		Ssid: ssid,
+		// 添加辅助信息，增强安全性
 		UserAgent: ctx.GetHeader("User-Agent"),
 		RegisteredClaims: jwt.RegisteredClaims{
 			// 1 分钟过期

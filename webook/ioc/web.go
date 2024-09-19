@@ -56,6 +56,7 @@ func InitGinMiddlewares(redisClient redis.Cmdable,
 	})
 
 	return []gin.HandlerFunc{
+		// 协议、域名和端口任意一个不同，都是跨域请求
 		cors.New(cors.Config{
 			//AllowAllOrigins: true,
 			//AllowOrigins:     []string{"http://localhost:3000"},
