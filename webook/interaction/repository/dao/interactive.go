@@ -68,7 +68,7 @@ func (dao *GORMInteractiveDAO) InsertCollectionBiz(ctx context.Context, cb UserC
 			Ctime:      now,
 			Utime:      now,
 			Biz:        cb.Biz,
-			BizId:      cb.BizId,
+			BizId:      cb.BiId,
 		}).Error
 	})
 }
@@ -163,6 +163,8 @@ func (dao *GORMInteractiveDAO) incrReadCnt(tx *gorm.DB, biz string, bizId int64)
 	}).Error
 }
 
+// 在一个事务里批量处理修改操作的效率通常比分别处理高，原因包括减少事务开销、锁争用、网络往返次数、数据库写入优化以及磁盘 I/O 开销的减少。这种方法在高并发和大规模数据操作的场景下尤为有效。
+
 func (dao *GORMInteractiveDAO) BatchIncrReadCnt(ctx context.Context, bizs []string, ids []int64) error {
 	return dao.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 让调用者保证两者是相等的
@@ -193,7 +195,7 @@ type Interactive struct {
 	Biz        string `gorm:"type:varchar(128);uniqueIndex:biz_type_id"`
 	ReadCnt    int64
 	CollectCnt int64
-	// 作业：就是直接在 LikeCnt 上创建一个索引
+	// 直接在 LikeCnt 上创建一个索引
 	// 1. 而后查询前 100 的，直接就命中索引，这样前 100 最多 100 次回表
 	// SELECT * FROM interactives ORDER BY like_cnt limit 0, 100
 	// 还有一种优化思路是
@@ -204,7 +206,7 @@ type Interactive struct {
 	Utime   int64
 }
 
-// UserLikeBiz 命名无能，用户点赞的某个东西
+// UserLikeBiz 用户点赞的某个东西
 type UserLikeBiz struct {
 	Id int64 `gorm:"primaryKey,autoIncrement"`
 	// 三个构成唯一索引
@@ -233,9 +235,9 @@ type UserCollectionBiz struct {
 	Id int64 `gorm:"primaryKey,autoIncrement"`
 	// 收藏夹 ID
 	// 作为关联关系中的外键，这里需要索引
-	Cid   int64  `gorm:"index"`
-	BizId int64  `gorm:"uniqueIndex:biz_type_id_uid"`
-	Biz   string `gorm:"type:varchar(128);uniqueIndex:biz_type_id_uid"`
+	Cid  int64  `gorm:"index"`
+	BiId int64  `gorm:"uniqueIndex:biz_type_id_uid"`
+	Biz  string `gorm:"type:varchar(128);uniqueIndex:biz_type_id_uid"`
 	// 这算是一个冗余，因为正常来说，
 	// 只需要在 Collection 中维持住 Uid 就可以
 	Uid   int64 `gorm:"uniqueIndex:biz_type_id_uid"`

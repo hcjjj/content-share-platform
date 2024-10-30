@@ -70,12 +70,6 @@ func (a *articleService) GetByAuthor(ctx context.Context, uid int64, offset int,
 
 func (a *articleService) Withdraw(ctx context.Context, uid int64, id int64) error {
 	return a.repo.SyncStatus(ctx, uid, id, domain.ArticleStatusPrivate)
-	// 2023.12.12 答疑演示
-	//err := a.repo.SyncStatus(ctx, uid, id, domain.ArticleStatusPrivate)
-	//if err != nil {
-	//	return fmt.Errorf("uid %d, id %d, %w", err)
-	//}
-	//return nil
 }
 
 func (a *articleService) Publish(ctx context.Context, art domain.Article) (int64, error) {

@@ -43,7 +43,8 @@ func (i *InteractiveRedisCache) Set(ctx context.Context,
 	biz string, bizId int64,
 	res domain.Interactive) error {
 	key := i.key(biz, bizId)
-	err := i.client.HSet(ctx, key, fieldCollectCnt, res.CollectCnt,
+	err := i.client.HSet(ctx, key,
+		fieldCollectCnt, res.CollectCnt,
 		fieldReadCnt, res.ReadCnt,
 		fieldLikeCnt, res.LikeCnt,
 	).Err()

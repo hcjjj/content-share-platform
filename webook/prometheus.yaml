@@ -1,5 +1,6 @@
 scrape_configs:
   - job_name: "webook"
+#    高并发的应用不宜太过频繁
     scrape_interval: 5s
     scrape_timeout: 3s
     static_configs:

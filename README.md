@@ -5,15 +5,20 @@
 
 ## 项目结构
 
-**单体应用**（遵循单一职责原则）
+**单体应用**（单一职责、依赖注入）
 
 ```mermaid
 flowchart LR
+    style A fill:#FFDDC1,stroke:#FF6F61,stroke-width:2px
+    style B fill:#FFEBCD,stroke:#FFA500,stroke-width:2px
+    style C fill:#E6E6FA,stroke:#9370DB,stroke-width:2px
+    style D fill:#D1F2EB,stroke:#1ABC9C,stroke-width:2px
+    style E fill:#FFEBE8,stroke:#F08080,stroke-width:2px
+
     A[Handler] <--> B[Service]
     B <--> C[Repository]
     C <--> D[DAO]
     C <--> E[Cache]
-
 ```
 
 
@@ -28,14 +33,16 @@ flowchart LR
 **拆分微服务**
 
 ```mermaid
-graph LR;
+graph LR
+    style A fill:#E3F2FD,stroke:#64B5F6,stroke-width:2px
+    style B fill:#BBDEFB,stroke:#42A5F5,stroke-width:2px
+    style C fill:#90CAF9,stroke:#2196F3,stroke-width:2px
+    style D fill:#64B5F6,stroke:#1E88E5,stroke-width:2px,color:#000
+
     A[单体应用-混沌一片] -->|模块划分| B[单体应用-模块化]
     B -->|模块独立维护| C[单体应用-模块依赖化]
     C -->|模块独立部署| D[微服务化]
-    style D fill:#f9d6d6
 ```
-
-
 
 > 1. 拆分为模块化（代码抽离，模块独立）
 > 2. 改造服务端（添加 RPC 接口和服务）

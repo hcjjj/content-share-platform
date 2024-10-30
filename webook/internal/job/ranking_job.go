@@ -11,6 +11,8 @@ import (
 	rlock "github.com/gotomicro/redis-lock"
 )
 
+// 基于 Redis 分布式锁的任务
+
 type RankingJob struct {
 	svc       service.RankingService
 	timeout   time.Duration

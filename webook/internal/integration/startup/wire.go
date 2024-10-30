@@ -27,7 +27,9 @@ var thirdPartySet = wire.NewSet( // 第三方依赖
 	InitRedis, InitDB,
 	InitSaramaClient,
 	InitSyncProducer,
-	InitLogger)
+	InitLogger,
+	InitEtcd,
+)
 
 var jobProviderSet = wire.NewSet(
 	service.NewCronJobService,

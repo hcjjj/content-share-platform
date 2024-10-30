@@ -16,6 +16,8 @@ type Job struct {
 	CancelFunc func()
 }
 
+// 通过 CORN 计算出下一次的运行时间
+
 func (j Job) NextTime() time.Time {
 	c := cron.NewParser(cron.Second | cron.Minute | cron.Hour |
 		cron.Dom | cron.Month | cron.Dow | cron.Descriptor)

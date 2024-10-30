@@ -14,7 +14,6 @@ import (
 	"basic-go/webook/interaction/repository/cache"
 	"basic-go/webook/interaction/repository/dao"
 	"basic-go/webook/interaction/service"
-
 	"github.com/google/wire"
 )
 

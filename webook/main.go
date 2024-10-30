@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/viper"
 
 	// 需要用到这里面的一个初始化方法，所以需要匿名引入
+	// 使用 viper 接入 etcd
 	_ "github.com/spf13/viper/remote"
 )
 
@@ -162,13 +163,14 @@ func initViperWatch() {
 }
 
 func initViperWithArg() {
+	// 利用 viper 读取启动参数
 	// 不同环境加载不同配置环境
 	// --config=config/dev.yaml
 	// program argument
 	// go run . --config=config/dev.yaml
 	cfile := pflag.String("config",
 		"./webook/config/dev.yaml", "指定配置文件路径")
-	// 顺序不能乱 要先从命令行中解析出来，不然都是默认值 dev/config.yaml
+	// 顺序不能乱 要先从命令行中解析出来，不然都是默认值
 	pflag.Parse()
 	viper.SetConfigFile(*cfile)
 
@@ -194,6 +196,7 @@ func initViperWithArg() {
 }
 
 // 用于开发联调环境
+// 都手写了，你干嘛不直接在 IoC 里面写死呢？
 func initViperReader() {
 	viper.SetConfigType("yaml")
 	cfg := `

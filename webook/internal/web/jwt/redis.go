@@ -54,6 +54,7 @@ func (h *RedisJWTHandler) ExtractToken(ctx *gin.Context) string {
 var _ Handler = &RedisJWTHandler{}
 
 func (h *RedisJWTHandler) SetLoginToken(ctx *gin.Context, uid int64) error {
+	// 退出的时候用，不能用 userId
 	ssid := uuid.New().String()
 	err := h.setRefreshToken(ctx, uid, ssid)
 	if err != nil {

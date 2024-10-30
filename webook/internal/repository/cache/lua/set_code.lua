@@ -12,7 +12,8 @@ if ttl == -1 then
     --    key 存在，但是没有过期时间
     -- 系统错误，手动设置了这个 key，但是没给过期时间
     return -2
-    --    540 = 600-60 九分钟
+    --如果验证码的剩余有效期小于 540 秒，或者验证码不存在
+    -- 1 min 只能发一条 验证码的有效期是 10 min
 elseif ttl == -2 or ttl < 540 then
     redis.call("set", key, val)
     redis.call("expire", key, 600)

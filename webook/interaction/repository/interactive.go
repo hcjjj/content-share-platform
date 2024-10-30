@@ -102,10 +102,10 @@ func (c *CachedReadCntRepository) BatchIncrReadCnt(ctx context.Context,
 func (c *CachedReadCntRepository) AddCollectionItem(ctx context.Context,
 	biz string, bizId, cid, uid int64) error {
 	err := c.dao.InsertCollectionBiz(ctx, dao.UserCollectionBiz{
-		Biz:   biz,
-		Cid:   cid,
-		BizId: bizId,
-		Uid:   uid,
+		Biz:  biz,
+		Cid:  cid,
+		BiId: bizId,
+		Uid:  uid,
 	})
 	if err != nil {
 		return err

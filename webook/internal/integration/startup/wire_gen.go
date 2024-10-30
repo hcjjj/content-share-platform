@@ -50,11 +50,8 @@ func InitWebServer() *gin.Engine {
 	syncProducer := InitSyncProducer(client)
 	producer := article.NewSaramaSyncProducer(syncProducer)
 	articleService := service.NewArticleService(articleRepository, producer)
-	interactiveDAO := dao2.NewGORMInteractiveDAO(db)
-	interactiveCache := cache2.NewInteractiveRedisCache(cmdable)
-	interactiveRepository := repository2.NewCachedInteractiveRepository(interactiveDAO, interactiveCache, loggerV1)
-	interactiveService := service2.NewInteractiveService(interactiveRepository, loggerV1)
-	interactiveServiceClient := ioc.InitIntrClient(interactiveService)
+	clientv3Client := InitEtcd()
+	interactiveServiceClient := ioc.InitIntrClient(clientv3Client)
 	articleHandler := web.NewArticleHandler(loggerV1, articleService, interactiveServiceClient)
 	engine := ioc.InitWebServer(v, userHandler, articleHandler)
 	return engine
@@ -69,7 +66,7 @@ func InitAsyncSmsService(svc sms.Service) *async.Service {
 	return asyncService
 }
 
-func InitArticleHandler(dao3 dao.ArticleDAO) *web.ArticleHandler {
+func InitArticleHandler(dao2 dao.ArticleDAO) *web.ArticleHandler {
 	loggerV1 := InitLogger()
 	db := InitDB()
 	userDAO := dao.NewUserDAO(db)
@@ -77,16 +74,13 @@ func InitArticleHandler(dao3 dao.ArticleDAO) *web.ArticleHandler {
 	userCache := cache.NewUserCache(cmdable)
 	userRepository := repository.NewCachedUserRepository(userDAO, userCache)
 	articleCache := cache.NewArticleRedisCache(cmdable)
-	articleRepository := repository.NewCachedArticleRepository(dao3, userRepository, articleCache)
+	articleRepository := repository.NewCachedArticleRepository(dao2, userRepository, articleCache)
 	client := InitSaramaClient()
 	syncProducer := InitSyncProducer(client)
 	producer := article.NewSaramaSyncProducer(syncProducer)
 	articleService := service.NewArticleService(articleRepository, producer)
-	interactiveDAO := dao2.NewGORMInteractiveDAO(db)
-	interactiveCache := cache2.NewInteractiveRedisCache(cmdable)
-	interactiveRepository := repository2.NewCachedInteractiveRepository(interactiveDAO, interactiveCache, loggerV1)
-	interactiveService := service2.NewInteractiveService(interactiveRepository, loggerV1)
-	interactiveServiceClient := ioc.InitIntrClient(interactiveService)
+	clientv3Client := InitEtcd()
+	interactiveServiceClient := ioc.InitIntrClient(clientv3Client)
 	articleHandler := web.NewArticleHandler(loggerV1, articleService, interactiveServiceClient)
 	return articleHandler
 }
@@ -107,7 +101,9 @@ var thirdPartySet = wire.NewSet(
 	InitRedis, InitDB,
 	InitSaramaClient,
 	InitSyncProducer,
-	InitLogger)
+	InitLogger,
+	InitEtcd,
+)
 
 var jobProviderSet = wire.NewSet(service.NewCronJobService, repository.NewPreemptJobRepository, dao.NewGORMJobDAO)
 

@@ -49,7 +49,7 @@ func (m *LoginJWTMiddlewareBuilder) CheckLogin() gin.HandlerFunc {
 			return
 		}
 
-		// 这里看
+		// 检查JWT是否在黑名单中
 		err = m.CheckSession(ctx, uc.Ssid)
 		if err != nil {
 			// token 无效或者 redis 有问题

@@ -31,6 +31,7 @@ func (t *TimeoutFailoverSMSService) Send(ctx context.Context, tplId string, args
 	if cnt >= t.threshold {
 		// 取余防止下标越界
 		newIdx := (idx + 1) % int32(len(t.svcs))
+		// 原子操作交换两个数据
 		if atomic.CompareAndSwapInt32(&t.idx, idx, newIdx) {
 			// 重置这个 cnt 计数
 			atomic.StoreInt32(&t.cnt, 0)

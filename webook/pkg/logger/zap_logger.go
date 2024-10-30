@@ -12,6 +12,8 @@ func NewZapLogger(l *zap.Logger) *ZapLogger {
 	}
 }
 
+// 适配器模式（把 Zap 适配到自定义的日志接口）
+
 func (z *ZapLogger) Debug(msg string, args ...Field) {
 	z.l.Debug(msg, z.toArgs(args)...)
 }

@@ -27,7 +27,7 @@ func (dao *GORMJobDAO) Preempt(ctx context.Context) (Job, error) {
 	for {
 		var j Job
 		now := time.Now().UnixMilli()
-		// 作业：这里是缺少找到续约失败的 JOB 出来执行
+		// 这里是缺少找到续约失败的 JOB 出来执行
 		err := db.Where("status = ? AND next_time <?",
 			jobStatusWaiting, now).
 			First(&j).Error
@@ -87,6 +87,9 @@ type Job struct {
 	// 状态来表达，是不是可以抢占，有没有被人抢占
 	Status int
 
+	// UPDATE your_table
+	//SET column1 = new_value, version = version + 1
+	//WHERE id = your_id AND version = old_version;
 	Version int
 
 	NextTime int64 `gorm:"index"`

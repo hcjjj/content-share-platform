@@ -98,6 +98,7 @@ func (s *Scheduler) Schedule(ctx context.Context) error {
 		}
 
 		go func() {
+			// 成功执行完这个任务后释放掉任务
 			defer func() {
 				s.limiter.Release(1)
 				// 这边要释放掉

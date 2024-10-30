@@ -18,7 +18,7 @@ import (
 var (
 	ErrSetCodeTooMany         = errors.New("发送验证码太频繁")
 	ErrVerifyCodeTooManyTimes = errors.New("验证次数超过限制")
-	ErrUnknownForCode         = errors.New("位置错误 与 code 有关")
+	ErrUnknownForCode         = errors.New("未知错误 与 code 有关")
 )
 
 // 编译器会在编译的时候，把 set_code 的代码放进来这个 luaSetCode 变量里

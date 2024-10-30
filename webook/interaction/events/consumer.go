@@ -60,18 +60,19 @@ type ReadEvent struct {
 	Uid int64
 }
 
-//func (i *InteractiveReadEventConsumer) BatchConsume(msgs []*sarama.ConsumerMessage,
-//	events []ReadEvent) error {
-//	bizs := make([]string, 0, len(events))
-//	bizIds := make([]int64, 0, len(events))
-//	for _, evt := range events {
-//		bizs = append(bizs, "article")
-//		bizIds = append(bizIds, evt.Aid)
-//	}
-//	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-//	defer cancel()
-//	return i.repo.BatchIncrReadCnt(ctx, bizs, bizIds)
-//}
+// BatchConsume 批量处理 Kafka 消息
+func (i *InteractiveReadEventConsumer) BatchConsume(msgs []*sarama.ConsumerMessage,
+	events []ReadEvent) error {
+	bizs := make([]string, 0, len(events))
+	bizIds := make([]int64, 0, len(events))
+	for _, evt := range events {
+		bizs = append(bizs, "article")
+		bizIds = append(bizIds, evt.Aid)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	return i.repo.BatchIncrReadCnt(ctx, bizs, bizIds)
+}
 
 func (i *InteractiveReadEventConsumer) Consume(msg *sarama.ConsumerMessage,
 	event ReadEvent) error {

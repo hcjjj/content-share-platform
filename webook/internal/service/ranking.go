@@ -5,6 +5,7 @@ import (
 	"basic-go/webook/internal/domain"
 	"basic-go/webook/internal/repository"
 	"context"
+	"errors"
 	"math"
 	"time"
 
@@ -114,7 +115,7 @@ func (b *BatchRankingService) topN(ctx context.Context) ([]domain.Article, error
 				art:   art,
 			}
 			err = topN.Enqueue(ele)
-			if err == queue.ErrOutOfCapacity {
+			if errors.Is(err, queue.ErrOutOfCapacity) {
 				// 这个也是满了
 				// 拿出最小的元素
 				minEle, _ := topN.Dequeue()

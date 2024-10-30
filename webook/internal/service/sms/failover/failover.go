@@ -22,6 +22,8 @@ func NewFailOverSMSService(svcs []sms.Service) *FailOverSMSService {
 	}
 }
 
+// 每次都从头开始轮询，绝大多数请求会在 svcs[0] 就成功，负载不均衡
+
 func (f *FailOverSMSService) Send(ctx context.Context, tplId string, args []string, numbers ...string) error {
 	for _, svc := range f.svcs {
 		err := svc.Send(ctx, tplId, args, numbers...)
@@ -40,6 +42,7 @@ func (f *FailOverSMSService) Send(ctx context.Context, tplId string, args []stri
 func (f *FailOverSMSService) SendV1(ctx context.Context, tplId string, args []string, numbers ...string) error {
 	// 取下一个节点为起始节点
 	// 不让每次都从 0 开始
+	// 原子操作是轻量级并发工具
 	idx := atomic.AddUint64(&f.idx, 1)
 	length := uint64(len(f.svcs))
 	// 要迭代 length
