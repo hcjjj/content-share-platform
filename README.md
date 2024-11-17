@@ -1,8 +1,4 @@
 # 建设中 🔨
-
-## 总体架构
-> 待补充
-
 ## 项目结构
 
 **单体应用**（单一职责、依赖注入）
@@ -20,8 +16,6 @@ flowchart LR
     C <--> D[DAO]
     C <--> E[Cache]
 ```
-
-
 
 * Handler：负责接收和解析 HTTP 请求，调用 Service 层进行业务处理，然后返回响应
 * Service：处理业务逻辑，协调 Repository 层和其他业务操作
